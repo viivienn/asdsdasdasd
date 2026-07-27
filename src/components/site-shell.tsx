@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { FOOTER_DISCLAIMER } from "@/components/disclaimers";
 import { ScrollCapture } from "@/components/scroll-capture";
+import { SiteSearch } from "@/components/site-search";
 
 const NAV = [
   { to: "/compare", label: "Compare" },
@@ -37,7 +38,10 @@ export function SiteShell({ children }: { children: ReactNode }) {
               Aesthetic Index
             </span>
           </Link>
-          <nav aria-label="Primary" className="hidden md:block">
+          <div className="hidden min-w-0 flex-1 justify-center lg:flex">
+            <SiteSearch />
+          </div>
+          <nav aria-label="Primary" className="hidden xl:block">
             <ul className="flex items-center gap-1 text-sm">
               {NAV.map((item) => (
                 <li key={item.to}>
@@ -60,7 +64,10 @@ export function SiteShell({ children }: { children: ReactNode }) {
             Compare treatments
           </Link>
         </div>
-        <nav aria-label="Primary mobile" className="md:hidden">
+        <div className="px-4 pb-3 lg:hidden">
+          <SiteSearch />
+        </div>
+        <nav aria-label="Primary mobile" className="xl:hidden">
           <ul className="flex gap-1 overflow-x-auto px-4 pb-3 text-sm">
             {NAV.map((item) => (
               <li key={item.to} className="shrink-0">
