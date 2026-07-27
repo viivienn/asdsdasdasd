@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as MethodologyRouteImport } from './routes/methodology'
 import { Route as MedicalDisclaimerRouteImport } from './routes/medical-disclaimer'
+import { Route as IndexnowKeyDottxtRouteImport } from './routes/indexnow-key[.]txt'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TreatmentsIndexRouteImport } from './routes/treatments.index'
@@ -34,6 +35,11 @@ const MethodologyRoute = MethodologyRouteImport.update({
 const MedicalDisclaimerRoute = MedicalDisclaimerRouteImport.update({
   id: '/medical-disclaimer',
   path: '/medical-disclaimer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexnowKeyDottxtRoute = IndexnowKeyDottxtRouteImport.update({
+  id: '/indexnow-key.txt',
+  path: '/indexnow-key.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -80,6 +86,7 @@ const PricesUsCaCityTreatmentRoute = PricesUsCaCityTreatmentRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/indexnow-key.txt': typeof IndexnowKeyDottxtRoute
   '/medical-disclaimer': typeof MedicalDisclaimerRoute
   '/methodology': typeof MethodologyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -93,6 +100,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/indexnow-key.txt': typeof IndexnowKeyDottxtRoute
   '/medical-disclaimer': typeof MedicalDisclaimerRoute
   '/methodology': typeof MethodologyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/indexnow-key.txt': typeof IndexnowKeyDottxtRoute
   '/medical-disclaimer': typeof MedicalDisclaimerRoute
   '/methodology': typeof MethodologyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -122,6 +131,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/indexnow-key.txt'
     | '/medical-disclaimer'
     | '/methodology'
     | '/sitemap.xml'
@@ -135,6 +145,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/indexnow-key.txt'
     | '/medical-disclaimer'
     | '/methodology'
     | '/sitemap.xml'
@@ -148,6 +159,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/indexnow-key.txt'
     | '/medical-disclaimer'
     | '/methodology'
     | '/sitemap.xml'
@@ -162,6 +174,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  IndexnowKeyDottxtRoute: typeof IndexnowKeyDottxtRoute
   MedicalDisclaimerRoute: typeof MedicalDisclaimerRoute
   MethodologyRoute: typeof MethodologyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -194,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/medical-disclaimer'
       fullPath: '/medical-disclaimer'
       preLoaderRoute: typeof MedicalDisclaimerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/indexnow-key.txt': {
+      id: '/indexnow-key.txt'
+      path: '/indexnow-key.txt'
+      fullPath: '/indexnow-key.txt'
+      preLoaderRoute: typeof IndexnowKeyDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -258,6 +278,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  IndexnowKeyDottxtRoute: IndexnowKeyDottxtRoute,
   MedicalDisclaimerRoute: MedicalDisclaimerRoute,
   MethodologyRoute: MethodologyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
