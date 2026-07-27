@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { submitCityRequest } from "@/lib/content.functions";
+import { TRENDING_TREATMENTS } from "@/lib/search-index";
 
 const DISMISS_KEY = "ai_scroll_capture_dismissed";
 
@@ -14,6 +15,11 @@ const DISMISS_KEY = "ai_scroll_capture_dismissed";
  */
 export function ScrollCapture() {
   const [visible, setVisible] = useState(false);
+  const [step, setStep] = useState<1 | 2>(1);
+  const [email, setEmail] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [city, setCity] = useState("");
+  const [treatment, setTreatment] = useState("");
   const [done, setDone] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,17 +89,69 @@ export function ScrollCapture() {
 
         {done ? (
           <p className="mt-2 text-sm text-muted-foreground">
-            Thanks — we'll email you once publicly listed prices are verified in your area. Nothing
-            on this site is hidden behind an account.
+            Thanks — we'll email you once publicly listed prices are verified for{" "}
+            {treatmentLabel(treatment)} in {city || "your area"}. Nothing on this site is hidden
+            behind an account.
           </p>
-        ) : (
+        ) : step === 1 ? (
           <>
             <p className="mt-2 text-sm text-muted-foreground">
-              Coverage is live for San Francisco and expands by demand. Every page stays free to
-              read — no account required.
+              Step 1 of 2 — where should we send alerts? Coverage is live for San Francisco and
+              expands by demand. Every page stays free to read — no account required.
             </p>
             <form
               className="mt-4 flex flex-col gap-3 sm:flex-row"
+              onSubmit={(e) => {
+                e.preventDefault();
+                setError(null);
+                setStep(2);
+              }}
+            >
+              <label className="sr-only" htmlFor="sc-email">
+                Email
+              </label>
+              <input
+                id="sc-email"
+                name="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@email.com"
+                className="w-full border border-input bg-background px-3 py-2 text-sm"
+              />
+              <label className="sr-only" htmlFor="sc-zip">
+                ZIP code
+              </label>
+              <input
+                id="sc-zip"
+                name="postal_code"
+                required
+                value={postalCode}
+                onChange={(e) => setPostalCode(e.target.value)}
+                placeholder="ZIP"
+                className="w-full border border-input bg-background px-3 py-2 text-sm sm:w-28"
+              />
+              <button
+                type="submit"
+                className="shrink-0 bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                Continue
+              </button>
+            </form>
+            <p className="mt-2 text-xs text-muted-foreground">
+              By continuing you agree to be emailed about pricing coverage. Educational information
+              only — not medical advice.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Step 2 of 2 — which city and treatment should we watch? This keeps your alerts
+              targeted; you can leave either blank for all coverage near {postalCode}.
+            </p>
+            <form
+              className="mt-4 grid gap-3 sm:grid-cols-2"
               onSubmit={async (e) => {
                 e.preventDefault();
                 setBusy(true);
@@ -102,10 +160,10 @@ export function ScrollCapture() {
                 try {
                   const res = await submit({
                     data: {
-                      email: String(fd.get("email") ?? ""),
-                      postal_code: String(fd.get("postal_code") ?? ""),
-                      city: "",
-                      treatment_slug: "",
+                      email,
+                      postal_code: postalCode,
+                      city,
+                      treatment_slug: treatment,
                       consent: true,
                       source_path: window.location.pathname,
                       company: String(fd.get("company") ?? ""),
@@ -120,51 +178,76 @@ export function ScrollCapture() {
                 }
               }}
             >
-              <label className="sr-only" htmlFor="sc-email">
-                Email
-              </label>
-              <input
-                id="sc-email"
-                name="email"
-                type="email"
-                required
-                placeholder="you@email.com"
-                className="w-full border border-input bg-background px-3 py-2 text-sm"
-              />
-              <label className="sr-only" htmlFor="sc-zip">
-                ZIP code
-              </label>
-              <input
-                id="sc-zip"
-                name="postal_code"
-                required
-                placeholder="ZIP"
-                className="w-full border border-input bg-background px-3 py-2 text-sm sm:w-28"
-              />
+              <div>
+                <label className="text-xs font-medium" htmlFor="sc-city">
+                  City <span className="text-muted-foreground">(optional)</span>
+                </label>
+                <input
+                  id="sc-city"
+                  name="city"
+                  maxLength={80}
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="San Francisco"
+                  className="mt-1 w-full border border-input bg-background px-3 py-2 text-sm"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium" htmlFor="sc-treatment">
+                  Treatment <span className="text-muted-foreground">(optional)</span>
+                </label>
+                <select
+                  id="sc-treatment"
+                  name="treatment_slug"
+                  value={treatment}
+                  onChange={(e) => setTreatment(e.target.value)}
+                  className="mt-1 w-full border border-input bg-background px-3 py-2 text-sm"
+                >
+                  <option value="">Any treatment</option>
+                  {TRENDING_TREATMENTS.map((t) => (
+                    <option key={t.slug} value={t.slug}>
+                      {t.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div className="hidden" aria-hidden="true">
                 <label htmlFor="sc-company">Company</label>
                 <input id="sc-company" name="company" tabIndex={-1} autoComplete="off" />
               </div>
-              <button
-                type="submit"
-                disabled={busy}
-                className="shrink-0 bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
-              >
-                {busy ? "Sending…" : "Notify me"}
-              </button>
+              <div className="flex items-center gap-3 sm:col-span-2">
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+                >
+                  {busy ? "Sending…" : "Notify me"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setError(null);
+                    setStep(1);
+                  }}
+                  className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+                >
+                  Back
+                </button>
+              </div>
             </form>
             {error ? (
               <p role="alert" className="mt-2 text-sm text-destructive">
                 {error}
               </p>
             ) : null}
-            <p className="mt-2 text-xs text-muted-foreground">
-              By submitting you agree to be emailed about pricing coverage. Educational information
-              only — not medical advice.
-            </p>
           </>
         )}
       </div>
     </div>
   );
+}
+
+function treatmentLabel(slug: string) {
+  if (!slug) return "your treatments";
+  return TRENDING_TREATMENTS.find((t) => t.slug === slug)?.label ?? slug;
 }
