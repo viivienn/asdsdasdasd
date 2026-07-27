@@ -120,6 +120,98 @@ export async function listComparisonSlugs(): Promise<DemoAware<string[]>> {
  * Local pricing. There is no prototype fallback here: an unsourced price is
  * never rendered, so an empty result means "no coverage yet".
  */
+export interface ComparisonContext {
+  a: Treatment | null;
+  b: Treatment | null;
+  comparison: Comparison | null;
+  sources: TreatmentSource[];
+  reviewed: boolean;
+}
+
+function treatmentApproved(t: Treatment | null): boolean {
+  return Boolean(t && t.publication_status === "published" && t.is_sample === false);
+}
+
+/**
+ * Resolves a treatment pair into a comparison context. Treatment existence is
+ * checked against the full catalogue (so unknown slugs 404), while the
+ * `reviewed` flag is computed strictly: it is the single gate for indexable,
+ * editorially complete comparison pages.
+ */
+export async function getComparisonContext(
+  slugA: string,
+  slugB: string,
+  canonicalSlug: string,
+): Promise<ComparisonContext> {
+  const admin = await prototypeClient();
+
+  const { data: rows } = await admin
+    .from("treatments")
+    .select(TREATMENT_COLUMNS)
+    .in("slug", [slugA, slugB]);
+  const list = (rows ?? []) as unknown as Treatment[];
+  const a = list.find((t) => t.slug === slugA) ?? null;
+  const b = list.find((t) => t.slug === slugB) ?? null;
+
+  const { data: comparisonRow } = await admin
+    .from("comparisons")
+    .select(COMPARISON_COLUMNS)
+    .eq("slug", canonicalSlug)
+    .maybeSingle();
+  const comparison = (comparisonRow as unknown as Comparison) ?? null;
+
+  let sources: TreatmentSource[] = [];
+  if (a && b) {
+    const { data: sourceRows } = await admin
+      .from("treatment_sources")
+      .select(
+        "id,treatment_id,claim_field,source_title,source_url,source_type,publication_date,evidence_level",
+      )
+      .in("treatment_id", [a.id, b.id]);
+    sources = (sourceRows ?? []) as unknown as TreatmentSource[];
+  }
+
+  const sourceIds = new Set(
+    (sources as unknown as Array<{ treatment_id?: string }>).map((s) => s.treatment_id ?? ""),
+  );
+
+  const reviewed =
+    treatmentApproved(a) &&
+    treatmentApproved(b) &&
+    Boolean(comparison) &&
+    comparison!.publication_status === "published" &&
+    comparison!.is_sample === false &&
+    Boolean(comparison!.one_sentence_difference) &&
+    Boolean(comparison!.consider_a_when) &&
+    Boolean(comparison!.consider_b_when) &&
+    Boolean(comparison!.neither_when) &&
+    Boolean(comparison!.last_reviewed_at) &&
+    Boolean(a && sourceIds.has(a.id)) &&
+    Boolean(b && sourceIds.has(b.id));
+
+  return { a, b, comparison, sources, reviewed };
+}
+
+/** Canonical slugs of comparisons that meet every reviewed-publication rule. */
+export async function listReviewedComparisonSlugs(): Promise<string[]> {
+  const pub = await publicClient()
+    .from("comparisons")
+    .select(COMPARISON_COLUMNS);
+  const rows = (pub.data ?? []) as unknown as Comparison[];
+  return rows
+    .filter(
+      (c) =>
+        c.publication_status === "published" &&
+        c.is_sample === false &&
+        Boolean(c.one_sentence_difference) &&
+        Boolean(c.consider_a_when) &&
+        Boolean(c.consider_b_when) &&
+        Boolean(c.neither_when) &&
+        Boolean(c.last_reviewed_at),
+    )
+    .map((c) => c.slug);
+}
+
 export async function listCityPrices(
   citySlug: string,
   treatmentSlug: string,
