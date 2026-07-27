@@ -125,7 +125,7 @@ export function SiteSearch({ variant = "header" }: { variant?: "header" | "hero"
   const hero = variant === "hero";
 
   return (
-    <div ref={containerRef} className={`relative ${hero ? "w-full" : "w-full max-w-md"}`}>
+    <div ref={containerRef} className={`relative ${hero ? "w-full" : "w-full max-w-sm xl:max-w-xs"}`}>
       <div
         className={`flex items-center gap-2.5 rounded-full border bg-card px-4 ${
           hero ? "h-14 text-base" : "h-10 text-sm"
