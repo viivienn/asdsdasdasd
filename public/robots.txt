@@ -1,4 +1,18 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /api/
+Disallow: /internal/
+Disallow: /preview/
 
-Disallow: /prices/
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: GPTBot
+Disallow: /
+
+Sitemap: https://aestheticindex.co/sitemap.xml
