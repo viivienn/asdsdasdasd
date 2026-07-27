@@ -46,7 +46,7 @@ function CompareHub() {
       <section className="mt-14">
         <SectionHeading>Published comparisons</SectionHeading>
         <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-          {slugs.map((slug) => (
+          {(slugs as string[]).map((slug: string) => (
             <li key={slug}>
               <Link
                 to="/compare/$slug"
