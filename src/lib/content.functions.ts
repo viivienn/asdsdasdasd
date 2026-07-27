@@ -105,3 +105,28 @@ export const submitPriceAlertInterest = createServerFn({ method: "POST" })
       ipHash,
     });
   });
+const comparisonRequestSchema = z.object({
+  treatment_a: z.string().trim().min(2).max(80),
+  treatment_b: z.string().trim().min(2).max(80),
+  email: z.string().trim().email().max(254).optional().or(z.literal("")),
+  context: z.string().trim().max(1000).optional().or(z.literal("")),
+  source_path: z.string().max(200).optional(),
+  company: z.string().max(0).optional().or(z.literal("")),
+});
+
+export const submitComparisonRequest = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => comparisonRequestSchema.parse(input))
+  .handler(async ({ data }) => {
+    if (data.company) return { ok: false as const, error: "Submission rejected." };
+    const ip = getRequestHeader("x-forwarded-for") ?? "unknown";
+    const ipHash = createHash("sha256").update(ip).digest("hex");
+    const { recordComparisonRequest } = await import("./content.server");
+    return recordComparisonRequest({
+      treatment_a: data.treatment_a,
+      treatment_b: data.treatment_b,
+      email: data.email || null,
+      context: data.context || null,
+      source_path: data.source_path ?? null,
+      ipHash,
+    });
+  });

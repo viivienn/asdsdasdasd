@@ -29,7 +29,7 @@ async function prototypeClient() {
 }
 
 const TREATMENT_COLUMNS =
-  "id,name,slug,category,treatment_class,brand_name,generic_name,summary,primary_purpose,mechanism,adds_volume,tightening_level,result_timing,sessions_text,downtime_text,longevity_text,pain_level,reversibility,major_risks,most_likely_disappointment,marketing_misconception,provider_variables,skin_tone_notes,fda_status,evidence_grade,last_reviewed_at,publication_status,is_sample";
+  "id,name,slug,category,treatment_class,brand_name,generic_name,summary,primary_purpose,mechanism,adds_volume,tightening_level,result_timing,sessions_text,downtime_text,longevity_text,pain_level,reversibility,major_risks,most_likely_disappointment,marketing_misconception,provider_variables,skin_tone_notes,appointment_time,swelling_text,bruising_text,exercise_restrictions,what_it_changes,what_it_does_not_change,expected_result_magnitude,true_substitute_notes,when_not_appropriate,fda_status,evidence_grade,last_reviewed_at,publication_status,is_sample";
 
 export interface DemoAware<T> {
   data: T;
@@ -248,5 +248,31 @@ export async function recordPriceAlertInterest(input: {
     return { ok: false as const, error: "We couldn't save that. Please try again." };
   }
   await audit("price_alert", input.ipHash);
+  return { ok: true as const };
+}
+export async function recordComparisonRequest(input: {
+  treatment_a: string;
+  treatment_b: string;
+  email: string | null;
+  context: string | null;
+  source_path: string | null;
+  ipHash: string;
+}) {
+  if (await rateLimited("comparison_request", input.ipHash)) {
+    return { ok: false as const, error: "Too many requests. Please try again later." };
+  }
+  const admin = await prototypeClient();
+  const { error } = await admin.from("comparison_requests").insert({
+    treatment_a: input.treatment_a,
+    treatment_b: input.treatment_b,
+    email: input.email,
+    context: input.context,
+    source_path: input.source_path,
+  });
+  if (error) {
+    console.error("comparison_request insert failed", error.message);
+    return { ok: false as const, error: "We couldn't save that. Please try again." };
+  }
+  await audit("comparison_request", input.ipHash);
   return { ok: true as const };
 }
