@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as MethodologyRouteImport } from './routes/methodology'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TreatmentsIndexRouteImport } from './routes/treatments.index'
 import { Route as CompareIndexRouteImport } from './routes/compare.index'
@@ -20,6 +21,11 @@ import { Route as PricesUsCaCityTreatmentRouteImport } from './routes/prices.us.
 const MethodologyRoute = MethodologyRouteImport.update({
   id: '/methodology',
   path: '/methodology',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -55,6 +61,7 @@ const PricesUsCaCityTreatmentRoute = PricesUsCaCityTreatmentRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/methodology': typeof MethodologyRoute
   '/compare/$slug': typeof CompareSlugRoute
   '/treatments/$slug': typeof TreatmentsSlugRoute
@@ -64,6 +71,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/methodology': typeof MethodologyRoute
   '/compare/$slug': typeof CompareSlugRoute
   '/treatments/$slug': typeof TreatmentsSlugRoute
@@ -74,6 +82,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/methodology': typeof MethodologyRoute
   '/compare/$slug': typeof CompareSlugRoute
   '/treatments/$slug': typeof TreatmentsSlugRoute
@@ -85,6 +94,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/methodology'
     | '/compare/$slug'
     | '/treatments/$slug'
@@ -94,6 +104,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/methodology'
     | '/compare/$slug'
     | '/treatments/$slug'
@@ -103,6 +114,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/methodology'
     | '/compare/$slug'
     | '/treatments/$slug'
@@ -113,6 +125,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   MethodologyRoute: typeof MethodologyRoute
   CompareSlugRoute: typeof CompareSlugRoute
   TreatmentsSlugRoute: typeof TreatmentsSlugRoute
@@ -128,6 +141,13 @@ declare module '@tanstack/react-router' {
       path: '/methodology'
       fullPath: '/methodology'
       preLoaderRoute: typeof MethodologyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -177,6 +197,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   MethodologyRoute: MethodologyRoute,
   CompareSlugRoute: CompareSlugRoute,
   TreatmentsSlugRoute: TreatmentsSlugRoute,
