@@ -60,15 +60,6 @@ export const fetchComparisonPair = createServerFn({ method: "GET" })
     return { ...context, reviewedSlugs };
   });
 
-const unusedCityPrices = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) =>
-    z.object({ city: z.string().max(80), treatment: z.string().max(80) }).parse(input),
-  )
-  .handler(async ({ data }) => {
-    const { listCityPrices } = await import("./content.server");
-    return listCityPrices(data.city, data.treatment);
-  });
-
 const cityRequestSchema = z.object({
   email: z.string().trim().email().max(254),
   postal_code: z.string().trim().min(3).max(12).regex(/^[A-Za-z0-9 -]+$/),
