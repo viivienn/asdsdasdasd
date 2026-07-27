@@ -214,6 +214,13 @@ export async function getComparisonContext(
 
 /** Canonical slugs of comparisons that meet every reviewed-publication rule. */
 export async function listReviewedComparisonSlugs(): Promise<string[]> {
+  return (await listReviewedComparisons()).map((c) => c.slug);
+}
+
+/** Reviewed comparisons with the real review date used as sitemap lastmod. */
+export async function listReviewedComparisons(): Promise<
+  Array<{ slug: string; last_reviewed_at: string }>
+> {
   const pub = await publicClient()
     .from("comparisons")
     .select(COMPARISON_COLUMNS);
@@ -229,7 +236,35 @@ export async function listReviewedComparisonSlugs(): Promise<string[]> {
         Boolean(c.neither_when) &&
         Boolean(c.last_reviewed_at),
     )
-    .map((c) => c.slug);
+    .map((c) => ({ slug: c.slug, last_reviewed_at: c.last_reviewed_at as string }));
+}
+
+/**
+ * Local price pages that carry a real, publishable dataset. Empty pages and
+ * pages backed only by sample rows are never advertised to crawlers.
+ */
+export async function listIndexablePricePages(): Promise<
+  Array<{ city: string; treatment: string; lastmod: string }>
+> {
+  const client = publicClient();
+  const rows = await client
+    .from("price_observations")
+    .select("observed_at,locations!inner(city_slug,country_code,region_code,is_indexable),treatments!inner(slug)");
+  const map = new Map<string, { city: string; treatment: string; lastmod: string }>();
+  for (const r of (rows.data ?? []) as unknown as Array<{
+    observed_at: string;
+    locations: { city_slug: string; is_indexable: boolean } | null;
+    treatments: { slug: string } | null;
+  }>) {
+    if (!r.locations?.is_indexable || !r.treatments) continue;
+    const key = `${r.locations.city_slug}/${r.treatments.slug}`;
+    const prev = map.get(key);
+    const lastmod = r.observed_at.slice(0, 10);
+    if (!prev || prev.lastmod < lastmod) {
+      map.set(key, { city: r.locations.city_slug, treatment: r.treatments.slug, lastmod });
+    }
+  }
+  return [...map.values()];
 }
 
 export async function listCityPrices(
