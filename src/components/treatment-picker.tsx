@@ -1,21 +1,13 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import type { Treatment } from "@/lib/content-types";
-import { COMPARISON_DISPLAY_ORDER } from "@/lib/content-types";
-
-function findSlug(a: string, b: string): string | null {
-  for (const [slug, pair] of Object.entries(COMPARISON_DISPLAY_ORDER)) {
-    if ((pair[0] === a && pair[1] === b) || (pair[0] === b && pair[1] === a)) return slug;
-  }
-  return null;
-}
+import { canonicalPairSlug } from "@/lib/content-types";
 
 export function TreatmentPicker({
   treatments,
-  publishedSlugs,
 }: {
   treatments: Treatment[];
-  publishedSlugs: string[];
+  publishedSlugs?: string[];
 }) {
   const [a, setA] = useState("");
   const [b, setB] = useState("");
@@ -35,12 +27,7 @@ export function TreatmentPicker({
         setMessage(null);
         if (!a || !b) return setMessage("Choose two treatments to compare.");
         if (a === b) return setMessage("Choose two different treatments.");
-        const slug = findSlug(a, b);
-        if (slug && publishedSlugs.includes(slug)) {
-          navigate({ to: "/compare/$slug", params: { slug } });
-        } else {
-          setMessage("This comparison is not published yet.");
-        }
+        navigate({ to: "/compare/$slug", params: { slug: canonicalPairSlug(a, b) } });
       }}
     >
       <div>

@@ -1,6 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { fetchTreatment } from "@/lib/content.functions";
-import { TREATMENT_PROFILE_ROWS, COMPARISON_DISPLAY_ORDER } from "@/lib/content-types";
+import {
+  TREATMENT_PROFILE_ROWS,
+  COMPARISON_DISPLAY_ORDER,
+  comparisonLabel,
+} from "@/lib/content-types";
 import type { Treatment, TreatmentSource } from "@/lib/content-types";
 import { DemoNotice, EvidenceState } from "@/components/editorial";
 import { CoverageRequestForm } from "@/components/demand-forms";
@@ -161,7 +165,7 @@ function TreatmentPage() {
                   params={{ slug: s }}
                   className="inline-block border border-rule bg-card px-3 py-1.5 hover:border-primary"
                 >
-                  {s.replace(/-vs-/, " vs. ").replace(/-/g, " ")}
+                  {comparisonLabel(s)}
                 </Link>
               </li>
             ))}

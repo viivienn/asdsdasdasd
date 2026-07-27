@@ -9,9 +9,20 @@ export const fetchTreatments = createServerFn({ method: "GET" }).handler(async (
 });
 
 export const fetchCompareIndex = createServerFn({ method: "GET" }).handler(async () => {
-  const { listTreatments, listComparisonSlugs } = await import("./content.server");
-  const [treatments, slugs] = await Promise.all([listTreatments(), listComparisonSlugs()]);
-  return { treatments: treatments.data, slugs: slugs.data, isDemo: treatments.isDemo };
+  const { listTreatments, listComparisonSlugs, listReviewedComparisonSlugs } = await import(
+    "./content.server"
+  );
+  const [treatments, slugs, reviewedSlugs] = await Promise.all([
+    listTreatments(),
+    listComparisonSlugs(),
+    listReviewedComparisonSlugs(),
+  ]);
+  return {
+    treatments: treatments.data,
+    slugs: slugs.data,
+    reviewedSlugs,
+    isDemo: treatments.isDemo,
+  };
 });
 
 export const fetchTreatment = createServerFn({ method: "GET" })
@@ -39,6 +50,25 @@ export const fetchCityPrices = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { listCityPrices } = await import("./content.server");
     return listCityPrices(data.city, data.treatment);
+  });
+
+export const fetchComparisonPair = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        a: z.string().max(80),
+        b: z.string().max(80),
+        canonicalSlug: z.string().max(160),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { getComparisonContext, listReviewedComparisonSlugs } = await import("./content.server");
+    const [context, reviewedSlugs] = await Promise.all([
+      getComparisonContext(data.a, data.b, data.canonicalSlug),
+      listReviewedComparisonSlugs(),
+    ]);
+    return { ...context, reviewedSlugs };
   });
 
 const cityRequestSchema = z.object({

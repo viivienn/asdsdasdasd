@@ -21,13 +21,18 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/medical-disclaimer", changefreq: "yearly", priority: "0.2" },
         ];
 
-        const { listComparisonSlugs, listTreatments } = await import("@/lib/content.server");
-        const [slugs, treatments] = await Promise.all([listComparisonSlugs(), listTreatments()]);
+        const { listReviewedComparisonSlugs, listTreatments } = await import(
+          "@/lib/content.server"
+        );
+        const [reviewedSlugs, treatments] = await Promise.all([
+          listReviewedComparisonSlugs(),
+          listTreatments(),
+        ]);
 
-        if (!slugs.isDemo) {
-          for (const slug of slugs.data) {
-            entries.push({ path: `/compare/${slug}`, changefreq: "monthly", priority: "0.7" });
-          }
+        // Only fully reviewed, non-sample comparison records are listed. Pair
+        // URLs that render the generated "review in progress" state never are.
+        for (const slug of reviewedSlugs) {
+          entries.push({ path: `/compare/${slug}`, changefreq: "monthly", priority: "0.7" });
         }
         if (!treatments.isDemo) {
           for (const t of treatments.data) {

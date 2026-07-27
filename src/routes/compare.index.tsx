@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { fetchCompareIndex } from "@/lib/content.functions";
 import { TreatmentPicker } from "@/components/treatment-picker";
-import { DemoNotice, SectionHeading } from "@/components/editorial";
+import { SectionHeading } from "@/components/editorial";
 import { ComparisonRequestForm } from "@/components/demand-forms";
+import { POPULAR_COMPARISON_SLUGS } from "@/lib/content-types";
 
 const LABELS: Record<string, string> = {
   "sculptra-vs-radiesse": "Sculptra vs. Radiesse",
@@ -33,7 +34,6 @@ export const Route = createFileRoute("/compare/")({
       },
       { property: "og:url", content: "/compare" },
       { property: "og:type", content: "website" },
-      ...(loaderData?.isDemo ? [{ name: "robots", content: "noindex" }] : []),
     ],
     links: [{ rel: "canonical", href: "/compare" }],
   }),
@@ -42,24 +42,19 @@ export const Route = createFileRoute("/compare/")({
 });
 
 function CompareHub() {
-  const { treatments, slugs, isDemo } = Route.useLoaderData();
+  const { treatments } = Route.useLoaderData();
   return (
     <>
-      {isDemo ? <DemoNotice /> : null}
       <h1 className="font-display text-4xl">Compare treatments</h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">
-        Choose two treatments. We only open a comparison when a reviewed record exists — we do not
-        generate conclusions for pairs we have not written.
+        Start from a popular pair, or build your own side-by-side view from any two treatments in
+        our records.
       </p>
 
-      <div className="mt-8 border border-rule bg-card p-5">
-        <TreatmentPicker treatments={treatments} publishedSlugs={slugs} />
-      </div>
-
-      <section className="mt-14">
-        <SectionHeading>Published comparisons</SectionHeading>
+      <section className="mt-10">
+        <SectionHeading>Popular comparisons</SectionHeading>
         <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-          {(slugs as string[]).map((slug: string) => (
+          {POPULAR_COMPARISON_SLUGS.map((slug) => (
             <li key={slug}>
               <Link
                 to="/compare/$slug"
@@ -67,11 +62,6 @@ function CompareHub() {
                 className="block border border-rule bg-card px-4 py-3 hover:border-primary"
               >
                 <span className="block">{comparisonLabel(slug)}</span>
-                {isDemo ? (
-                  <span className="mt-1 inline-block border border-rule bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                    Prototype comparison
-                  </span>
-                ) : null}
               </Link>
             </li>
           ))}
@@ -79,6 +69,16 @@ function CompareHub() {
       </section>
 
       <section className="mt-14">
+        <SectionHeading>Compare any two treatments</SectionHeading>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+          Pick any two treatments to open their side-by-side view.
+        </p>
+        <div className="mt-4 border border-rule bg-card p-5">
+          <TreatmentPicker treatments={treatments} />
+        </div>
+      </section>
+
+      <section id="request" className="mt-14 scroll-mt-24">
         <ComparisonRequestForm />
       </section>
     </>
