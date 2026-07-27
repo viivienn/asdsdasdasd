@@ -50,6 +50,7 @@ export interface TreatmentSource {
   source_type: string;
   publication_date: string | null;
   evidence_level: string | null;
+  treatment_id?: string;
 }
 
 export interface Comparison {
@@ -117,6 +118,10 @@ export const COMPARISON_ROWS = [
 ] as const satisfies ReadonlyArray<{ key: keyof Treatment; label: string }>;
 
 export const TREATMENT_PROFILE_ROWS = [
+  { key: "primary_purpose", label: "Primary purpose" },
+] as unknown as ReadonlyArray<{ key: keyof Treatment; label: string }>;
+
+const _TREATMENT_PROFILE_ROWS_ORIGINAL = [
   { key: "primary_purpose", label: "Primary purpose" },
   { key: "mechanism", label: "Mechanism" },
   { key: "result_timing", label: "When results appear" },
