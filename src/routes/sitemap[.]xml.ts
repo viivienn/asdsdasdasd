@@ -18,6 +18,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/treatments", changefreq: "weekly", priority: "0.8" },
           { path: "/methodology", changefreq: "monthly", priority: "0.5" },
           { path: "/about", changefreq: "monthly", priority: "0.5" },
+          { path: "/medical-disclaimer", changefreq: "yearly", priority: "0.2" },
         ];
 
         const { listComparisonSlugs, listTreatments } = await import("@/lib/content.server");

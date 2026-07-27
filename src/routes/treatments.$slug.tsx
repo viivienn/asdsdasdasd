@@ -4,6 +4,7 @@ import { TREATMENT_PROFILE_ROWS, COMPARISON_DISPLAY_ORDER } from "@/lib/content-
 import type { Treatment, TreatmentSource } from "@/lib/content-types";
 import { DemoNotice, EvidenceState } from "@/components/editorial";
 import { CoverageRequestForm } from "@/components/demand-forms";
+import { TreatmentDisclaimer } from "@/components/disclaimers";
 
 export const Route = createFileRoute("/treatments/$slug")({
   loader: async ({ params }) => {
@@ -172,10 +173,7 @@ function TreatmentPage() {
         <CoverageRequestForm treatmentSlug={slug} />
       </section>
 
-      <p className="mt-10 max-w-2xl text-sm text-muted-foreground">
-        Educational information only. This is not medical advice, diagnosis, or a treatment
-        recommendation.
-      </p>
+      <TreatmentDisclaimer />
     </>
   );
 }

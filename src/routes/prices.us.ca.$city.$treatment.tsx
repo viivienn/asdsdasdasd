@@ -7,6 +7,7 @@ import {
 } from "@/components/pricing-preview";
 import { CoverageRequestForm, PriceAlertForm } from "@/components/demand-forms";
 import { FeaturePreview } from "@/components/editorial";
+import { PricingDisclaimer } from "@/components/disclaimers";
 import type { PriceObservation } from "@/lib/content-types";
 
 const CITY_LABELS: Record<string, string> = { "san-francisco": "San Francisco" };
@@ -96,12 +97,14 @@ function PricingPage() {
           <div className="mt-6">
             <EmptyCoverage city={cityLabel} treatment={treatmentLabel} />
           </div>
+          <PricingDisclaimer className="mt-6" />
         </>
       ) : (
         <>
           <div className="mt-8">
             <LocalPriceSummary observations={rows} />
           </div>
+          <PricingDisclaimer className="mt-6" />
           <div className="mt-6">
             <PriceObservationTable observations={rows} />
           </div>
@@ -140,11 +143,6 @@ function PricingPage() {
       <section className="mt-8">
         <CoverageRequestForm treatmentSlug={treatment} />
       </section>
-
-      <p className="mt-10 max-w-2xl text-sm text-muted-foreground">
-        Prices are observations of public advertising, not quotes. What you pay depends on the
-        clinic, the injector, and how much product you need.
-      </p>
     </>
   );
 }
