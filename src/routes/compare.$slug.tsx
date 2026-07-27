@@ -9,6 +9,7 @@ import {
   parsePairSlug,
   treatmentLabel,
   type Treatment,
+  type TreatmentSource,
 } from "@/lib/content-types";
 import { EvidenceState, Prose } from "@/components/editorial";
 import { ComparisonRequestForm, CoverageRequestForm } from "@/components/demand-forms";
