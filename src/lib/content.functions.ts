@@ -9,9 +9,20 @@ export const fetchTreatments = createServerFn({ method: "GET" }).handler(async (
 });
 
 export const fetchCompareIndex = createServerFn({ method: "GET" }).handler(async () => {
-  const { listTreatments, listComparisonSlugs } = await import("./content.server");
-  const [treatments, slugs] = await Promise.all([listTreatments(), listComparisonSlugs()]);
-  return { treatments: treatments.data, slugs: slugs.data, isDemo: treatments.isDemo };
+  const { listTreatments, listComparisonSlugs, listReviewedComparisonSlugs } = await import(
+    "./content.server"
+  );
+  const [treatments, slugs, reviewedSlugs] = await Promise.all([
+    listTreatments(),
+    listComparisonSlugs(),
+    listReviewedComparisonSlugs(),
+  ]);
+  return {
+    treatments: treatments.data,
+    slugs: slugs.data,
+    reviewedSlugs,
+    isDemo: treatments.isDemo,
+  };
 });
 
 export const fetchTreatment = createServerFn({ method: "GET" })
