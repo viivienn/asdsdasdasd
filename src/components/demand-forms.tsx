@@ -216,7 +216,19 @@ export function PriceAlertForm({ treatmentSlug }: { treatmentSlug: string }) {
     </div>
   );
 }
-export function ComparisonRequestForm() {
+export function ComparisonRequestForm({
+  defaultA = "",
+  defaultB = "",
+  heading = "Can't find the comparison you need?",
+  description = "Tell us which two treatments you want Aesthetic Index to research next. Requests help us prioritise; we can't promise a publication date.",
+  submitLabel = "Request comparison",
+}: {
+  defaultA?: string;
+  defaultB?: string;
+  heading?: string;
+  description?: string;
+  submitLabel?: string;
+} = {}) {
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -232,10 +244,8 @@ export function ComparisonRequestForm() {
 
   return (
     <div className="border border-rule bg-card p-5">
-      <h2 className="text-xl">Can't find the comparison you need?</h2>
-      <p className="mt-1 max-w-xl text-sm text-muted-foreground">
-        Tell us which two treatments you want Aesthetic Index to research next.
-      </p>
+      <h2 className="text-xl">{heading}</h2>
+      <p className="mt-1 max-w-xl text-sm text-muted-foreground">{description}</p>
       <form
         className="mt-4 grid max-w-xl gap-4 sm:grid-cols-2"
         onSubmit={async (e) => {
@@ -273,6 +283,7 @@ export function ComparisonRequestForm() {
             required
             minLength={2}
             maxLength={80}
+            defaultValue={defaultA}
             className={`${field} mt-1`}
           />
         </div>
@@ -286,6 +297,7 @@ export function ComparisonRequestForm() {
             required
             minLength={2}
             maxLength={80}
+            defaultValue={defaultB}
             className={`${field} mt-1`}
           />
         </div>
@@ -324,7 +336,7 @@ export function ComparisonRequestForm() {
         ) : null}
         <div className="sm:col-span-2">
           <button type="submit" className={button} disabled={busy}>
-            {busy ? "Sending…" : "Request comparison"}
+            {busy ? "Sending…" : submitLabel}
           </button>
         </div>
       </form>
