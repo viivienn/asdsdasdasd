@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as MethodologyRouteImport } from './routes/methodology'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -18,6 +19,11 @@ import { Route as TreatmentsSlugRouteImport } from './routes/treatments.$slug'
 import { Route as CompareSlugRouteImport } from './routes/compare.$slug'
 import { Route as PricesUsCaCityTreatmentRouteImport } from './routes/prices.us.ca.$city.$treatment'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MethodologyRoute = MethodologyRouteImport.update({
   id: '/methodology',
   path: '/methodology',
@@ -63,6 +69,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/methodology': typeof MethodologyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/compare/$slug': typeof CompareSlugRoute
   '/treatments/$slug': typeof TreatmentsSlugRoute
   '/compare/': typeof CompareIndexRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/methodology': typeof MethodologyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/compare/$slug': typeof CompareSlugRoute
   '/treatments/$slug': typeof TreatmentsSlugRoute
   '/compare': typeof CompareIndexRoute
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/methodology': typeof MethodologyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/compare/$slug': typeof CompareSlugRoute
   '/treatments/$slug': typeof TreatmentsSlugRoute
   '/compare/': typeof CompareIndexRoute
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/methodology'
+    | '/sitemap.xml'
     | '/compare/$slug'
     | '/treatments/$slug'
     | '/compare/'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/methodology'
+    | '/sitemap.xml'
     | '/compare/$slug'
     | '/treatments/$slug'
     | '/compare'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/methodology'
+    | '/sitemap.xml'
     | '/compare/$slug'
     | '/treatments/$slug'
     | '/compare/'
@@ -127,6 +139,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   MethodologyRoute: typeof MethodologyRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CompareSlugRoute: typeof CompareSlugRoute
   TreatmentsSlugRoute: typeof TreatmentsSlugRoute
   CompareIndexRoute: typeof CompareIndexRoute
@@ -136,6 +149,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/methodology': {
       id: '/methodology'
       path: '/methodology'
@@ -199,6 +219,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   MethodologyRoute: MethodologyRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   CompareSlugRoute: CompareSlugRoute,
   TreatmentsSlugRoute: TreatmentsSlugRoute,
   CompareIndexRoute: CompareIndexRoute,
@@ -208,3 +229,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
