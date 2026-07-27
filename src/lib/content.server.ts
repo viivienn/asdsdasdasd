@@ -207,7 +207,9 @@ export async function getComparisonContext(
     Boolean(a && sourceIds.has(a.id)) &&
     Boolean(b && sourceIds.has(b.id));
 
-  return { a, b, comparison, sources, reviewed };
+  // Unreviewed editorial copy never leaves the server: the generated view is
+  // built only from approved individual treatment records.
+  return { a, b, comparison: reviewed ? comparison : null, sources: reviewed ? sources : [], reviewed };
 }
 
 /** Canonical slugs of comparisons that meet every reviewed-publication rule. */
