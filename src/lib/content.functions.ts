@@ -41,6 +41,34 @@ export const fetchCityPrices = createServerFn({ method: "GET" })
     return listCityPrices(data.city, data.treatment);
   });
 
+export const fetchComparisonPair = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        a: z.string().max(80),
+        b: z.string().max(80),
+        canonicalSlug: z.string().max(160),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { getComparisonContext, listReviewedComparisonSlugs } = await import("./content.server");
+    const [context, reviewedSlugs] = await Promise.all([
+      getComparisonContext(data.a, data.b, data.canonicalSlug),
+      listReviewedComparisonSlugs(),
+    ]);
+    return { ...context, reviewedSlugs };
+  });
+
+const unusedCityPrices = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) =>
+    z.object({ city: z.string().max(80), treatment: z.string().max(80) }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { listCityPrices } = await import("./content.server");
+    return listCityPrices(data.city, data.treatment);
+  });
+
 const cityRequestSchema = z.object({
   email: z.string().trim().email().max(254),
   postal_code: z.string().trim().min(3).max(12).regex(/^[A-Za-z0-9 -]+$/),
