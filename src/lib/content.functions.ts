@@ -8,6 +8,12 @@ export const fetchTreatments = createServerFn({ method: "GET" }).handler(async (
   return listTreatments();
 });
 
+export const fetchCompareIndex = createServerFn({ method: "GET" }).handler(async () => {
+  const { listTreatments, listComparisonSlugs } = await import("./content.server");
+  const [treatments, slugs] = await Promise.all([listTreatments(), listComparisonSlugs()]);
+  return { treatments: treatments.data, slugs: slugs.data, isDemo: treatments.isDemo };
+});
+
 export const fetchTreatment = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => z.object({ slug: z.string().max(80) }).parse(input))
   .handler(async ({ data }) => {

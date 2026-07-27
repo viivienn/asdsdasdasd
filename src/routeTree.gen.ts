@@ -9,38 +9,167 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as MethodologyRouteImport } from './routes/methodology'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TreatmentsIndexRouteImport } from './routes/treatments.index'
+import { Route as CompareIndexRouteImport } from './routes/compare.index'
+import { Route as TreatmentsSlugRouteImport } from './routes/treatments.$slug'
+import { Route as CompareSlugRouteImport } from './routes/compare.$slug'
+import { Route as PricesUsCaCityTreatmentRouteImport } from './routes/prices.us.ca.$city.$treatment'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MethodologyRoute = MethodologyRouteImport.update({
+  id: '/methodology',
+  path: '/methodology',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TreatmentsIndexRoute = TreatmentsIndexRouteImport.update({
+  id: '/treatments/',
+  path: '/treatments/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareIndexRoute = CompareIndexRouteImport.update({
+  id: '/compare/',
+  path: '/compare/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TreatmentsSlugRoute = TreatmentsSlugRouteImport.update({
+  id: '/treatments/$slug',
+  path: '/treatments/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareSlugRoute = CompareSlugRouteImport.update({
+  id: '/compare/$slug',
+  path: '/compare/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricesUsCaCityTreatmentRoute = PricesUsCaCityTreatmentRouteImport.update({
+  id: '/prices/us/ca/$city/$treatment',
+  path: '/prices/us/ca/$city/$treatment',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/methodology': typeof MethodologyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/compare/$slug': typeof CompareSlugRoute
+  '/treatments/$slug': typeof TreatmentsSlugRoute
+  '/compare/': typeof CompareIndexRoute
+  '/treatments/': typeof TreatmentsIndexRoute
+  '/prices/us/ca/$city/$treatment': typeof PricesUsCaCityTreatmentRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/methodology': typeof MethodologyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/compare/$slug': typeof CompareSlugRoute
+  '/treatments/$slug': typeof TreatmentsSlugRoute
+  '/compare': typeof CompareIndexRoute
+  '/treatments': typeof TreatmentsIndexRoute
+  '/prices/us/ca/$city/$treatment': typeof PricesUsCaCityTreatmentRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/methodology': typeof MethodologyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/compare/$slug': typeof CompareSlugRoute
+  '/treatments/$slug': typeof TreatmentsSlugRoute
+  '/compare/': typeof CompareIndexRoute
+  '/treatments/': typeof TreatmentsIndexRoute
+  '/prices/us/ca/$city/$treatment': typeof PricesUsCaCityTreatmentRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/methodology'
+    | '/sitemap.xml'
+    | '/compare/$slug'
+    | '/treatments/$slug'
+    | '/compare/'
+    | '/treatments/'
+    | '/prices/us/ca/$city/$treatment'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/about'
+    | '/methodology'
+    | '/sitemap.xml'
+    | '/compare/$slug'
+    | '/treatments/$slug'
+    | '/compare'
+    | '/treatments'
+    | '/prices/us/ca/$city/$treatment'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/methodology'
+    | '/sitemap.xml'
+    | '/compare/$slug'
+    | '/treatments/$slug'
+    | '/compare/'
+    | '/treatments/'
+    | '/prices/us/ca/$city/$treatment'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  MethodologyRoute: typeof MethodologyRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  CompareSlugRoute: typeof CompareSlugRoute
+  TreatmentsSlugRoute: typeof TreatmentsSlugRoute
+  CompareIndexRoute: typeof CompareIndexRoute
+  TreatmentsIndexRoute: typeof TreatmentsIndexRoute
+  PricesUsCaCityTreatmentRoute: typeof PricesUsCaCityTreatmentRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/methodology': {
+      id: '/methodology'
+      path: '/methodology'
+      fullPath: '/methodology'
+      preLoaderRoute: typeof MethodologyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +177,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/treatments/': {
+      id: '/treatments/'
+      path: '/treatments'
+      fullPath: '/treatments/'
+      preLoaderRoute: typeof TreatmentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare/': {
+      id: '/compare/'
+      path: '/compare'
+      fullPath: '/compare/'
+      preLoaderRoute: typeof CompareIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/treatments/$slug': {
+      id: '/treatments/$slug'
+      path: '/treatments/$slug'
+      fullPath: '/treatments/$slug'
+      preLoaderRoute: typeof TreatmentsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare/$slug': {
+      id: '/compare/$slug'
+      path: '/compare/$slug'
+      fullPath: '/compare/$slug'
+      preLoaderRoute: typeof CompareSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prices/us/ca/$city/$treatment': {
+      id: '/prices/us/ca/$city/$treatment'
+      path: '/prices/us/ca/$city/$treatment'
+      fullPath: '/prices/us/ca/$city/$treatment'
+      preLoaderRoute: typeof PricesUsCaCityTreatmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  MethodologyRoute: MethodologyRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  CompareSlugRoute: CompareSlugRoute,
+  TreatmentsSlugRoute: TreatmentsSlugRoute,
+  CompareIndexRoute: CompareIndexRoute,
+  TreatmentsIndexRoute: TreatmentsIndexRoute,
+  PricesUsCaCityTreatmentRoute: PricesUsCaCityTreatmentRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
