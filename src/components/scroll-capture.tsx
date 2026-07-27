@@ -25,6 +25,11 @@ export function ScrollCapture() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const dismissed = useRef(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const cityRef = useRef<HTMLInputElement>(null);
+  const statusRef = useRef<HTMLParagraphElement>(null);
+  const returnFocusRef = useRef<Element | null>(null);
   const submit = useServerFn(submitCityRequest);
 
   useEffect(() => {
@@ -53,9 +58,43 @@ export function ScrollCapture() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Remember where focus was, then move it into the panel when it appears.
+  useEffect(() => {
+    if (!visible) return;
+    returnFocusRef.current = document.activeElement;
+    emailRef.current?.focus();
+  }, [visible]);
+
+  // Move focus to the field that starts each subsequent step / the confirmation.
+  useEffect(() => {
+    if (!visible) return;
+    if (done) statusRef.current?.focus();
+    else if (step === 2) cityRef.current?.focus();
+  }, [visible, step, done]);
+
+  // Escape dismisses the prompt from anywhere inside it.
+  useEffect(() => {
+    if (!visible) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      const panel = panelRef.current;
+      if (!panel) return;
+      if (panel.contains(document.activeElement)) {
+        e.stopPropagation();
+        close();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  });
+
   function close() {
     dismissed.current = true;
     setVisible(false);
+    const previous = returnFocusRef.current;
+    if (previous instanceof HTMLElement && document.contains(previous)) {
+      previous.focus();
+    }
     try {
       window.sessionStorage.setItem(DISMISS_KEY, "1");
     } catch {
@@ -68,8 +107,10 @@ export function ScrollCapture() {
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center px-4 pb-4 sm:pb-6">
       <div
+        ref={panelRef}
         role="dialog"
-        aria-label="Local pricing updates"
+        aria-labelledby="sc-heading"
+        aria-describedby="sc-description"
         className="pointer-events-auto w-full max-w-xl card-soft animate-fade-in p-5 shadow-lg"
         style={{ boxShadow: "var(--shadow-lift)" }}
       >
@@ -78,30 +119,37 @@ export function ScrollCapture() {
             <p className="text-xs font-medium uppercase tracking-wide text-primary">
               Local pricing
             </p>
-            <h2 className="mt-1 font-display text-lg">
+            <h2 id="sc-heading" className="mt-1 font-display text-lg">
               {done ? "You're on the list" : "Get notified when we verify prices near you"}
             </h2>
           </div>
           <button
             type="button"
             onClick={close}
-            aria-label="Dismiss"
-            className="-mr-1 -mt-1 px-2 py-1 text-sm text-muted-foreground hover:text-foreground"
+            aria-label="Dismiss local pricing updates"
+            className="-mr-2 -mt-2 inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-sm text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
-            ✕
+            <span aria-hidden="true">✕</span>
           </button>
         </div>
 
         {done ? (
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p
+            id="sc-description"
+            ref={statusRef}
+            tabIndex={-1}
+            role="status"
+            aria-live="polite"
+            className="mt-2 text-sm text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
             Thanks — we'll email you once publicly listed prices are verified for{" "}
             {treatmentLabel(treatment)} in {city || "your area"}. Nothing on this site is hidden
             behind an account.
           </p>
         ) : step === 1 ? (
           <>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Step 1 of 2 — where should we send alerts? Coverage is live for San Francisco and
+            <p id="sc-description" className="mt-2 text-sm text-muted-foreground">
+              <span className="font-medium text-foreground">Step 1 of 2</span> — where should we send alerts? Coverage is live for San Francisco and
               expands by demand. Every page stays free to read — no account required.
             </p>
             <form
@@ -118,13 +166,19 @@ export function ScrollCapture() {
               </label>
               <input
                 id="sc-email"
+                ref={emailRef}
                 name="email"
                 type="email"
                 required
+                autoComplete="email"
+                inputMode="email"
+                aria-required="true"
+                aria-invalid={error ? true : undefined}
+                aria-describedby={error ? "sc-error" : "sc-consent-note"}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@email.com"
-                className="w-full border border-input bg-background px-3 py-2 text-sm"
+                className="w-full border border-input bg-background px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               />
               <label className="sr-only" htmlFor="sc-zip">
                 ZIP code
@@ -133,27 +187,31 @@ export function ScrollCapture() {
                 id="sc-zip"
                 name="postal_code"
                 required
+                autoComplete="postal-code"
+                inputMode="numeric"
+                aria-required="true"
+                aria-invalid={error ? true : undefined}
                 value={postalCode}
                 onChange={(e) => setPostalCode(e.target.value)}
                 placeholder="ZIP"
-                className="w-full border border-input bg-background px-3 py-2 text-sm sm:w-28"
+                className="w-full border border-input bg-background px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:w-28"
               />
               <button
                 type="submit"
-                className="shrink-0 bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                className="shrink-0 bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 Continue
               </button>
             </form>
-            <p className="mt-2 text-xs text-muted-foreground">
+            <p id="sc-consent-note" className="mt-2 text-xs text-muted-foreground">
               By continuing you agree to be emailed about pricing coverage. Educational information
               only — not medical advice.
             </p>
           </>
         ) : (
           <>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Step 2 of 2 — which city and treatment should we watch? This keeps your alerts
+            <p id="sc-description" className="mt-2 text-sm text-muted-foreground">
+              <span className="font-medium text-foreground">Step 2 of 2</span> — which city and treatment should we watch? This keeps your alerts
               targeted; you can leave either blank for all coverage near {postalCode}.
             </p>
             <form
@@ -202,12 +260,14 @@ export function ScrollCapture() {
                 </label>
                 <input
                   id="sc-city"
+                  ref={cityRef}
                   name="city"
+                  autoComplete="address-level2"
                   maxLength={80}
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="San Francisco"
-                  className="mt-1 w-full border border-input bg-background px-3 py-2 text-sm"
+                  className="mt-1 w-full border border-input bg-background px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 />
               </div>
               <div>
@@ -219,7 +279,7 @@ export function ScrollCapture() {
                   name="treatment_slug"
                   value={treatment}
                   onChange={(e) => setTreatment(e.target.value)}
-                  className="mt-1 w-full border border-input bg-background px-3 py-2 text-sm"
+                  className="mt-1 w-full border border-input bg-background px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 >
                   <option value="">Any treatment</option>
                   {TRENDING_TREATMENTS.map((t) => (
@@ -237,7 +297,7 @@ export function ScrollCapture() {
                 <button
                   type="submit"
                   disabled={busy}
-                  className="bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+                  className="bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-60"
                 >
                   {busy ? "Sending…" : "Notify me"}
                 </button>
@@ -253,11 +313,14 @@ export function ScrollCapture() {
                 </button>
               </div>
             </form>
-            {error ? (
-              <p role="alert" className="mt-2 text-sm text-destructive">
-                {error}
-              </p>
-            ) : null}
+            <p
+              id="sc-error"
+              role="alert"
+              aria-live="assertive"
+              className="mt-2 text-sm text-destructive empty:mt-0"
+            >
+              {error}
+            </p>
           </>
         )}
       </div>
