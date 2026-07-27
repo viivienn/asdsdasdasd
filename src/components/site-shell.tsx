@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { FOOTER_DISCLAIMER } from "@/components/disclaimers";
 
 const NAV = [
   { to: "/compare", label: "Compare" },
@@ -50,12 +51,13 @@ export function SiteShell({ children }: { children: ReactNode }) {
 
       <footer className="mt-16 border-t border-rule">
         <div className="mx-auto max-w-5xl px-5 py-8 text-sm text-muted-foreground">
-          <p className="max-w-2xl">
-            Aesthetic Index is an independent comparison resource. It is educational and does not
-            provide medical advice, diagnosis, or treatment recommendations. Talk to a licensed
-            clinician about what is appropriate for you.
-          </p>
+          <p className="max-w-3xl">{FOOTER_DISCLAIMER}</p>
           <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-1">
+            <li>
+              <Link to="/medical-disclaimer" className="underline underline-offset-4 hover:text-foreground">
+                Medical Disclaimer
+              </Link>
+            </li>
             <li>
               <Link to="/methodology" className="hover:text-foreground">
                 Methodology
