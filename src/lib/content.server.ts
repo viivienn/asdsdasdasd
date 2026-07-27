@@ -270,7 +270,12 @@ export async function listIndexablePricePages(): Promise<
 export async function listCityPrices(
   citySlug: string,
   treatmentSlug: string,
-): Promise<{ observations: PriceObservation[]; cityKnown: boolean }> {
+): Promise<{
+  observations: PriceObservation[];
+  cityKnown: boolean;
+  clinicsChecked: number;
+  clinicsWithPublicPrices: number;
+}> {
   const client = publicClient();
   const admin = await prototypeClient();
 
@@ -282,7 +287,9 @@ export async function listCityPrices(
     .eq("city_slug", citySlug)
     .maybeSingle();
 
-  if (!loc.data) return { observations: [], cityKnown: false };
+  if (!loc.data) {
+    return { observations: [], cityKnown: false, clinicsChecked: 0, clinicsWithPublicPrices: 0 };
+  }
 
   const rows = await client
     .from("price_observations")
@@ -321,7 +328,19 @@ export async function listCityPrices(
     } satisfies PriceObservation;
   });
 
-  return { observations, cityKnown: true };
+  const checked = await admin
+    .from("clinics")
+    .select("id", { count: "exact", head: true })
+    .eq("location_id", loc.data.id);
+
+  const clinicNames = new Set(observations.map((o) => o.clinic_name));
+
+  return {
+    observations,
+    cityKnown: true,
+    clinicsChecked: Math.max(checked.count ?? 0, clinicNames.size),
+    clinicsWithPublicPrices: clinicNames.size,
+  };
 }
 
 // ---------- submissions ----------
