@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
+import { SITE_URL } from "@/lib/site";
 
-// TODO: replace with the project URL once the domain is live on Lovable hosting.
-const BASE_URL = "";
+const BASE_URL = SITE_URL;
 
 /**
  * Only published, non-sample routes belong here. Comparison, treatment, and
@@ -12,7 +12,12 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const entries: Array<{ path: string; changefreq: string; priority: string }> = [
+        const entries: Array<{
+          path: string;
+          changefreq: string;
+          priority: string;
+          lastmod?: string;
+        }> = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
           { path: "/compare", changefreq: "weekly", priority: "0.8" },
           { path: "/treatments", changefreq: "weekly", priority: "0.8" },
@@ -21,23 +26,43 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/medical-disclaimer", changefreq: "yearly", priority: "0.2" },
         ];
 
-        const { listReviewedComparisonSlugs, listTreatments } = await import(
+        const { listReviewedComparisons, listTreatments, listIndexablePricePages } = await import(
           "@/lib/content.server"
         );
-        const [reviewedSlugs, treatments] = await Promise.all([
-          listReviewedComparisonSlugs(),
+        const [reviewed, treatments, pricePages] = await Promise.all([
+          listReviewedComparisons(),
           listTreatments(),
+          listIndexablePricePages(),
         ]);
 
         // Only fully reviewed, non-sample comparison records are listed. Pair
         // URLs that render the generated "review in progress" state never are.
-        for (const slug of reviewedSlugs) {
-          entries.push({ path: `/compare/${slug}`, changefreq: "monthly", priority: "0.7" });
+        for (const c of reviewed) {
+          entries.push({
+            path: `/compare/${c.slug}`,
+            changefreq: "monthly",
+            priority: "0.7",
+            lastmod: c.last_reviewed_at.slice(0, 10),
+          });
         }
         if (!treatments.isDemo) {
           for (const t of treatments.data) {
-            entries.push({ path: `/treatments/${t.slug}`, changefreq: "monthly", priority: "0.7" });
+            entries.push({
+              path: `/treatments/${t.slug}`,
+              changefreq: "monthly",
+              priority: "0.7",
+              lastmod: t.last_reviewed_at ? t.last_reviewed_at.slice(0, 10) : undefined,
+            });
           }
+        }
+        // Price pages appear only when a real, non-sample observation exists.
+        for (const p of pricePages) {
+          entries.push({
+            path: `/prices/us/ca/${p.city}/${p.treatment}`,
+            changefreq: "weekly",
+            priority: "0.6",
+            lastmod: p.lastmod,
+          });
         }
 
         const xml = [
@@ -47,10 +72,13 @@ export const Route = createFileRoute("/sitemap.xml")({
             [
               `  <url>`,
               `    <loc>${BASE_URL}${e.path}</loc>`,
+              e.lastmod ? `    <lastmod>${e.lastmod}</lastmod>` : null,
               `    <changefreq>${e.changefreq}</changefreq>`,
               `    <priority>${e.priority}</priority>`,
               `  </url>`,
-            ].join("\n"),
+            ]
+              .filter(Boolean)
+              .join("\n"),
           ),
           `</urlset>`,
         ].join("\n");
