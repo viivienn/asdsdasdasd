@@ -9,7 +9,7 @@ import { CoverageRequestForm, PriceAlertForm } from "@/components/demand-forms";
 import { FeaturePreview } from "@/components/editorial";
 import { PricingDisclaimer } from "@/components/disclaimers";
 import type { PriceObservation } from "@/lib/content-types";
-import { SITE_URL, absoluteUrl, breadcrumbJsonLd, organizationJsonLd } from "@/lib/site";
+import { SITE, SITE_URL, absoluteUrl, breadcrumbJsonLd, organizationJsonLd } from "@/lib/site";
 
 const CITY_LABELS: Record<string, string> = { "san-francisco": "San Francisco" };
 const TREATMENT_LABELS: Record<string, string> = { botox: "Botox" };
