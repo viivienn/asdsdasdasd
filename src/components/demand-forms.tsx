@@ -5,6 +5,7 @@ import {
   submitComparisonRequest,
   submitPriceAlertInterest,
 } from "@/lib/content.functions";
+import { trackEvent } from "@/lib/analytics";
 
 const field =
   "w-full border border-input bg-card px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-primary";
@@ -140,6 +141,10 @@ export function PriceAlertForm({ treatmentSlug }: { treatmentSlug: string }) {
           setError(null);
           const fd = new FormData(e.currentTarget);
           const raw = String(fd.get("max_unit_price") ?? "").trim();
+          trackEvent("price_alert_submitted", {
+            treatment_slug: treatmentSlug,
+            has_max_price: Boolean(raw),
+          });
           try {
             const res = await submit({
               data: {
@@ -151,8 +156,15 @@ export function PriceAlertForm({ treatmentSlug }: { treatmentSlug: string }) {
                 company: String(fd.get("company") ?? ""),
               },
             });
-            if (res.ok) setDone(true);
-            else setError(res.error ?? "Something went wrong.");
+            if (res.ok) {
+              trackEvent("alert_signup_success", {
+                source: "price_alert_form",
+                treatment_slug: treatmentSlug,
+              });
+              setDone(true);
+            } else {
+              setError(res.error ?? "Something went wrong.");
+            }
           } catch {
             setError("Please check the form and try again.");
           } finally {
@@ -242,8 +254,15 @@ export function ComparisonRequestForm() {
                 company: String(fd.get("company") ?? ""),
               },
             });
-            if (res.ok) setDone(true);
-            else setError(res.error ?? "Something went wrong.");
+            if (res.ok) {
+              trackEvent("alert_signup_success", {
+                source: "price_alert_form",
+                treatment_slug: treatmentSlug,
+              });
+              setDone(true);
+            } else {
+              setError(res.error ?? "Something went wrong.");
+            }
           } catch {
             setError("Please check the form and try again.");
           } finally {
