@@ -137,6 +137,97 @@ export const TREATMENT_PROFILE_ROWS = [
 ] as const satisfies ReadonlyArray<{ key: keyof Treatment; label: string }>;
 
 /**
+ * The compact "Quick comparison" table shown directly under the bottom line.
+ * Deliberately short: the distinctions people ask for most often.
+ */
+export const QUICK_COMPARISON_ROWS = [
+  { key: "primary_purpose", label: "Primary purpose" },
+  { key: "treatment_class", label: "Treatment class" },
+  { key: "adds_volume", label: "Adds volume" },
+  { key: "tightening_level", label: "Tightening effect" },
+  { key: "result_timing", label: "Results onset" },
+  { key: "sessions_text", label: "Typical sessions" },
+  { key: "downtime_text", label: "Downtime" },
+  { key: "longevity_text", label: "Longevity" },
+  { key: "reversibility", label: "Reversibility" },
+  { key: "evidence_grade", label: "Evidence status" },
+] as const satisfies ReadonlyArray<{ key: keyof Treatment; label: string }>;
+
+/**
+ * Detailed comparison sections. The ids are stable page anchors and are also
+ * used for in-page navigation and citation-friendly deep links.
+ */
+export const COMPARISON_SECTIONS = [
+  {
+    id: "purpose",
+    title: "Purpose and mechanism",
+    keys: [
+      "primary_purpose",
+      "mechanism",
+      "what_it_changes",
+      "what_it_does_not_change",
+      "adds_volume",
+      "tightening_level",
+      "true_substitute_notes",
+    ],
+  },
+  {
+    id: "results",
+    title: "Results",
+    keys: ["result_timing", "expected_result_magnitude", "sessions_text"],
+  },
+  {
+    id: "experience",
+    title: "Treatment experience",
+    keys: ["appointment_time", "pain_level"],
+  },
+  {
+    id: "downtime",
+    title: "Downtime and recovery",
+    keys: ["downtime_text", "swelling_text", "bruising_text", "exercise_restrictions"],
+  },
+  { id: "longevity", title: "How long results last", keys: ["longevity_text"] },
+  { id: "reversibility", title: "Reversibility", keys: ["reversibility"] },
+  {
+    id: "risks",
+    title: "Risks and limitations",
+    keys: [
+      "major_risks",
+      "most_likely_disappointment",
+      "when_not_appropriate",
+      "provider_variables",
+      "skin_tone_notes",
+    ],
+  },
+  {
+    id: "evidence",
+    title: "Evidence and regulatory status",
+    keys: ["fda_status", "evidence_grade"],
+  },
+] as const satisfies ReadonlyArray<{
+  id: string;
+  title: string;
+  keys: ReadonlyArray<keyof Treatment>;
+}>;
+
+const ROW_LABELS: Record<string, string> = Object.fromEntries(
+  COMPARISON_ROWS.map((r) => [r.key, r.label]),
+);
+
+export function comparisonRowLabel(key: keyof Treatment): string {
+  return ROW_LABELS[key] ?? String(key).replace(/_/g, " ");
+}
+
+/** Publisher shown next to a source, derived from the source URL host. */
+export function sourcePublisher(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "Unknown publisher";
+  }
+}
+
+/**
  * Comparison slugs are permanent URLs. Display order is taken from the slug so
  * the stored canonical pair order (a_id < b_id) never leaks into the UI.
  */
