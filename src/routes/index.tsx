@@ -45,22 +45,24 @@ function Home() {
     <>
       {isDemo ? <DemoNotice /> : null}
 
-      <section className="max-w-3xl">
-        <h1 className="font-display text-4xl leading-[1.1] sm:text-5xl">
+      <section className="rounded-2xl bg-surface px-5 py-12 text-center sm:px-10 sm:py-16">
+        <p className="text-xs font-medium uppercase tracking-[0.14em] text-primary">
+          Independent · no sponsorships
+        </p>
+        <h1 className="mx-auto mt-3 max-w-3xl font-display text-4xl leading-[1.08] sm:text-6xl">
           Compare cosmetic treatments before you book.
         </h1>
-        <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-          See results, downtime, risks, reversibility, and publicly listed local prices in one clear
-          place.
+        <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
+          Results, downtime, risks, reversibility, and publicly listed local prices — side by side.
         </p>
-        <div className="mt-8 border border-rule bg-card p-5">
+        <div className="mx-auto mt-8 max-w-2xl card-soft p-4 text-left sm:p-5">
           <TreatmentPicker treatments={treatments} publishedSlugs={slugs} />
         </div>
         <p className="mt-4 text-sm">
           <Link
             to="/prices/us/ca/$city/$treatment"
             params={{ city: "san-francisco", treatment: "botox" }}
-            className="underline underline-offset-4"
+            className="underline underline-offset-4 hover:text-primary"
           >
             See San Francisco Botox prices
           </Link>
@@ -69,17 +71,20 @@ function Home() {
 
       <section className="mt-16">
         <SectionHeading>Popular comparisons</SectionHeading>
-        <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+        <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {POPULAR.map(([slug, label]) => (
             <li key={slug}>
               <Link
                 to="/compare/$slug"
                 params={{ slug }}
-                className="block border border-rule bg-card p-4 transition-colors hover:border-primary"
+                className="block h-full card-soft card-hover p-5"
               >
-                <span className="text-lg">{label}</span>
-                <span className="mt-1 block text-sm text-muted-foreground">
+                <span className="font-display text-lg font-semibold">{label}</span>
+                <span className="mt-1.5 block text-sm text-muted-foreground">
                   Side-by-side on results, downtime, risks, and reversibility.
+                </span>
+                <span className="mt-4 block text-sm font-medium text-primary">
+                  Compare →
                 </span>
               </Link>
             </li>
@@ -97,7 +102,7 @@ function Home() {
                 <Link
                   to="/treatments/$slug"
                   params={{ slug: t.slug }}
-                  className="inline-block border border-rule bg-card px-3 py-1.5 text-sm hover:border-primary"
+                  className="inline-block rounded-full border border-rule bg-card px-4 py-1.5 text-sm transition-colors hover:border-primary hover:text-primary"
                 >
                   {t.name}
                 </Link>

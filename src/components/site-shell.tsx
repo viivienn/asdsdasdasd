@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { FOOTER_DISCLAIMER } from "@/components/disclaimers";
+import { ScrollCapture } from "@/components/scroll-capture";
 
 const NAV = [
   { to: "/compare", label: "Compare" },
@@ -23,23 +24,28 @@ export function SiteShell({ children }: { children: ReactNode }) {
       >
         Skip to content
       </a>
-      <header className="border-b border-rule">
-        <div className="mx-auto flex max-w-5xl flex-col gap-3 px-5 py-5 sm:flex-row sm:items-baseline sm:justify-between">
-          <Link to="/" className="group">
-            <span className="block font-display text-2xl leading-none">Aesthetic Index</span>
-            <span className="mt-1 block text-xs tracking-wide text-muted-foreground">
-              Compare before you book.
+      <header className="sticky top-0 z-40 rule-top border-b border-rule bg-background/85 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3.5">
+          <Link to="/" className="flex items-center gap-2.5">
+            <span
+              aria-hidden="true"
+              className="grid size-8 place-items-center rounded-lg bg-primary font-display text-sm font-bold text-primary-foreground"
+            >
+              AI
+            </span>
+            <span className="font-display text-lg font-semibold tracking-tight">
+              Aesthetic Index
             </span>
           </Link>
-          <nav aria-label="Primary">
-            <ul className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
+          <nav aria-label="Primary" className="hidden md:block">
+            <ul className="flex items-center gap-1 text-sm">
               {NAV.map((item) => (
                 <li key={item.to}>
                   <Link
                     to={item.to}
                     params={"params" in item ? item.params : undefined}
-                    className="border-b border-transparent pb-0.5 text-muted-foreground transition-colors hover:text-foreground"
-                    activeProps={{ className: "border-primary text-foreground" }}
+                    className="rounded-full px-3 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                    activeProps={{ className: "bg-secondary text-secondary-foreground font-medium" }}
                   >
                     {item.label}
                   </Link>
@@ -47,15 +53,39 @@ export function SiteShell({ children }: { children: ReactNode }) {
               ))}
             </ul>
           </nav>
+          <Link
+            to="/compare"
+            className="hidden shrink-0 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 sm:inline-flex"
+          >
+            Compare treatments
+          </Link>
         </div>
+        <nav aria-label="Primary mobile" className="md:hidden">
+          <ul className="flex gap-1 overflow-x-auto px-4 pb-3 text-sm">
+            {NAV.map((item) => (
+              <li key={item.to} className="shrink-0">
+                <Link
+                  to={item.to}
+                  params={"params" in item ? item.params : undefined}
+                  className="rounded-full border border-rule px-3 py-1.5 text-muted-foreground"
+                  activeProps={{ className: "bg-secondary text-secondary-foreground" }}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </header>
 
-      <main id="main" className="mx-auto max-w-5xl px-5 py-10 sm:py-14">
+      <main id="main" className="mx-auto max-w-6xl px-5 py-10 sm:py-14">
         {children}
       </main>
 
-      <footer className="mt-16 border-t border-rule">
-        <div className="mx-auto max-w-5xl px-5 py-8 text-sm text-muted-foreground">
+      <ScrollCapture />
+
+      <footer className="mt-16 rule-top border-t border-rule bg-surface">
+        <div className="mx-auto max-w-6xl px-5 py-10 text-sm text-muted-foreground">
           <p className="max-w-3xl">{FOOTER_DISCLAIMER}</p>
           <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-1">
             <li>
