@@ -64,7 +64,7 @@ export const Route = createFileRoute("/compare/$slug")({
 function titleCase(slug: string) {
   const map: Record<string, string> = {
     "ha-filler": "HA filler",
-    "thermage-flx": "Thermage FLX",
+    "thermage": "Thermage FLX",
     botox: "Botox",
     dysport: "Dysport",
     sculptra: "Sculptra",
