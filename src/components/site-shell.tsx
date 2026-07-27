@@ -5,7 +5,11 @@ import { FOOTER_DISCLAIMER } from "@/components/disclaimers";
 const NAV = [
   { to: "/compare", label: "Compare" },
   { to: "/treatments", label: "Treatments" },
-  { to: "/prices/us/ca/san-francisco/botox", label: "SF Botox Prices" },
+  {
+    to: "/prices/us/ca/$city/$treatment",
+    params: { city: "san-francisco", treatment: "botox" },
+    label: "SF Botox Prices",
+  },
   { to: "/methodology", label: "Methodology" },
   { to: "/about", label: "About" },
 ] as const;
@@ -33,6 +37,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
                 <li key={item.to}>
                   <Link
                     to={item.to}
+                    params={"params" in item ? item.params : undefined}
                     className="border-b border-transparent pb-0.5 text-muted-foreground transition-colors hover:text-foreground"
                     activeProps={{ className: "border-primary text-foreground" }}
                   >
