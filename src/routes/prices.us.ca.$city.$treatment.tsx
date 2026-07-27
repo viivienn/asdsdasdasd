@@ -97,6 +97,7 @@ function PricingPage() {
           <div className="mt-6">
             <EmptyCoverage city={cityLabel} treatment={treatmentLabel} />
           </div>
+          <PricingDisclaimer className="mt-6" />
         </>
       ) : (
         <>
