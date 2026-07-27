@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { submitCityRequest } from "@/lib/content.functions";
 import { TRENDING_TREATMENTS } from "@/lib/search-index";
+import { trackEvent } from "@/lib/analytics";
 
 const DISMISS_KEY = "ai_scroll_capture_dismissed";
 
@@ -40,6 +41,10 @@ export function ScrollCapture() {
       const total = document.documentElement.scrollHeight;
       if (total > window.innerHeight * 1.4 && scrolled / total > 0.45) {
         setVisible(true);
+        trackEvent("scroll_prompt_impression", {
+          path: window.location.pathname,
+          scroll_depth: 45,
+        });
         window.removeEventListener("scroll", onScroll);
       }
     };
@@ -104,6 +109,7 @@ export function ScrollCapture() {
               onSubmit={(e) => {
                 e.preventDefault();
                 setError(null);
+                trackEvent("scroll_prompt_step_completed", { step: 1, has_postal_code: true });
                 setStep(2);
               }}
             >
@@ -157,6 +163,10 @@ export function ScrollCapture() {
                 setBusy(true);
                 setError(null);
                 const fd = new FormData(e.currentTarget);
+                trackEvent("scroll_prompt_submitted", {
+                  has_city: Boolean(city),
+                  treatment_slug: treatment || "any",
+                });
                 try {
                   const res = await submit({
                     data: {
@@ -169,8 +179,16 @@ export function ScrollCapture() {
                       company: String(fd.get("company") ?? ""),
                     },
                   });
-                  if (res.ok) setDone(true);
-                  else setError(res.error ?? "Something went wrong.");
+                  if (res.ok) {
+                    trackEvent("alert_signup_success", {
+                      source: "scroll_prompt",
+                      has_city: Boolean(city),
+                      treatment_slug: treatment || "any",
+                    });
+                    setDone(true);
+                  } else {
+                    setError(res.error ?? "Something went wrong.");
+                  }
                 } catch {
                   setError("Please check your details and try again.");
                 } finally {
