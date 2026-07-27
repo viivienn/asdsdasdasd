@@ -7,6 +7,7 @@ import {
 } from "@/lib/content-types";
 import { DemoNotice, EvidenceState, Prose } from "@/components/editorial";
 import { CoverageRequestForm } from "@/components/demand-forms";
+import { ComparisonDisclaimer } from "@/components/disclaimers";
 
 export const Route = createFileRoute("/compare/$slug")({
   loader: async ({ params }) => {
@@ -200,6 +201,8 @@ function ComparisonPage() {
         </ul>
       </section>
 
+      <ComparisonDisclaimer />
+
       <section className="mt-12">
         <h2 className="text-2xl">Sources</h2>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
@@ -244,11 +247,6 @@ function ComparisonPage() {
       <section className="mt-12">
         <CoverageRequestForm treatmentSlug={slugA} />
       </section>
-
-      <p className="mt-10 max-w-2xl text-sm text-muted-foreground">
-        This page is educational and is not medical advice. Only a licensed clinician who has
-        examined you can say whether a treatment is appropriate.
-      </p>
     </>
   );
 }

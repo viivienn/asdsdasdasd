@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as MethodologyRouteImport } from './routes/methodology'
+import { Route as MedicalDisclaimerRouteImport } from './routes/medical-disclaimer'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TreatmentsIndexRouteImport } from './routes/treatments.index'
@@ -27,6 +28,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const MethodologyRoute = MethodologyRouteImport.update({
   id: '/methodology',
   path: '/methodology',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MedicalDisclaimerRoute = MedicalDisclaimerRouteImport.update({
+  id: '/medical-disclaimer',
+  path: '/medical-disclaimer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -68,6 +74,7 @@ const PricesUsCaCityTreatmentRoute = PricesUsCaCityTreatmentRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/medical-disclaimer': typeof MedicalDisclaimerRoute
   '/methodology': typeof MethodologyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/compare/$slug': typeof CompareSlugRoute
@@ -79,6 +86,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/medical-disclaimer': typeof MedicalDisclaimerRoute
   '/methodology': typeof MethodologyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/compare/$slug': typeof CompareSlugRoute
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/medical-disclaimer': typeof MedicalDisclaimerRoute
   '/methodology': typeof MethodologyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/compare/$slug': typeof CompareSlugRoute
@@ -104,6 +113,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/medical-disclaimer'
     | '/methodology'
     | '/sitemap.xml'
     | '/compare/$slug'
@@ -115,6 +125,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/medical-disclaimer'
     | '/methodology'
     | '/sitemap.xml'
     | '/compare/$slug'
@@ -126,6 +137,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/medical-disclaimer'
     | '/methodology'
     | '/sitemap.xml'
     | '/compare/$slug'
@@ -138,6 +150,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  MedicalDisclaimerRoute: typeof MedicalDisclaimerRoute
   MethodologyRoute: typeof MethodologyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CompareSlugRoute: typeof CompareSlugRoute
@@ -161,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/methodology'
       fullPath: '/methodology'
       preLoaderRoute: typeof MethodologyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/medical-disclaimer': {
+      id: '/medical-disclaimer'
+      path: '/medical-disclaimer'
+      fullPath: '/medical-disclaimer'
+      preLoaderRoute: typeof MedicalDisclaimerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -218,6 +238,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  MedicalDisclaimerRoute: MedicalDisclaimerRoute,
   MethodologyRoute: MethodologyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   CompareSlugRoute: CompareSlugRoute,
