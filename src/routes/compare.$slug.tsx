@@ -37,7 +37,9 @@ export const Route = createFileRoute("/compare/$slug")({
         { property: "og:description", content: description.slice(0, 155) },
         { property: "og:url", content: `/compare/${params.slug}` },
         { property: "og:type", content: "article" },
-        ...(loaderData.comparison.isDemo ? [{ name: "robots", content: "noindex" }] : []),
+        ...(loaderData.comparison.isDemo
+          ? [{ name: "robots", content: "noindex, nofollow" }]
+          : []),
       ],
       links: [{ rel: "canonical", href: `/compare/${params.slug}` }],
     };
@@ -62,7 +64,7 @@ export const Route = createFileRoute("/compare/$slug")({
 function titleCase(slug: string) {
   const map: Record<string, string> = {
     "ha-filler": "HA filler",
-    "thermage-flx": "Thermage FLX",
+    "thermage": "Thermage FLX",
     botox: "Botox",
     dysport: "Dysport",
     sculptra: "Sculptra",
@@ -119,8 +121,18 @@ function ComparisonPage() {
             ? new Date(record.last_reviewed_at).toLocaleDateString()
             : "Not yet reviewed"}
         </span>
-        <EvidenceState state={comparison.isDemo ? "unsourced" : "sourced"} />
-        <Link to="/compare" className="underline underline-offset-4">
+        {comparison.isDemo ? (
+          <>
+            <EvidenceState state="unsourced" />
+            <span className="border border-rule bg-muted px-2 py-0.5">Prototype content</span>
+          </>
+        ) : (
+          <EvidenceState state="sourced" />
+        )}
+        <Link
+          to="/compare"
+          className="inline-flex items-center border border-input bg-card px-3 py-1.5 hover:border-primary"
+        >
           Change treatments
         </Link>
       </div>
@@ -147,7 +159,10 @@ function ComparisonPage() {
       </div>
 
       <section className="mt-14">
-        <h2 className="text-2xl">Side by side</h2>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground">Side by side</p>
+        <h2 className="mt-1 text-2xl">
+          {titleCase(slugA)} vs. {titleCase(slugB)}: attribute-by-attribute comparison
+        </h2>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[36rem] border-collapse text-sm">
             <caption className="sr-only">
@@ -194,11 +209,20 @@ function ComparisonPage() {
         <h2 className="text-2xl">Questions to ask at consultation</h2>
         <ul className="mt-3 max-w-2xl list-disc space-y-2 pl-5 text-sm">
           <li>Which of these two do you use more often for my goal, and why?</li>
-          <li>How many sessions do you expect, and what is the total cost across them?</li>
-          <li>What does the result look like if I stop after one session?</li>
-          <li>What is your plan if I am unhappy with the outcome?</li>
-          <li>What are the risks you have personally seen with this treatment?</li>
+          <li>
+            How many sessions do you expect, and what is the estimated total cost across the full
+            treatment course?
+          </li>
+          <li>What result would be realistic if I stop after one session?</li>
+          <li>What options would I have if I were unhappy with the outcome?</li>
+          <li>
+            What complications or unwanted outcomes have you personally managed with this
+            treatment?
+          </li>
         </ul>
+        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
+          These are general consultation prompts, not personalized medical advice.
+        </p>
       </section>
 
       <ComparisonDisclaimer />
