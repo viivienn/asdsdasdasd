@@ -1,8 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { FOOTER_DISCLAIMER } from "@/components/disclaimers";
 import { ScrollCapture } from "@/components/scroll-capture";
 import { SiteSearch } from "@/components/site-search";
+import { trackAnswerEngineReferral } from "@/lib/analytics";
+import { POPULAR_COMPARISON_SLUGS, comparisonLabel } from "@/lib/content-types";
 
 const NAV = [
   { to: "/compare", label: "Compare" },
@@ -17,6 +19,10 @@ const NAV = [
 ] as const;
 
 export function SiteShell({ children }: { children: ReactNode }) {
+  useEffect(() => {
+    trackAnswerEngineReferral();
+  }, []);
+
   return (
     <div className="min-h-dvh bg-background text-foreground">
       <a
@@ -94,6 +100,22 @@ export function SiteShell({ children }: { children: ReactNode }) {
       <footer className="mt-16 rule-top border-t border-rule bg-surface">
         <div className="mx-auto max-w-6xl px-5 py-10 text-sm text-muted-foreground">
           <p className="max-w-3xl">{FOOTER_DISCLAIMER}</p>
+          <nav aria-label="Popular comparisons" className="mt-6">
+            <h2 className="text-xs uppercase tracking-wider">Popular comparisons</h2>
+            <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-1">
+              {POPULAR_COMPARISON_SLUGS.map((slug) => (
+                <li key={slug}>
+                  <Link
+                    to="/compare/$slug"
+                    params={{ slug }}
+                    className="hover:text-foreground hover:underline"
+                  >
+                    {comparisonLabel(slug)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
           <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-1">
             <li>
               <Link to="/medical-disclaimer" className="underline underline-offset-4 hover:text-foreground">
@@ -109,6 +131,11 @@ export function SiteShell({ children }: { children: ReactNode }) {
               <Link to="/about" className="hover:text-foreground">
                 About
               </Link>
+            </li>
+            <li>
+              <a href="mailto:corrections@aestheticindex.co" className="hover:text-foreground">
+                Corrections &amp; contact
+              </a>
             </li>
           </ul>
           <p className="mt-6 text-xs">© {new Date().getFullYear()} Aesthetic Index</p>
