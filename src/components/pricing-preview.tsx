@@ -110,6 +110,148 @@ export function LocalPriceSummary({
   );
 }
 
+function median(values: number[]): number | null {
+  if (values.length === 0) return null;
+  const sorted = [...values].sort((x, y) => x - y);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+}
+
+function money(amount: number, currency: string) {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount);
+}
+
+/**
+ * Documented summary of the local pricing dataset. Units are never mixed: one
+ * block per pricing unit, and a median is only shown with enough observations.
+ */
+export function PriceDatasetSummary({
+  city,
+  treatment,
+  observations,
+  clinicsChecked,
+  clinicsWithPublicPrices,
+}: {
+  city: string;
+  treatment: string;
+  observations: PriceObservation[];
+  clinicsChecked: number;
+  clinicsWithPublicPrices: number;
+}) {
+  if (observations.length === 0) return null;
+
+  const units = [...new Set(observations.map((o) => o.pricing_unit))];
+  const dates = observations.map((o) => o.observed_at).sort();
+  const collected = dates[0]!.slice(0, 10);
+  const refreshed = dates[dates.length - 1]!.slice(0, 10);
+
+  return (
+    <section className="border border-rule bg-card p-5 text-sm">
+      <h2 className="text-xl">
+        {treatment} pricing dataset — {city}
+      </h2>
+      <dl className="mt-4 grid gap-x-8 gap-y-2 sm:grid-cols-2">
+        <div className="flex justify-between gap-4 border-b border-rule py-1">
+          <dt className="text-muted-foreground">Geographic scope</dt>
+          <dd>{city}</dd>
+        </div>
+        <div className="flex justify-between gap-4 border-b border-rule py-1">
+          <dt className="text-muted-foreground">Treatment</dt>
+          <dd>{treatment}</dd>
+        </div>
+        <div className="flex justify-between gap-4 border-b border-rule py-1">
+          <dt className="text-muted-foreground">Pricing basis</dt>
+          <dd>Publicly advertised clinic prices</dd>
+        </div>
+        <div className="flex justify-between gap-4 border-b border-rule py-1">
+          <dt className="text-muted-foreground">Clinics checked</dt>
+          <dd>{clinicsChecked}</dd>
+        </div>
+        <div className="flex justify-between gap-4 border-b border-rule py-1">
+          <dt className="text-muted-foreground">Clinics with usable public prices</dt>
+          <dd>{clinicsWithPublicPrices}</dd>
+        </div>
+        <div className="flex justify-between gap-4 border-b border-rule py-1">
+          <dt className="text-muted-foreground">Observations included</dt>
+          <dd>{observations.length}</dd>
+        </div>
+        <div className="flex justify-between gap-4 border-b border-rule py-1">
+          <dt className="text-muted-foreground">Collection date</dt>
+          <dd>{collected}</dd>
+        </div>
+        <div className="flex justify-between gap-4 border-b border-rule py-1">
+          <dt className="text-muted-foreground">Last refreshed</dt>
+          <dd>{refreshed}</dd>
+        </div>
+      </dl>
+
+      <div className="mt-5 space-y-3">
+        {units.map((unit) => {
+          const rows = observations.filter((o) => o.pricing_unit === unit);
+          const currency = rows[0]?.currency ?? "USD";
+          const amounts = rows
+            .map((o) => Number(o.effective_unit_price ?? o.advertised_amount))
+            .filter((n) => Number.isFinite(n));
+          const med = amounts.length >= 5 ? median(amounts) : null;
+          const low = Math.min(...amounts);
+          const high = Math.max(...amounts);
+          return (
+            <div key={unit} className="border border-rule p-3">
+              <p className="font-medium">Priced {unit.replace(/_/g, " ")}</p>
+              <p className="mt-1 text-muted-foreground">
+                {rows.length} observation{rows.length === 1 ? "" : "s"} · observed range{" "}
+                {money(low, currency)}–{money(high, currency)}
+                {med !== null ? ` · median ${money(med, currency)}` : ""}
+              </p>
+              {med === null ? (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  A median is withheld until at least five compatible observations exist.
+                </p>
+              ) : null}
+            </div>
+          );
+        })}
+        {units.length > 1 ? (
+          <p className="text-xs text-muted-foreground">
+            Pricing units are summarised separately and are not combined, because they are not
+            comparable amounts.
+          </p>
+        ) : null}
+      </div>
+
+      <div className="mt-5 grid gap-4 sm:grid-cols-2">
+        <div>
+          <h3 className="font-medium">Inclusion criteria</h3>
+          <p className="mt-1 text-muted-foreground">
+            A price is included when a clinic publishes it on a public page, the amount and unit
+            are stated, and we can link to the page where we observed it.
+          </p>
+        </div>
+        <div>
+          <h3 className="font-medium">Exclusion criteria</h3>
+          <p className="mt-1 text-muted-foreground">
+            We exclude quoted-on-request pricing, prices given only by phone or DM, sample or
+            placeholder records, and listings we could not re-verify at the source URL.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-5">
+        <h3 className="font-medium">Limitations</h3>
+        <p className="mt-1 text-muted-foreground">
+          This is a snapshot of advertised prices in one city, not a market average. Advertised
+          amounts are frequently starting prices, may exclude consultation or product fees, and can
+          change without notice. Clinics that do not publish prices are absent from the dataset.
+        </p>
+      </div>
+
+      <p className="mt-4 text-xs text-muted-foreground">
+        Each observation links to its own source below.
+      </p>
+    </section>
+  );
+}
+
 export function PriceObservationTable({
   observations,
 }: {
