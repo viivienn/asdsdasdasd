@@ -254,15 +254,8 @@ export function ComparisonRequestForm() {
                 company: String(fd.get("company") ?? ""),
               },
             });
-            if (res.ok) {
-              trackEvent("alert_signup_success", {
-                source: "price_alert_form",
-                treatment_slug: treatmentSlug,
-              });
-              setDone(true);
-            } else {
-              setError(res.error ?? "Something went wrong.");
-            }
+            if (res.ok) setDone(true);
+            else setError(res.error ?? "Something went wrong.");
           } catch {
             setError("Please check the form and try again.");
           } finally {
