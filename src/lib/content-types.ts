@@ -148,3 +148,69 @@ export const COMPARISON_DISPLAY_ORDER: Record<string, [string, string]> = {
 };
 
 export const COMPARISON_SLUGS = Object.keys(COMPARISON_DISPLAY_ORDER);
+
+/** Curated pairs surfaced as "Popular comparisons" in the interface. */
+export const POPULAR_COMPARISON_SLUGS = COMPARISON_SLUGS;
+
+/** Display labels for treatment slugs that are not simple title case. */
+export const TREATMENT_LABELS: Record<string, string> = {
+  "ha-filler": "HA filler",
+  thermage: "Thermage FLX",
+  botox: "Botox",
+  dysport: "Dysport",
+  sculptra: "Sculptra",
+  radiesse: "Radiesse",
+  morpheus8: "Morpheus8",
+  ultherapy: "Ultherapy",
+  daxxify: "Daxxify",
+  xeomin: "Xeomin",
+  juvederm: "Juvéderm",
+  restylane: "Restylane",
+};
+
+export function treatmentLabel(slug: string, name?: string | null): string {
+  if (name) return name;
+  return (
+    TREATMENT_LABELS[slug] ??
+    slug
+      .split("-")
+      .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+      .join(" ")
+  );
+}
+
+/**
+ * One permanent URL per unordered pair. Curated slugs keep their historical
+ * order; every other pair is normalized alphabetically.
+ */
+export function canonicalPairSlug(a: string, b: string): string {
+  for (const [slug, pair] of Object.entries(COMPARISON_DISPLAY_ORDER)) {
+    if ((pair[0] === a && pair[1] === b) || (pair[0] === b && pair[1] === a)) return slug;
+  }
+  const [x, y] = [a, b].sort((p, q) => p.localeCompare(q));
+  return `${x}-vs-${y}`;
+}
+
+/** Split a comparison slug into its two treatment slugs, in display order. */
+export function parsePairSlug(slug: string): [string, string] | null {
+  const known = COMPARISON_DISPLAY_ORDER[slug];
+  if (known) return known;
+  const idx = slug.indexOf("-vs-");
+  if (idx <= 0) return null;
+  const a = slug.slice(0, idx);
+  const b = slug.slice(idx + 4);
+  if (!a || !b) return null;
+  if (!/^[a-z0-9-]+$/.test(a) || !/^[a-z0-9-]+$/.test(b)) return null;
+  return [a, b];
+}
+
+export function comparisonLabel(slug: string, names?: [string?, string?]): string {
+  const pair = parsePairSlug(slug);
+  if (!pair) return slug.replace(/-/g, " ");
+  return `${treatmentLabel(pair[0], names?.[0])} vs. ${treatmentLabel(pair[1], names?.[1])}`;
+}
+
+/** Pairs we deliberately refuse to render because the comparison misleads. */
+export function pairDisallowed(a: string, b: string): boolean {
+  return a === b;
+}
