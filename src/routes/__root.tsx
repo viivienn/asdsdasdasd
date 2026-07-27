@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteShell } from "../components/site-shell";
+import { SITE, SITE_URL, organizationJsonLd } from "../lib/site";
 
 function NotFoundComponent() {
   return (
@@ -107,17 +108,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@graph": [
-            {
-              "@type": "Organization",
-              name: "Aesthetic Index",
-              url: "https://aestheticindex.co",
-              description:
-                "Independent consumer platform for comparing cosmetic treatments and publicly listed local prices.",
-            },
+            organizationJsonLd(),
             {
               "@type": "WebSite",
-              name: "Aesthetic Index",
-              url: "https://aestheticindex.co",
+              "@id": `${SITE_URL}#website`,
+              name: SITE.name,
+              url: SITE.url,
+              description: SITE.description,
+              inLanguage: "en",
+              publisher: { "@id": `${SITE_URL}#organization` },
             },
           ],
         }),
