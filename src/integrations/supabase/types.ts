@@ -94,6 +94,36 @@ export type Database = {
           },
         ]
       }
+      comparison_requests: {
+        Row: {
+          context: string | null
+          created_at: string
+          email: string | null
+          id: string
+          source_path: string | null
+          treatment_a: string
+          treatment_b: string
+        }
+        Insert: {
+          context?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          source_path?: string | null
+          treatment_a: string
+          treatment_b: string
+        }
+        Update: {
+          context?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          source_path?: string | null
+          treatment_a?: string
+          treatment_b?: string
+        }
+        Relationships: []
+      }
       comparisons: {
         Row: {
           common_misconception: string | null
@@ -211,14 +241,19 @@ export type Database = {
           created_at: string
           currency: string
           description: string | null
+          effective_unit_price: number | null
           ends_at: string | null
           id: string
           is_sample: boolean
           location_id: string
+          membership_required: boolean
+          new_customer_only: boolean
           observed_at: string | null
           offer_amount: number | null
           pricing_unit: string | null
           publication_status: Database["public"]["Enums"]["publication_status"]
+          quantity: number | null
+          regular_amount: number | null
           restrictions: string | null
           source_type: string | null
           source_url: string | null
@@ -233,14 +268,19 @@ export type Database = {
           created_at?: string
           currency?: string
           description?: string | null
+          effective_unit_price?: number | null
           ends_at?: string | null
           id?: string
           is_sample?: boolean
           location_id: string
+          membership_required?: boolean
+          new_customer_only?: boolean
           observed_at?: string | null
           offer_amount?: number | null
           pricing_unit?: string | null
           publication_status?: Database["public"]["Enums"]["publication_status"]
+          quantity?: number | null
+          regular_amount?: number | null
           restrictions?: string | null
           source_type?: string | null
           source_url?: string | null
@@ -255,14 +295,19 @@ export type Database = {
           created_at?: string
           currency?: string
           description?: string | null
+          effective_unit_price?: number | null
           ends_at?: string | null
           id?: string
           is_sample?: boolean
           location_id?: string
+          membership_required?: boolean
+          new_customer_only?: boolean
           observed_at?: string | null
           offer_amount?: number | null
           pricing_unit?: string | null
           publication_status?: Database["public"]["Enums"]["publication_status"]
+          quantity?: number | null
+          regular_amount?: number | null
           restrictions?: string | null
           source_type?: string | null
           source_url?: string | null
@@ -509,11 +554,15 @@ export type Database = {
       treatments: {
         Row: {
           adds_volume: string | null
+          appointment_time: string | null
           brand_name: string | null
+          bruising_text: string | null
           category: string
           created_at: string
           downtime_text: string | null
           evidence_grade: string | null
+          exercise_restrictions: string | null
+          expected_result_magnitude: string | null
           fda_status: string | null
           generic_name: string | null
           id: string
@@ -535,17 +584,26 @@ export type Database = {
           skin_tone_notes: string | null
           slug: string
           summary: string | null
+          swelling_text: string | null
           tightening_level: string | null
           treatment_class: string
+          true_substitute_notes: string | null
           updated_at: string
+          what_it_changes: string | null
+          what_it_does_not_change: string | null
+          when_not_appropriate: string | null
         }
         Insert: {
           adds_volume?: string | null
+          appointment_time?: string | null
           brand_name?: string | null
+          bruising_text?: string | null
           category: string
           created_at?: string
           downtime_text?: string | null
           evidence_grade?: string | null
+          exercise_restrictions?: string | null
+          expected_result_magnitude?: string | null
           fda_status?: string | null
           generic_name?: string | null
           id?: string
@@ -567,17 +625,26 @@ export type Database = {
           skin_tone_notes?: string | null
           slug: string
           summary?: string | null
+          swelling_text?: string | null
           tightening_level?: string | null
           treatment_class: string
+          true_substitute_notes?: string | null
           updated_at?: string
+          what_it_changes?: string | null
+          what_it_does_not_change?: string | null
+          when_not_appropriate?: string | null
         }
         Update: {
           adds_volume?: string | null
+          appointment_time?: string | null
           brand_name?: string | null
+          bruising_text?: string | null
           category?: string
           created_at?: string
           downtime_text?: string | null
           evidence_grade?: string | null
+          exercise_restrictions?: string | null
+          expected_result_magnitude?: string | null
           fda_status?: string | null
           generic_name?: string | null
           id?: string
@@ -599,9 +666,14 @@ export type Database = {
           skin_tone_notes?: string | null
           slug?: string
           summary?: string | null
+          swelling_text?: string | null
           tightening_level?: string | null
           treatment_class?: string
+          true_substitute_notes?: string | null
           updated_at?: string
+          what_it_changes?: string | null
+          what_it_does_not_change?: string | null
+          when_not_appropriate?: string | null
         }
         Relationships: []
       }
@@ -641,6 +713,7 @@ export type Database = {
         | "source_checked"
         | "clinic_confirmed"
         | "expired"
+        | "publicly_listed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -775,6 +848,7 @@ export const Constants = {
         "source_checked",
         "clinic_confirmed",
         "expired",
+        "publicly_listed",
       ],
     },
   },
