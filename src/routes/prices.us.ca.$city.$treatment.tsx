@@ -2,13 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { fetchCityPrices } from "@/lib/content.functions";
 import {
   EmptyCoverage,
-  LocalPriceSummary,
+  PriceDatasetSummary,
   PriceObservationTable,
 } from "@/components/pricing-preview";
 import { CoverageRequestForm, PriceAlertForm } from "@/components/demand-forms";
 import { FeaturePreview } from "@/components/editorial";
 import { PricingDisclaimer } from "@/components/disclaimers";
 import type { PriceObservation } from "@/lib/content-types";
+import { SITE, SITE_URL, absoluteUrl, breadcrumbJsonLd, organizationJsonLd } from "@/lib/site";
 
 const CITY_LABELS: Record<string, string> = { "san-francisco": "San Francisco" };
 const TREATMENT_LABELS: Record<string, string> = { botox: "Botox" };
@@ -23,19 +24,55 @@ export const Route = createFileRoute("/prices/us/ca/$city/$treatment")({
     const description = `Publicly advertised ${treatment} prices in ${city}, each with a source link and the date observed. No estimates.`;
     // Pricing pages stay noindex until manually verified records exist.
     const verified = (loaderData?.observations.length ?? 0) > 0;
+    const url = absoluteUrl(`/prices/us/ca/${params.city}/${params.treatment}`);
+    const dates = (loaderData?.observations ?? []).map((o) => o.observed_at).sort();
     return {
       meta: [
         { title },
         { name: "description", content: description },
         { property: "og:title", content: `${city} ${treatment} prices` },
         { property: "og:description", content: description },
-        { property: "og:url", content: `/prices/us/ca/${params.city}/${params.treatment}` },
+        { property: "og:url", content: url },
         { property: "og:type", content: "website" },
         ...(verified ? [] : [{ name: "robots", content: "noindex" }]),
       ],
-      links: [
-        { rel: "canonical", href: `/prices/us/ca/${params.city}/${params.treatment}` },
-      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: verified
+        ? [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@graph": [
+                  organizationJsonLd(),
+                  breadcrumbJsonLd([
+                    { name: "Home", path: "/" },
+                    {
+                      name: `${city} ${treatment} prices`,
+                      path: `/prices/us/ca/${params.city}/${params.treatment}`,
+                    },
+                  ]),
+                  {
+                    "@type": "Dataset",
+                    "@id": `${url}#dataset`,
+                    name: `Publicly advertised ${treatment} prices in ${city}`,
+                    description: `Individually sourced, publicly advertised ${treatment} prices collected from clinic websites in ${city}. Each observation records the amount, pricing unit, source URL and observation date.`,
+                    url,
+                    isAccessibleForFree: true,
+                    license: SITE.pricingMethodology,
+                    creator: { "@id": `${SITE_URL}#organization` },
+                    spatialCoverage: city,
+                    measurementTechnique:
+                      "Manual collection of publicly listed prices from clinic websites",
+                    variableMeasured: "Advertised price per stated pricing unit",
+                    dateCreated: dates[0]?.slice(0, 10),
+                    dateModified: dates[dates.length - 1]?.slice(0, 10),
+                  },
+                ],
+              }),
+            },
+          ]
+        : [],
     };
   },
   errorComponent: () => <p>We couldn't load pricing. Please refresh.</p>,
@@ -44,7 +81,8 @@ export const Route = createFileRoute("/prices/us/ca/$city/$treatment")({
 
 function PricingPage() {
   const { city, treatment } = Route.useParams();
-  const { observations, cityKnown } = Route.useLoaderData();
+  const { observations, cityKnown, clinicsChecked, clinicsWithPublicPrices } =
+    Route.useLoaderData();
   const cityLabel = CITY_LABELS[city] ?? city;
   const treatmentLabel = TREATMENT_LABELS[treatment] ?? treatment;
   const rows = observations as PriceObservation[];
@@ -102,7 +140,13 @@ function PricingPage() {
       ) : (
         <>
           <div className="mt-8">
-            <LocalPriceSummary observations={rows} />
+            <PriceDatasetSummary
+              city={cityLabel}
+              treatment={treatmentLabel}
+              observations={rows}
+              clinicsChecked={clinicsChecked}
+              clinicsWithPublicPrices={clinicsWithPublicPrices}
+            />
           </div>
           <PricingDisclaimer className="mt-6" />
           <div className="mt-6">

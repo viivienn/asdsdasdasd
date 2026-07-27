@@ -2,15 +2,20 @@ import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-route
 import { fetchComparisonPair } from "@/lib/content.functions";
 import {
   COMPARISON_ROWS,
+  COMPARISON_SECTIONS,
+  QUICK_COMPARISON_ROWS,
   POPULAR_COMPARISON_SLUGS,
   canonicalPairSlug,
   comparisonLabel,
+  comparisonRowLabel,
   pairDisallowed,
   parsePairSlug,
+  sourcePublisher,
   treatmentLabel,
   type Treatment,
   type TreatmentSource,
 } from "@/lib/content-types";
+import { SITE_URL, absoluteUrl, breadcrumbJsonLd, organizationJsonLd } from "@/lib/site";
 import { EvidenceState, Prose } from "@/components/editorial";
 import { ComparisonRequestForm, CoverageRequestForm } from "@/components/demand-forms";
 import { ComparisonDisclaimer } from "@/components/disclaimers";
@@ -63,9 +68,9 @@ export const Route = createFileRoute("/compare/$slug")({
           { name: "robots", content: "noindex, follow" },
           { property: "og:title", content: label },
           { property: "og:type", content: "website" },
-          { property: "og:url", content: `/compare/${params.slug}` },
+          { property: "og:url", content: absoluteUrl(`/compare/${params.slug}`) },
         ],
-        links: [{ rel: "canonical", href: `/compare/${params.slug}` }],
+        links: [{ rel: "canonical", href: absoluteUrl(`/compare/${params.slug}`) }],
       };
     }
 
@@ -73,25 +78,55 @@ export const Route = createFileRoute("/compare/$slug")({
     const nameB = treatmentLabel(loaderData.slugB, loaderData.b?.name);
     const title = `${nameA} vs. ${nameB}: Results, Risks, Downtime & Cost | Aesthetic Index`;
     const description = `Compare ${nameA} and ${nameB} by purpose, results, downtime, risks, reversibility, longevity, and publicly listed local pricing.`;
+    const url = absoluteUrl(`/compare/${params.slug}`);
+    const reviewedAt = loaderData.comparison?.last_reviewed_at ?? undefined;
     return {
       meta: [
         { title },
         { name: "description", content: description },
+        { name: "robots", content: "index, follow, max-image-preview:large" },
         { property: "og:title", content: `${nameA} vs. ${nameB}` },
         { property: "og:description", content: description },
-        { property: "og:url", content: `/compare/${params.slug}` },
+        { property: "og:url", content: url },
         { property: "og:type", content: "article" },
       ],
-      links: [{ rel: "canonical", href: `/compare/${params.slug}` }],
+      links: [{ rel: "canonical", href: url }],
       scripts: [
         {
           type: "application/ld+json",
           children: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "Article",
-            headline: `${nameA} vs. ${nameB}`,
-            description,
-            dateModified: loaderData.comparison?.last_reviewed_at ?? undefined,
+            "@graph": [
+              organizationJsonLd(),
+              breadcrumbJsonLd([
+                { name: "Home", path: "/" },
+                { name: "Compare", path: "/compare" },
+                { name: `${nameA} vs. ${nameB}`, path: `/compare/${params.slug}` },
+              ]),
+              {
+                "@type": ["Article", "MedicalWebPage"],
+                "@id": url,
+                url,
+                headline: `${nameA} vs. ${nameB}`,
+                name: `${nameA} vs. ${nameB}`,
+                description,
+                inLanguage: "en",
+                isAccessibleForFree: true,
+                dateModified: reviewedAt,
+                datePublished: reviewedAt,
+                publisher: { "@id": `${SITE_URL}#organization` },
+                about: [
+                  { "@type": "MedicalTherapy", name: nameA },
+                  { "@type": "MedicalTherapy", name: nameB },
+                ],
+                citation: (loaderData.sources as TreatmentSource[] | undefined)?.map((s) => ({
+                  "@type": "CreativeWork",
+                  name: s.source_title,
+                  url: s.source_url,
+                  datePublished: s.publication_date ?? undefined,
+                })),
+              },
+            ],
           }),
         },
       ],
@@ -305,11 +340,6 @@ function ComparisonPage() {
       <Breadcrumb label={label} />
 
       <h1 className="mt-4 font-display text-4xl">{label}</h1>
-      {comparison?.one_sentence_difference ? (
-        <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
-          {comparison.one_sentence_difference}
-        </p>
-      ) : null}
 
       <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
         <span>
@@ -327,6 +357,82 @@ function ComparisonPage() {
         </Link>
       </div>
 
+      <section id="bottom-line" className="mt-8 scroll-mt-24 border border-rule bg-card p-5">
+        <h2 className="text-2xl">Bottom line</h2>
+        <p className="mt-3 max-w-3xl">
+          {comparison?.one_sentence_difference}{" "}
+          {a?.true_substitute_notes ? `${a.true_substitute_notes} ` : ""}
+          Neither treatment is universally better than the other. They are compared here on
+          purpose, results, downtime, longevity, reversibility and documented risks. Whether
+          either is appropriate depends on individual clinical factors that only an in-person
+          assessment can establish.
+        </p>
+      </section>
+
+      <nav aria-label="On this page" className="mt-6 text-sm">
+        <ul className="flex flex-wrap gap-x-4 gap-y-1 text-muted-foreground">
+          {[
+            ["quick-comparison", "Quick comparison"],
+            ...COMPARISON_SECTIONS.map((s) => [s.id, s.title] as const),
+            ["cost", "Cost"],
+            ["local-prices", "Local prices"],
+            ["sources", "Sources"],
+            ["medical-disclaimer", "Medical disclaimer"],
+          ].map(([id, title]) => (
+            <li key={id}>
+              <a href={`#${id}`} className="hover:text-foreground hover:underline">
+                {title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <section id="quick-comparison" className="mt-10 scroll-mt-24">
+        <h2 className="text-2xl">Quick comparison</h2>
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full min-w-[36rem] border-collapse text-sm">
+            <caption className="sr-only">{label}: quick comparison of key distinctions</caption>
+            <thead>
+              <tr className="border-b border-rule text-left">
+                <th scope="col" className="w-1/3 py-2 pr-4 font-medium">
+                  Distinction
+                </th>
+                <th scope="col" className="py-2 pr-4 font-medium">
+                  {nameA}
+                </th>
+                <th scope="col" className="py-2 font-medium">
+                  {nameB}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {QUICK_COMPARISON_ROWS.map((row) => (
+                <tr key={row.key} className="border-b border-rule align-top">
+                  <th
+                    scope="row"
+                    className="py-3 pr-4 text-left font-normal text-muted-foreground"
+                  >
+                    {row.label}
+                  </th>
+                  <td className="py-3 pr-4">{cell(a, row.key)}</td>
+                  <td className="py-3">{cell(b, row.key)}</td>
+                </tr>
+              ))}
+              <tr className="border-b border-rule align-top">
+                <th scope="row" className="py-3 pr-4 text-left font-normal text-muted-foreground">
+                  Pricing basis
+                </th>
+                <td className="py-3 pr-4" colSpan={2}>
+                  Publicly advertised clinic prices only, recorded with a source link and an
+                  observation date. No estimates or modelled averages.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <div className="mt-8 grid gap-4 md:grid-cols-3">
         <article className="border border-rule bg-card p-4">
           <h2 className="text-base font-medium">Consider {nameA} when…</h2>
@@ -343,9 +449,89 @@ function ComparisonPage() {
       </div>
 
       <section className="mt-14">
-        <p className="text-xs uppercase tracking-wider text-muted-foreground">Side by side</p>
-        <h2 className="mt-1 text-2xl">{label}: attribute-by-attribute comparison</h2>
-        <ComparisonTable a={a} b={b} nameA={nameA} nameB={nameB} label={label} />
+        <h2 className="text-2xl">Detailed comparison</h2>
+        <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
+          Every attribute below comes from the two individual treatment records. Where a claim is
+          sourced, the supporting reference is linked next to that row.
+        </p>
+        {COMPARISON_SECTIONS.map((section) => (
+          <section key={section.id} id={section.id} className="mt-10 scroll-mt-24">
+            <h3 className="text-xl">{section.title}</h3>
+            <div className="mt-3 overflow-x-auto">
+              <table className="w-full min-w-[36rem] border-collapse text-sm">
+                <caption className="sr-only">
+                  {label}: {section.title}
+                </caption>
+                <thead>
+                  <tr className="border-b border-rule text-left">
+                    <th scope="col" className="w-1/3 py-2 pr-4 font-medium">
+                      Attribute
+                    </th>
+                    <th scope="col" className="py-2 pr-4 font-medium">
+                      {nameA}
+                    </th>
+                    <th scope="col" className="py-2 font-medium">
+                      {nameB}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {section.keys.map((key) => (
+                    <tr key={key} className="border-b border-rule align-top">
+                      <th
+                        scope="row"
+                        className="py-3 pr-4 text-left font-normal text-muted-foreground"
+                      >
+                        {comparisonRowLabel(key)}
+                      </th>
+                      <td className="py-3 pr-4">
+                        {cell(a, key)}
+                        <RowSources sources={data.sources as TreatmentSource[]} treatmentId={a?.id} claim={key} />
+                      </td>
+                      <td className="py-3">
+                        {cell(b, key)}
+                        <RowSources sources={data.sources as TreatmentSource[]} treatmentId={b?.id} claim={key} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ))}
+      </section>
+
+      <section id="cost" className="mt-14 scroll-mt-24">
+        <h2 className="text-2xl">Cost</h2>
+        <p className="mt-3 max-w-3xl text-sm text-muted-foreground">
+          We do not publish national averages. Cost is shown only where a clinic advertises a
+          price publicly, recorded with the page it came from and the date it was observed.
+          Pricing units differ between treatments (per unit, per syringe, per session), so amounts
+          across these two treatments are not directly interchangeable.
+        </p>
+      </section>
+
+      <section id="local-prices" className="mt-12 scroll-mt-24">
+        <h2 className="text-2xl">Local prices</h2>
+        <p className="mt-3 max-w-3xl text-sm text-muted-foreground">
+          Publicly listed local pricing currently starts with San Francisco.
+        </p>
+        <ul className="mt-3 flex flex-wrap gap-3 text-sm">
+          <li>
+            <Link
+              to="/prices/us/ca/$city/$treatment"
+              params={{ city: "san-francisco", treatment: "botox" }}
+              className="inline-block border border-rule bg-card px-3 py-1.5 hover:border-primary"
+            >
+              San Francisco Botox prices
+            </Link>
+          </li>
+          <li>
+            <Link to="/methodology" className="underline underline-offset-4">
+              How prices are collected
+            </Link>
+          </li>
+        </ul>
       </section>
 
       {comparison?.common_misconception ? (
@@ -377,25 +563,13 @@ function ComparisonPage() {
         </p>
       </section>
 
-      <ComparisonDisclaimer />
-
-      <section className="mt-12">
+      <section id="sources" className="mt-12 scroll-mt-24">
         <h2 className="text-2xl">Sources</h2>
-        <ul className="mt-3 space-y-2 text-sm">
-          {(data.sources as TreatmentSource[]).map((s) => (
-            <li key={s.id}>
-              <a
-                href={s.source_url}
-                rel="nofollow noopener"
-                target="_blank"
-                className="underline underline-offset-4"
-              >
-                {s.source_title}
-              </a>
-              <span className="text-muted-foreground"> · {s.source_type}</span>
-            </li>
-          ))}
-        </ul>
+        <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
+          Sources are grouped by the specific claim they support, not pooled into one
+          undifferentiated list.
+        </p>
+        <SourcesByClaim sources={data.sources as TreatmentSource[]} a={a} b={b} nameA={nameA} nameB={nameB} />
         <ul className="mt-4 flex flex-wrap gap-3 text-sm">
           {[slugA, slugB].map((s) => (
             <li key={s}>
@@ -409,6 +583,10 @@ function ComparisonPage() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section id="medical-disclaimer" className="scroll-mt-24">
+        <ComparisonDisclaimer />
       </section>
 
       <RelatedComparisons currentSlug={slug} reviewedSlugs={reviewedSlugs} />
@@ -457,4 +635,102 @@ function cell(t: Treatment | null | undefined, key: keyof Treatment) {
     return <span className="text-muted-foreground">Not yet recorded</span>;
   }
   return value;
+}
+
+/** Claim-level sourcing: the reference supporting one row, for one treatment. */
+function RowSources({
+  sources,
+  treatmentId,
+  claim,
+}: {
+  sources: TreatmentSource[];
+  treatmentId?: string;
+  claim: keyof Treatment;
+}) {
+  if (!treatmentId) return null;
+  const matches = sources.filter(
+    (s) => s.treatment_id === treatmentId && s.claim_field === claim,
+  );
+  if (matches.length === 0) return null;
+  return (
+    <ul className="mt-1.5 space-y-1 text-xs text-muted-foreground">
+      {matches.map((s) => (
+        <li key={s.id}>
+          <a
+            href={s.source_url}
+            rel="nofollow noopener"
+            target="_blank"
+            className="underline underline-offset-2"
+          >
+            {s.source_title}
+          </a>{" "}
+          — {sourcePublisher(s.source_url)}
+          {s.publication_date ? `, ${s.publication_date.slice(0, 10)}` : ""}
+          {s.source_type ? ` · ${s.source_type}` : ""}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Full source list, grouped by treatment and by the claim each source supports. */
+function SourcesByClaim({
+  sources,
+  a,
+  b,
+  nameA,
+  nameB,
+}: {
+  sources: TreatmentSource[];
+  a: Treatment | null;
+  b: Treatment | null;
+  nameA: string;
+  nameB: string;
+}) {
+  const groups = [
+    { id: a?.id, name: nameA },
+    { id: b?.id, name: nameB },
+  ];
+  return (
+    <div className="mt-4 grid gap-6 md:grid-cols-2">
+      {groups.map((group) => {
+        const rows = sources.filter((s) => group.id && s.treatment_id === group.id);
+        return (
+          <div key={group.name}>
+            <h3 className="text-base font-medium">{group.name}</h3>
+            {rows.length === 0 ? (
+              <p className="mt-2 text-sm text-muted-foreground">No sources recorded yet.</p>
+            ) : (
+              <dl className="mt-2 space-y-3 text-sm">
+                {rows.map((s) => (
+                  <div key={s.id}>
+                    <dt className="text-muted-foreground">
+                      Claim: {comparisonRowLabel(s.claim_field as keyof Treatment)}
+                    </dt>
+                    <dd>
+                      <a
+                        href={s.source_url}
+                        rel="nofollow noopener"
+                        target="_blank"
+                        className="underline underline-offset-4"
+                      >
+                        {s.source_title}
+                      </a>
+                      <span className="text-muted-foreground">
+                        {" "}
+                        — {sourcePublisher(s.source_url)}
+                        {s.publication_date ? `, published ${s.publication_date.slice(0, 10)}` : ""}
+                        {s.source_type ? ` · ${s.source_type}` : ""}
+                        {s.evidence_level ? ` · evidence: ${s.evidence_level}` : ""}
+                      </span>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
 }

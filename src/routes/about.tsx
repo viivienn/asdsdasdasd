@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Prose } from "@/components/editorial";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -15,10 +16,10 @@ export const Route = createFileRoute("/about")({
         property: "og:description",
         content: "Independent cosmetic treatment comparisons. No sponsorships, no lead selling.",
       },
-      { property: "og:url", content: "/about" },
+      { property: "og:url", content: absoluteUrl("/about") },
       { property: "og:type", content: "article" },
     ],
-    links: [{ rel: "canonical", href: "/about" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/about") }],
   }),
   component: About,
 });
@@ -58,7 +59,7 @@ function About() {
           here before they go live.
         </p>
 
-        <h2 className="mt-10 text-2xl">Correction policy</h2>
+        <h2 id="corrections" className="mt-10 scroll-mt-24 text-2xl">Correction policy</h2>
         <p>
           If we get something wrong, tell us and we will fix it. Substantive corrections to medical
           content or prices are noted on the page rather than silently edited, along with the date

@@ -4,6 +4,7 @@ import { TreatmentPicker } from "@/components/treatment-picker";
 import { SectionHeading } from "@/components/editorial";
 import { ComparisonRequestForm } from "@/components/demand-forms";
 import { POPULAR_COMPARISON_SLUGS } from "@/lib/content-types";
+import { absoluteUrl } from "@/lib/site";
 
 const LABELS: Record<string, string> = {
   "sculptra-vs-radiesse": "Sculptra vs. Radiesse",
@@ -32,10 +33,10 @@ export const Route = createFileRoute("/compare/")({
         property: "og:description",
         content: "Structured, like-for-like comparisons of cosmetic treatments.",
       },
-      { property: "og:url", content: "/compare" },
+      { property: "og:url", content: absoluteUrl("/compare") },
       { property: "og:type", content: "website" },
     ],
-    links: [{ rel: "canonical", href: "/compare" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/compare") }],
   }),
   errorComponent: () => <p>We couldn't load the comparison hub. Please refresh.</p>,
   component: CompareHub,

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { absoluteUrl } from "@/lib/site";
 
 const LAST_UPDATED = "2026-07-27";
 
@@ -17,12 +18,12 @@ export const Route = createFileRoute("/medical-disclaimer")({
         content:
           "Educational purpose, no provider-patient relationship, no personalized recommendations, and how pricing observations should be read.",
       },
-      { property: "og:url", content: "/medical-disclaimer" },
+      { property: "og:url", content: absoluteUrl("/medical-disclaimer") },
       { property: "og:type", content: "article" },
       // Public and indexable, but not a search landing page.
       { name: "robots", content: "index, follow, noimageindex, max-snippet:0" },
     ],
-    links: [{ rel: "canonical", href: "/medical-disclaimer" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/medical-disclaimer") }],
   }),
   component: MedicalDisclaimer,
 });

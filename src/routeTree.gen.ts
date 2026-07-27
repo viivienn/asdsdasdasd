@@ -12,12 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as MethodologyRouteImport } from './routes/methodology'
 import { Route as MedicalDisclaimerRouteImport } from './routes/medical-disclaimer'
+import { Route as IndexnowKeyDottxtRouteImport } from './routes/indexnow-key[.]txt'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TreatmentsIndexRouteImport } from './routes/treatments.index'
 import { Route as CompareIndexRouteImport } from './routes/compare.index'
 import { Route as TreatmentsSlugRouteImport } from './routes/treatments.$slug'
 import { Route as CompareSlugRouteImport } from './routes/compare.$slug'
+import { Route as ApiPublicIndexnowRouteImport } from './routes/api/public/indexnow'
 import { Route as PricesUsCaCityTreatmentRouteImport } from './routes/prices.us.ca.$city.$treatment'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -33,6 +35,11 @@ const MethodologyRoute = MethodologyRouteImport.update({
 const MedicalDisclaimerRoute = MedicalDisclaimerRouteImport.update({
   id: '/medical-disclaimer',
   path: '/medical-disclaimer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexnowKeyDottxtRoute = IndexnowKeyDottxtRouteImport.update({
+  id: '/indexnow-key.txt',
+  path: '/indexnow-key.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -65,6 +72,11 @@ const CompareSlugRoute = CompareSlugRouteImport.update({
   path: '/compare/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicIndexnowRoute = ApiPublicIndexnowRouteImport.update({
+  id: '/api/public/indexnow',
+  path: '/api/public/indexnow',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PricesUsCaCityTreatmentRoute = PricesUsCaCityTreatmentRouteImport.update({
   id: '/prices/us/ca/$city/$treatment',
   path: '/prices/us/ca/$city/$treatment',
@@ -74,6 +86,7 @@ const PricesUsCaCityTreatmentRoute = PricesUsCaCityTreatmentRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/indexnow-key.txt': typeof IndexnowKeyDottxtRoute
   '/medical-disclaimer': typeof MedicalDisclaimerRoute
   '/methodology': typeof MethodologyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -81,11 +94,13 @@ export interface FileRoutesByFullPath {
   '/treatments/$slug': typeof TreatmentsSlugRoute
   '/compare/': typeof CompareIndexRoute
   '/treatments/': typeof TreatmentsIndexRoute
+  '/api/public/indexnow': typeof ApiPublicIndexnowRoute
   '/prices/us/ca/$city/$treatment': typeof PricesUsCaCityTreatmentRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/indexnow-key.txt': typeof IndexnowKeyDottxtRoute
   '/medical-disclaimer': typeof MedicalDisclaimerRoute
   '/methodology': typeof MethodologyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -93,12 +108,14 @@ export interface FileRoutesByTo {
   '/treatments/$slug': typeof TreatmentsSlugRoute
   '/compare': typeof CompareIndexRoute
   '/treatments': typeof TreatmentsIndexRoute
+  '/api/public/indexnow': typeof ApiPublicIndexnowRoute
   '/prices/us/ca/$city/$treatment': typeof PricesUsCaCityTreatmentRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/indexnow-key.txt': typeof IndexnowKeyDottxtRoute
   '/medical-disclaimer': typeof MedicalDisclaimerRoute
   '/methodology': typeof MethodologyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -106,6 +123,7 @@ export interface FileRoutesById {
   '/treatments/$slug': typeof TreatmentsSlugRoute
   '/compare/': typeof CompareIndexRoute
   '/treatments/': typeof TreatmentsIndexRoute
+  '/api/public/indexnow': typeof ApiPublicIndexnowRoute
   '/prices/us/ca/$city/$treatment': typeof PricesUsCaCityTreatmentRoute
 }
 export interface FileRouteTypes {
@@ -113,6 +131,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/indexnow-key.txt'
     | '/medical-disclaimer'
     | '/methodology'
     | '/sitemap.xml'
@@ -120,11 +139,13 @@ export interface FileRouteTypes {
     | '/treatments/$slug'
     | '/compare/'
     | '/treatments/'
+    | '/api/public/indexnow'
     | '/prices/us/ca/$city/$treatment'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/indexnow-key.txt'
     | '/medical-disclaimer'
     | '/methodology'
     | '/sitemap.xml'
@@ -132,11 +153,13 @@ export interface FileRouteTypes {
     | '/treatments/$slug'
     | '/compare'
     | '/treatments'
+    | '/api/public/indexnow'
     | '/prices/us/ca/$city/$treatment'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/indexnow-key.txt'
     | '/medical-disclaimer'
     | '/methodology'
     | '/sitemap.xml'
@@ -144,12 +167,14 @@ export interface FileRouteTypes {
     | '/treatments/$slug'
     | '/compare/'
     | '/treatments/'
+    | '/api/public/indexnow'
     | '/prices/us/ca/$city/$treatment'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  IndexnowKeyDottxtRoute: typeof IndexnowKeyDottxtRoute
   MedicalDisclaimerRoute: typeof MedicalDisclaimerRoute
   MethodologyRoute: typeof MethodologyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -157,6 +182,7 @@ export interface RootRouteChildren {
   TreatmentsSlugRoute: typeof TreatmentsSlugRoute
   CompareIndexRoute: typeof CompareIndexRoute
   TreatmentsIndexRoute: typeof TreatmentsIndexRoute
+  ApiPublicIndexnowRoute: typeof ApiPublicIndexnowRoute
   PricesUsCaCityTreatmentRoute: typeof PricesUsCaCityTreatmentRoute
 }
 
@@ -181,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/medical-disclaimer'
       fullPath: '/medical-disclaimer'
       preLoaderRoute: typeof MedicalDisclaimerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/indexnow-key.txt': {
+      id: '/indexnow-key.txt'
+      path: '/indexnow-key.txt'
+      fullPath: '/indexnow-key.txt'
+      preLoaderRoute: typeof IndexnowKeyDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -225,6 +258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompareSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/indexnow': {
+      id: '/api/public/indexnow'
+      path: '/api/public/indexnow'
+      fullPath: '/api/public/indexnow'
+      preLoaderRoute: typeof ApiPublicIndexnowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/prices/us/ca/$city/$treatment': {
       id: '/prices/us/ca/$city/$treatment'
       path: '/prices/us/ca/$city/$treatment'
@@ -238,6 +278,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  IndexnowKeyDottxtRoute: IndexnowKeyDottxtRoute,
   MedicalDisclaimerRoute: MedicalDisclaimerRoute,
   MethodologyRoute: MethodologyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
@@ -245,6 +286,7 @@ const rootRouteChildren: RootRouteChildren = {
   TreatmentsSlugRoute: TreatmentsSlugRoute,
   CompareIndexRoute: CompareIndexRoute,
   TreatmentsIndexRoute: TreatmentsIndexRoute,
+  ApiPublicIndexnowRoute: ApiPublicIndexnowRoute,
   PricesUsCaCityTreatmentRoute: PricesUsCaCityTreatmentRoute,
 }
 export const routeTree = rootRouteImport
