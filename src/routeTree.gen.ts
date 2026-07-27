@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CompareIndexRouteImport } from './routes/compare.index'
+import { Route as CompareSlugRouteImport } from './routes/compare.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,30 +23,39 @@ const CompareIndexRoute = CompareIndexRouteImport.update({
   path: '/compare/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompareSlugRoute = CompareSlugRouteImport.update({
+  id: '/compare/$slug',
+  path: '/compare/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/compare/$slug': typeof CompareSlugRoute
   '/compare/': typeof CompareIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/compare/$slug': typeof CompareSlugRoute
   '/compare': typeof CompareIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/compare/$slug': typeof CompareSlugRoute
   '/compare/': typeof CompareIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/compare/'
+  fullPaths: '/' | '/compare/$slug' | '/compare/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/compare'
-  id: '__root__' | '/' | '/compare/'
+  to: '/' | '/compare/$slug' | '/compare'
+  id: '__root__' | '/' | '/compare/$slug' | '/compare/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CompareSlugRoute: typeof CompareSlugRoute
   CompareIndexRoute: typeof CompareIndexRoute
 }
 
@@ -65,11 +75,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompareIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/compare/$slug': {
+      id: '/compare/$slug'
+      path: '/compare/$slug'
+      fullPath: '/compare/$slug'
+      preLoaderRoute: typeof CompareSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CompareSlugRoute: CompareSlugRoute,
   CompareIndexRoute: CompareIndexRoute,
 }
 export const routeTree = rootRouteImport
