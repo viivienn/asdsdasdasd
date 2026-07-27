@@ -9,6 +9,7 @@ import type { Treatment, TreatmentSource } from "@/lib/content-types";
 import { DemoNotice, EvidenceState } from "@/components/editorial";
 import { CoverageRequestForm } from "@/components/demand-forms";
 import { TreatmentDisclaimer } from "@/components/disclaimers";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/treatments/$slug")({
   loader: async ({ params }) => {
@@ -32,11 +33,11 @@ export const Route = createFileRoute("/treatments/$slug")({
         { name: "description", content: description.slice(0, 155) },
         { property: "og:title", content: `${t.name}` },
         { property: "og:description", content: description.slice(0, 155) },
-        { property: "og:url", content: `/treatments/${params.slug}` },
+        { property: "og:url", content: absoluteUrl(`/treatments/${params.slug}`) },
         { property: "og:type", content: "article" },
         ...(loaderData.isDemo ? [{ name: "robots", content: "noindex, nofollow" }] : []),
       ],
-      links: [{ rel: "canonical", href: `/treatments/${params.slug}` }],
+      links: [{ rel: "canonical", href: absoluteUrl(`/treatments/${params.slug}`) }],
     };
   },
   errorComponent: () => <p>We couldn't load this treatment. Please refresh.</p>,

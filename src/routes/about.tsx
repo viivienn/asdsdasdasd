@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Prose } from "@/components/editorial";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -15,10 +16,10 @@ export const Route = createFileRoute("/about")({
         property: "og:description",
         content: "Independent cosmetic treatment comparisons. No sponsorships, no lead selling.",
       },
-      { property: "og:url", content: "/about" },
+      { property: "og:url", content: absoluteUrl("/about") },
       { property: "og:type", content: "article" },
     ],
-    links: [{ rel: "canonical", href: "/about" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/about") }],
   }),
   component: About,
 });

@@ -3,6 +3,7 @@ import { fetchCompareIndex } from "@/lib/content.functions";
 import { TreatmentPicker } from "@/components/treatment-picker";
 import { DemoNotice, Prose, SectionHeading } from "@/components/editorial";
 import { CoverageRequestForm } from "@/components/demand-forms";
+import { absoluteUrl } from "@/lib/site";
 
 const POPULAR: Array<[string, string]> = [
   ["sculptra-vs-radiesse", "Sculptra vs. Radiesse"],
@@ -28,11 +29,11 @@ export const Route = createFileRoute("/")({
         content:
           "Results, downtime, risks, reversibility, and publicly listed local prices — in one clear place.",
       },
-      { property: "og:url", content: "/" },
+      { property: "og:url", content: absoluteUrl("/") },
       { property: "og:type", content: "website" },
       ...(loaderData?.isDemo ? [{ name: "robots", content: "noindex" }] : []),
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/") }],
   }),
   errorComponent: () => <p>We couldn't load this page. Please refresh.</p>,
   component: Home,

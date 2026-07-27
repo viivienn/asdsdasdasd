@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { fetchTreatments } from "@/lib/content.functions";
 import { DemoNotice } from "@/components/editorial";
 import type { Treatment } from "@/lib/content-types";
+import { absoluteUrl } from "@/lib/site";
 
 const FILTERS = [
   "All",
@@ -28,11 +29,11 @@ export const Route = createFileRoute("/treatments/")({
         property: "og:description",
         content: "Structured profiles of injectables, biostimulators, fillers, and energy devices.",
       },
-      { property: "og:url", content: "/treatments" },
+      { property: "og:url", content: absoluteUrl("/treatments") },
       { property: "og:type", content: "website" },
       ...(loaderData?.isDemo ? [{ name: "robots", content: "noindex" }] : []),
     ],
-    links: [{ rel: "canonical", href: "/treatments" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/treatments") }],
   }),
   errorComponent: () => <p>We couldn't load treatments. Please refresh.</p>,
   component: TreatmentsIndex,
