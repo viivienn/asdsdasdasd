@@ -636,3 +636,101 @@ function cell(t: Treatment | null | undefined, key: keyof Treatment) {
   }
   return value;
 }
+
+/** Claim-level sourcing: the reference supporting one row, for one treatment. */
+function RowSources({
+  sources,
+  treatmentId,
+  claim,
+}: {
+  sources: TreatmentSource[];
+  treatmentId?: string;
+  claim: keyof Treatment;
+}) {
+  if (!treatmentId) return null;
+  const matches = sources.filter(
+    (s) => s.treatment_id === treatmentId && s.claim_field === claim,
+  );
+  if (matches.length === 0) return null;
+  return (
+    <ul className="mt-1.5 space-y-1 text-xs text-muted-foreground">
+      {matches.map((s) => (
+        <li key={s.id}>
+          <a
+            href={s.source_url}
+            rel="nofollow noopener"
+            target="_blank"
+            className="underline underline-offset-2"
+          >
+            {s.source_title}
+          </a>{" "}
+          — {sourcePublisher(s.source_url)}
+          {s.publication_date ? `, ${s.publication_date.slice(0, 10)}` : ""}
+          {s.source_type ? ` · ${s.source_type}` : ""}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Full source list, grouped by treatment and by the claim each source supports. */
+function SourcesByClaim({
+  sources,
+  a,
+  b,
+  nameA,
+  nameB,
+}: {
+  sources: TreatmentSource[];
+  a: Treatment | null;
+  b: Treatment | null;
+  nameA: string;
+  nameB: string;
+}) {
+  const groups = [
+    { id: a?.id, name: nameA },
+    { id: b?.id, name: nameB },
+  ];
+  return (
+    <div className="mt-4 grid gap-6 md:grid-cols-2">
+      {groups.map((group) => {
+        const rows = sources.filter((s) => group.id && s.treatment_id === group.id);
+        return (
+          <div key={group.name}>
+            <h3 className="text-base font-medium">{group.name}</h3>
+            {rows.length === 0 ? (
+              <p className="mt-2 text-sm text-muted-foreground">No sources recorded yet.</p>
+            ) : (
+              <dl className="mt-2 space-y-3 text-sm">
+                {rows.map((s) => (
+                  <div key={s.id}>
+                    <dt className="text-muted-foreground">
+                      Claim: {comparisonRowLabel(s.claim_field as keyof Treatment)}
+                    </dt>
+                    <dd>
+                      <a
+                        href={s.source_url}
+                        rel="nofollow noopener"
+                        target="_blank"
+                        className="underline underline-offset-4"
+                      >
+                        {s.source_title}
+                      </a>
+                      <span className="text-muted-foreground">
+                        {" "}
+                        — {sourcePublisher(s.source_url)}
+                        {s.publication_date ? `, published ${s.publication_date.slice(0, 10)}` : ""}
+                        {s.source_type ? ` · ${s.source_type}` : ""}
+                        {s.evidence_level ? ` · evidence: ${s.evidence_level}` : ""}
+                      </span>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
