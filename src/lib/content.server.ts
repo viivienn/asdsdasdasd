@@ -36,17 +36,35 @@ export interface DemoAware<T> {
   isDemo: boolean;
 }
 
+const PLACEHOLDER = /demonstration text|pending sourcing|pending research/i;
+
+/**
+ * Placeholder editorial strings never reach a public page. A missing value is
+ * rendered as "Not yet recorded" instead of prototype copy.
+ */
+function scrubTreatment<T extends Record<string, unknown>>(row: T): T {
+  const out: Record<string, unknown> = { ...row };
+  for (const [k, v] of Object.entries(out)) {
+    if (typeof v === "string" && PLACEHOLDER.test(v)) out[k] = null;
+  }
+  return out as T;
+}
+
+function scrubTreatments(rows: unknown[]): Treatment[] {
+  return (rows as Record<string, unknown>[]).map(scrubTreatment) as unknown as Treatment[];
+}
+
 export async function listTreatments(): Promise<DemoAware<Treatment[]>> {
   const pub = await publicClient()
     .from("treatments")
     .select(TREATMENT_COLUMNS)
     .order("name");
   if (pub.data && pub.data.length > 0) {
-    return { data: pub.data as unknown as Treatment[], isDemo: false };
+    return { data: scrubTreatments(pub.data), isDemo: false };
   }
   const admin = await prototypeClient();
   const proto = await admin.from("treatments").select(TREATMENT_COLUMNS).order("name");
-  return { data: (proto.data ?? []) as unknown as Treatment[], isDemo: true };
+  return { data: scrubTreatments(proto.data ?? []), isDemo: true };
 }
 
 export async function getTreatmentBySlug(
@@ -65,7 +83,7 @@ export async function getTreatmentBySlug(
       .eq("treatment_id", (pub.data as unknown as Treatment).id);
     return {
       data: {
-        treatment: pub.data as unknown as Treatment,
+        treatment: scrubTreatments([pub.data])[0] ?? null,
         sources: (sources.data ?? []) as unknown as TreatmentSource[],
       },
       isDemo: false,
@@ -79,7 +97,7 @@ export async function getTreatmentBySlug(
     .eq("slug", slug)
     .maybeSingle();
   return {
-    data: { treatment: (proto.data as unknown as Treatment) ?? null, sources: [] },
+    data: { treatment: proto.data ? (scrubTreatments([proto.data])[0] ?? null) : null, sources: [] },
     isDemo: true,
   };
 }
@@ -149,7 +167,7 @@ export async function getComparisonContext(
     .from("treatments")
     .select(TREATMENT_COLUMNS)
     .in("slug", [slugA, slugB]);
-  const list = (rows ?? []) as unknown as Treatment[];
+  const list = scrubTreatments(rows ?? []);
   const a = list.find((t) => t.slug === slugA) ?? null;
   const b = list.find((t) => t.slug === slugB) ?? null;
 
