@@ -30,7 +30,7 @@ export const Route = createFileRoute("/treatments/$slug")({
         { property: "og:description", content: description.slice(0, 155) },
         { property: "og:url", content: `/treatments/${params.slug}` },
         { property: "og:type", content: "article" },
-        ...(loaderData.isDemo ? [{ name: "robots", content: "noindex" }] : []),
+        ...(loaderData.isDemo ? [{ name: "robots", content: "noindex, nofollow" }] : []),
       ],
       links: [{ rel: "canonical", href: `/treatments/${params.slug}` }],
     };

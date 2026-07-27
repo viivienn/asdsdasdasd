@@ -2,6 +2,19 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { fetchCompareIndex } from "@/lib/content.functions";
 import { TreatmentPicker } from "@/components/treatment-picker";
 import { DemoNotice, SectionHeading } from "@/components/editorial";
+import { ComparisonRequestForm } from "@/components/demand-forms";
+
+const LABELS: Record<string, string> = {
+  "sculptra-vs-radiesse": "Sculptra vs. Radiesse",
+  "sculptra-vs-ha-filler": "Sculptra vs. HA Filler",
+  "botox-vs-dysport": "Botox vs. Dysport",
+  "thermage-vs-ultherapy": "Thermage vs. Ultherapy",
+  "morpheus8-vs-ultherapy": "Morpheus8 vs. Ultherapy",
+};
+
+function comparisonLabel(slug: string) {
+  return LABELS[slug] ?? slug.replace(/-vs-/, " vs. ").replace(/-/g, " ");
+}
 
 export const Route = createFileRoute("/compare/")({
   loader: () => fetchCompareIndex(),
@@ -53,22 +66,20 @@ function CompareHub() {
                 params={{ slug }}
                 className="block border border-rule bg-card px-4 py-3 hover:border-primary"
               >
-                {slug.replace(/-vs-/, " vs. ").replace(/-/g, " ")}
+                <span className="block">{comparisonLabel(slug)}</span>
+                {isDemo ? (
+                  <span className="mt-1 inline-block border border-rule bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                    Prototype comparison
+                  </span>
+                ) : null}
               </Link>
             </li>
           ))}
         </ul>
       </section>
 
-      <section className="mt-14 border border-rule bg-secondary p-5">
-        <h2 className="text-xl">Request a comparison</h2>
-        <p className="mt-2 max-w-2xl text-sm">
-          Missing a pair? Email{" "}
-          <a href="mailto:hello@aestheticindex.co" className="underline underline-offset-4">
-            hello@aestheticindex.co
-          </a>{" "}
-          with the two treatments and we'll add it to the editorial queue.
-        </p>
+      <section className="mt-14">
+        <ComparisonRequestForm />
       </section>
     </>
   );
