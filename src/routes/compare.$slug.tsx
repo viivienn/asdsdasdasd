@@ -68,9 +68,9 @@ export const Route = createFileRoute("/compare/$slug")({
           { name: "robots", content: "noindex, follow" },
           { property: "og:title", content: label },
           { property: "og:type", content: "website" },
-          { property: "og:url", content: `/compare/${params.slug}` },
+          { property: "og:url", content: absoluteUrl(`/compare/${params.slug}`) },
         ],
-        links: [{ rel: "canonical", href: `/compare/${params.slug}` }],
+        links: [{ rel: "canonical", href: absoluteUrl(`/compare/${params.slug}`) }],
       };
     }
 

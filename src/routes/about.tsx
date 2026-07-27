@@ -59,7 +59,7 @@ function About() {
           here before they go live.
         </p>
 
-        <h2 className="mt-10 text-2xl">Correction policy</h2>
+        <h2 id="corrections" className="mt-10 scroll-mt-24 text-2xl">Correction policy</h2>
         <p>
           If we get something wrong, tell us and we will fix it. Substantive corrections to medical
           content or prices are noted on the page rather than silently edited, along with the date
