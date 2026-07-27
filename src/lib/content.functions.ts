@@ -45,7 +45,13 @@ const cityRequestSchema = z.object({
   email: z.string().trim().email().max(254),
   postal_code: z.string().trim().min(3).max(12).regex(/^[A-Za-z0-9 -]+$/),
   city: z.string().trim().max(80).optional().or(z.literal("")),
-  treatment_slug: z.string().trim().max(80).optional().or(z.literal("")),
+  treatment_slug: z
+    .string()
+    .trim()
+    .max(80)
+    .regex(/^[a-z0-9-]*$/)
+    .optional()
+    .or(z.literal("")),
   consent: z.literal(true),
   source_path: z.string().max(200).optional(),
   company: z.string().max(0).optional().or(z.literal("")),
@@ -72,7 +78,12 @@ export const submitCityRequest = createServerFn({ method: "POST" })
 const priceAlertSchema = z.object({
   email: z.string().trim().email().max(254),
   postal_code: z.string().trim().min(3).max(12).regex(/^[A-Za-z0-9 -]+$/),
-  treatment_slug: z.string().trim().min(1).max(80),
+  treatment_slug: z
+    .string()
+    .trim()
+    .min(1)
+    .max(80)
+    .regex(/^[a-z0-9-]+$/),
   max_unit_price: z.number().positive().max(100000).nullable().optional(),
   source_path: z.string().max(200).optional(),
   company: z.string().max(0).optional().or(z.literal("")),
