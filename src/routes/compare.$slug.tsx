@@ -381,7 +381,7 @@ function ComparisonPage() {
       <section className="mt-12">
         <h2 className="text-2xl">Sources</h2>
         <ul className="mt-3 space-y-2 text-sm">
-          {data.sources.map((s) => (
+          {(data.sources as TreatmentSource[]).map((s) => (
             <li key={s.id}>
               <a
                 href={s.source_url}
