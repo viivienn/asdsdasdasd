@@ -2,15 +2,20 @@ import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-route
 import { fetchComparisonPair } from "@/lib/content.functions";
 import {
   COMPARISON_ROWS,
+  COMPARISON_SECTIONS,
+  QUICK_COMPARISON_ROWS,
   POPULAR_COMPARISON_SLUGS,
   canonicalPairSlug,
   comparisonLabel,
+  comparisonRowLabel,
   pairDisallowed,
   parsePairSlug,
+  sourcePublisher,
   treatmentLabel,
   type Treatment,
   type TreatmentSource,
 } from "@/lib/content-types";
+import { SITE_URL, absoluteUrl, breadcrumbJsonLd, organizationJsonLd } from "@/lib/site";
 import { EvidenceState, Prose } from "@/components/editorial";
 import { ComparisonRequestForm, CoverageRequestForm } from "@/components/demand-forms";
 import { ComparisonDisclaimer } from "@/components/disclaimers";
@@ -73,25 +78,55 @@ export const Route = createFileRoute("/compare/$slug")({
     const nameB = treatmentLabel(loaderData.slugB, loaderData.b?.name);
     const title = `${nameA} vs. ${nameB}: Results, Risks, Downtime & Cost | Aesthetic Index`;
     const description = `Compare ${nameA} and ${nameB} by purpose, results, downtime, risks, reversibility, longevity, and publicly listed local pricing.`;
+    const url = absoluteUrl(`/compare/${params.slug}`);
+    const reviewedAt = loaderData.comparison?.last_reviewed_at ?? undefined;
     return {
       meta: [
         { title },
         { name: "description", content: description },
+        { name: "robots", content: "index, follow, max-image-preview:large" },
         { property: "og:title", content: `${nameA} vs. ${nameB}` },
         { property: "og:description", content: description },
-        { property: "og:url", content: `/compare/${params.slug}` },
+        { property: "og:url", content: url },
         { property: "og:type", content: "article" },
       ],
-      links: [{ rel: "canonical", href: `/compare/${params.slug}` }],
+      links: [{ rel: "canonical", href: url }],
       scripts: [
         {
           type: "application/ld+json",
           children: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "Article",
-            headline: `${nameA} vs. ${nameB}`,
-            description,
-            dateModified: loaderData.comparison?.last_reviewed_at ?? undefined,
+            "@graph": [
+              organizationJsonLd(),
+              breadcrumbJsonLd([
+                { name: "Home", path: "/" },
+                { name: "Compare", path: "/compare" },
+                { name: `${nameA} vs. ${nameB}`, path: `/compare/${params.slug}` },
+              ]),
+              {
+                "@type": ["Article", "MedicalWebPage"],
+                "@id": url,
+                url,
+                headline: `${nameA} vs. ${nameB}`,
+                name: `${nameA} vs. ${nameB}`,
+                description,
+                inLanguage: "en",
+                isAccessibleForFree: true,
+                dateModified: reviewedAt,
+                datePublished: reviewedAt,
+                publisher: { "@id": `${SITE_URL}#organization` },
+                about: [
+                  { "@type": "MedicalTherapy", name: nameA },
+                  { "@type": "MedicalTherapy", name: nameB },
+                ],
+                citation: (loaderData.sources as TreatmentSource[] | undefined)?.map((s) => ({
+                  "@type": "CreativeWork",
+                  name: s.source_title,
+                  url: s.source_url,
+                  datePublished: s.publication_date ?? undefined,
+                })),
+              },
+            ],
           }),
         },
       ],
