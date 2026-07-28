@@ -5,7 +5,15 @@ import {
   ENTITY_GROUP_LABEL,
   ENTITY_DESCRIPTION,
   type EntityType,
+  type Treatment,
+  type TreatmentMedia,
 } from "@/lib/content-types";
+
+interface CatalogEntryView extends Treatment {
+  parent_name: string | null;
+  parent_slug: string | null;
+  media: TreatmentMedia | null;
+}
 import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/explore/")({
@@ -35,7 +43,7 @@ export const Route = createFileRoute("/explore/")({
 });
 
 function Explore() {
-  const { entries } = Route.useLoaderData();
+  const { entries } = Route.useLoaderData() as { entries: CatalogEntryView[] };
 
   return (
     <>
