@@ -193,6 +193,45 @@ export type Database = {
           },
         ]
       }
+      content_suggestions: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string
+          id: string
+          sources: string[]
+          status: Database["public"]["Enums"]["suggestion_status"]
+          target_slug: string | null
+          target_type: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          created_by: string
+          id?: string
+          sources?: string[]
+          status?: Database["public"]["Enums"]["suggestion_status"]
+          target_slug?: string | null
+          target_type: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          sources?: string[]
+          status?: Database["public"]["Enums"]["suggestion_status"]
+          target_slug?: string | null
+          target_type?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       locations: {
         Row: {
           city: string
@@ -708,6 +747,7 @@ export type Database = {
     Enums: {
       app_role: "admin" | "editor"
       publication_status: "draft" | "review" | "published"
+      suggestion_status: "new" | "accepted" | "rejected"
       verification_status:
         | "unverified"
         | "source_checked"
@@ -843,6 +883,7 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "editor"],
       publication_status: ["draft", "review", "published"],
+      suggestion_status: ["new", "accepted", "rejected"],
       verification_status: [
         "unverified",
         "source_checked",
