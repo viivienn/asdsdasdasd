@@ -237,6 +237,7 @@ export const COMPARISON_DISPLAY_ORDER: Record<string, [string, string]> = {
   "botox-vs-dysport": ["botox", "dysport"],
   "thermage-vs-ultherapy": ["thermage", "ultherapy"],
   "morpheus8-vs-ultherapy": ["morpheus8", "ultherapy"],
+  "hydrafacial-vs-diamondglow": ["hydrafacial", "diamondglow"],
 };
 
 export const COMPARISON_SLUGS = Object.keys(COMPARISON_DISPLAY_ORDER);
@@ -258,6 +259,8 @@ export const TREATMENT_LABELS: Record<string, string> = {
   xeomin: "Xeomin",
   juvederm: "Juvéderm",
   restylane: "Restylane",
+  hydrafacial: "HydraFacial",
+  diamondglow: "DiamondGlow",
 };
 
 export function treatmentLabel(slug: string, name?: string | null): string {

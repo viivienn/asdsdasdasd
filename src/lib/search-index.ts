@@ -35,12 +35,22 @@ export const POPULAR_SEARCHES: SearchEntry[] = [
   },
 ];
 
+export const MORE_COMPARISONS: SearchEntry[] = [
+  {
+    label: "HydraFacial vs. DiamondGlow",
+    sub: "Comparison",
+    kind: "comparison",
+    slug: "hydrafacial-vs-diamondglow",
+  },
+];
+
 /** Treatment classes — the "ingredient"-level concept: what kind of thing it is. */
 export const CATEGORY_ENTRIES: SearchEntry[] = [
   { label: "Filler", sub: "Category", kind: "category", slug: "filler" },
   { label: "Neuromodulator", sub: "Category", kind: "category", slug: "neuromodulator" },
   { label: "Collagen stimulator", sub: "Category", kind: "category", slug: "collagen-stimulator" },
   { label: "Energy device", sub: "Category", kind: "category", slug: "energy-device" },
+  { label: "Exfoliation facial", sub: "Category", kind: "category", slug: "exfoliation-facial" },
 ];
 
 /** Brands — a family of products from one maker. */
@@ -63,6 +73,8 @@ export const TRENDING_TREATMENTS: SearchEntry[] = [
   { label: "Thermage", sub: "Energy device", kind: "treatment", slug: "thermage" },
   { label: "Ultherapy", sub: "Energy device", kind: "treatment", slug: "ultherapy" },
   { label: "Morpheus8", sub: "Energy device", kind: "treatment", slug: "morpheus8" },
+  { label: "HydraFacial", sub: "Exfoliation facial", kind: "treatment", slug: "hydrafacial" },
+  { label: "DiamondGlow", sub: "Exfoliation facial", kind: "treatment", slug: "diamondglow" },
 ];
 
 export const PRICE_ENTRIES: SearchEntry[] = [
@@ -79,6 +91,7 @@ export const SEARCH_ENTRIES: SearchEntry[] = [
   ...TRENDING_TREATMENTS,
   ...BRAND_ENTRIES,
   ...POPULAR_SEARCHES,
+  ...MORE_COMPARISONS,
   ...PRICE_ENTRIES,
 ];
 
