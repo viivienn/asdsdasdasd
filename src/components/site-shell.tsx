@@ -124,13 +124,13 @@ export function SiteShell({ children }: { children: ReactNode }) {
             <SiteSearch />
           </div>
           <nav aria-label="Primary" className="hidden lg:block">
-            <ul className="flex items-center gap-1 text-sm">
-              <NavMenu label="Explore" items={EXPLORE} />
-              <NavMenu label="Tools" items={TOOLS} />
+            <ul className="flex items-center gap-0.5">
+              <NavMenu label="Explore" items={EXPLORE} align="left" />
+              <NavMenu label="Tools" items={TOOLS} align="right" />
               <li>
                 <Link
                   to="/about"
-                  className="rounded-full px-3 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                  className="rounded-full px-2.5 py-1 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                   activeProps={{ className: "bg-secondary text-secondary-foreground font-medium" }}
                 >
                   About
