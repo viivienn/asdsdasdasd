@@ -3,6 +3,7 @@ import { fetchCompareIndex } from "@/lib/content.functions";
 import { TreatmentPicker } from "@/components/treatment-picker";
 import { Prose, SectionHeading } from "@/components/editorial";
 import { CoverageRequestForm } from "@/components/demand-forms";
+import { SiteSearch } from "@/components/site-search";
 import { absoluteUrl } from "@/lib/site";
 
 const POPULAR: Array<[string, string]> = [
@@ -44,46 +45,34 @@ function Home() {
 
   return (
     <>
-      <section className="rounded-2xl bg-surface px-5 py-12 text-center sm:px-10 sm:py-16">
-        <p className="text-xs font-medium uppercase tracking-[0.14em] text-primary">
-          Independent · no sponsorships
-        </p>
-        <h1 className="mx-auto mt-3 max-w-3xl font-display text-4xl leading-[1.08] sm:text-6xl">
-          Compare cosmetic treatments before you book.
+      <section className="-mt-4 px-2 py-14 text-center sm:py-24">
+        <h1 className="mx-auto max-w-3xl font-display text-4xl leading-[1.05] tracking-tight sm:text-6xl">
+          Find the treatment that fits
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
-          Results, downtime, risks, reversibility, and publicly listed local prices — side by side.
+          Search any cosmetic treatment and see what it actually involves.
         </p>
-        <div className="mx-auto mt-8 max-w-2xl card-soft p-4 text-left sm:p-5">
-          <TreatmentPicker treatments={treatments} publishedSlugs={slugs} />
+        <div className="mx-auto mt-8 max-w-xl">
+          <SiteSearch variant="hero" />
         </div>
-        <p className="mt-4 text-sm">
-          <Link
-            to="/prices/us/ca/$city/$treatment"
-            params={{ city: "san-francisco", treatment: "botox" }}
-            className="underline underline-offset-4 hover:text-primary"
-          >
-            See San Francisco Botox prices
-          </Link>
+        <p className="mt-4 text-xs uppercase tracking-[0.14em] text-muted-foreground">
+          Independent · no sponsorships · publicly listed prices
         </p>
       </section>
 
-      <section className="mt-16">
+      <section className="mt-4">
         <SectionHeading>Popular comparisons</SectionHeading>
-        <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {POPULAR.map(([slug, label]) => (
             <li key={slug}>
               <Link
                 to="/compare/$slug"
                 params={{ slug }}
-                className="block h-full card-soft card-hover p-5"
+                className="block h-full card-soft card-hover p-4"
               >
-                <span className="font-display text-lg font-semibold">{label}</span>
-                <span className="mt-1.5 block text-sm text-muted-foreground">
-                  Side-by-side on results, downtime, risks, and reversibility.
-                </span>
-                <span className="mt-4 block text-sm font-medium text-primary">
-                  Compare →
+                <span className="font-display text-base font-semibold">{label}</span>
+                <span className="mt-1 block text-sm text-muted-foreground">
+                  Results, downtime, risks, reversibility.
                 </span>
               </Link>
             </li>
@@ -91,7 +80,7 @@ function Home() {
         </ul>
       </section>
 
-      <section className="mt-16">
+      <section className="mt-14">
         <SectionHeading>Browse treatments</SectionHeading>
         <ul className="mt-5 flex flex-wrap gap-2">
           {[...treatments]
@@ -110,7 +99,14 @@ function Home() {
         </ul>
       </section>
 
-      <section className="mt-16">
+      <section className="mt-14">
+        <SectionHeading>Compare any two treatments</SectionHeading>
+        <div className="mt-5 card-soft p-4 sm:p-5">
+          <TreatmentPicker treatments={treatments} publishedSlugs={slugs} />
+        </div>
+      </section>
+
+      <section className="mt-14">
         <SectionHeading>How Aesthetic Index works</SectionHeading>
         <Prose>
           <p className="mt-4">
@@ -133,29 +129,22 @@ function Home() {
         </Prose>
       </section>
 
-      <section className="mt-16">
+      <section className="mt-14">
         <SectionHeading>Local pricing coverage</SectionHeading>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-          Coverage starts in San Francisco and expands by demand.
+          Coverage starts in San Francisco and expands by demand.{" "}
+          <Link
+            to="/prices/us/ca/$city/$treatment"
+            params={{ city: "san-francisco", treatment: "botox" }}
+            className="underline underline-offset-4 hover:text-primary"
+          >
+            See San Francisco Botox prices
+          </Link>
+          .
         </p>
         <div className="mt-5">
           <CoverageRequestForm />
         </div>
-      </section>
-
-      <section className="mt-16">
-        <SectionHeading>Methodology and trust</SectionHeading>
-        <Prose>
-          <p className="mt-4">
-            Aesthetic Index takes no clinic sponsorships, sells no leads, and accepts no payment for
-            placement. Corrections are published, not quietly edited.
-          </p>
-          <p>
-            <Link to="/about" className="underline underline-offset-4">
-              About Aesthetic Index
-            </Link>
-          </p>
-        </Prose>
       </section>
     </>
   );
