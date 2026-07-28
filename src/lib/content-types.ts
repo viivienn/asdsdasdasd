@@ -274,8 +274,17 @@ const ROW_LABELS: Record<string, string> = Object.fromEntries(
   COMPARISON_ROWS.map((r) => [r.key, r.label]),
 );
 
+const EXTRA_ROW_LABELS: Record<string, string> = {
+  generic_name: "Active ingredient",
+  brand_name: "Brand",
+  manufacturer: "Manufacturer",
+  category: "Category",
+  treatment_class: "Treatment class",
+  summary: "Summary",
+};
+
 export function comparisonRowLabel(key: keyof Treatment): string {
-  return ROW_LABELS[key] ?? String(key).replace(/_/g, " ");
+  return ROW_LABELS[key] ?? EXTRA_ROW_LABELS[key] ?? String(key).replace(/_/g, " ");
 }
 
 /** Publisher shown next to a source, derived from the source URL host. */
