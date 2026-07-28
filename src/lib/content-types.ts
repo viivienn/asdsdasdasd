@@ -120,6 +120,7 @@ export interface Comparison {
   consider_b_when: string | null;
   neither_when: string | null;
   common_misconception: string | null;
+  row_template: string | null;
   publication_status: PublicationStatus;
   is_sample: boolean;
   last_reviewed_at: string | null;
