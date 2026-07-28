@@ -137,6 +137,7 @@ export type Database = {
           one_sentence_difference: string | null
           pair_key: string | null
           publication_status: Database["public"]["Enums"]["publication_status"]
+          row_template: string | null
           slug: string
           treatment_a_id: string
           treatment_b_id: string
@@ -154,6 +155,7 @@ export type Database = {
           one_sentence_difference?: string | null
           pair_key?: string | null
           publication_status?: Database["public"]["Enums"]["publication_status"]
+          row_template?: string | null
           slug: string
           treatment_a_id: string
           treatment_b_id: string
@@ -171,6 +173,7 @@ export type Database = {
           one_sentence_difference?: string | null
           pair_key?: string | null
           publication_status?: Database["public"]["Enums"]["publication_status"]
+          row_template?: string | null
           slug?: string
           treatment_a_id?: string
           treatment_b_id?: string
@@ -537,6 +540,65 @@ export type Database = {
         }
         Relationships: []
       }
+      treatment_media: {
+        Row: {
+          alt_text: string
+          created_at: string
+          credit: string
+          id: string
+          is_sample: boolean
+          license: string
+          license_url: string | null
+          media_role: string
+          publication_status: Database["public"]["Enums"]["publication_status"]
+          rights_verified_at: string | null
+          source_url: string
+          treatment_id: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          alt_text: string
+          created_at?: string
+          credit: string
+          id?: string
+          is_sample?: boolean
+          license: string
+          license_url?: string | null
+          media_role?: string
+          publication_status?: Database["public"]["Enums"]["publication_status"]
+          rights_verified_at?: string | null
+          source_url: string
+          treatment_id: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          alt_text?: string
+          created_at?: string
+          credit?: string
+          id?: string
+          is_sample?: boolean
+          license?: string
+          license_url?: string | null
+          media_role?: string
+          publication_status?: Database["public"]["Enums"]["publication_status"]
+          rights_verified_at?: string | null
+          source_url?: string
+          treatment_id?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treatment_media_treatment_id_fkey"
+            columns: ["treatment_id"]
+            isOneToOne: false
+            referencedRelation: "treatments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       treatment_sources: {
         Row: {
           claim_field: string
@@ -594,11 +656,13 @@ export type Database = {
         Row: {
           adds_volume: string | null
           appointment_time: string | null
+          at_a_glance: Json | null
           brand_name: string | null
           bruising_text: string | null
           category: string
           created_at: string
           downtime_text: string | null
+          entity_type: Database["public"]["Enums"]["treatment_entity_type"]
           evidence_grade: string | null
           exercise_restrictions: string | null
           expected_result_magnitude: string | null
@@ -609,11 +673,13 @@ export type Database = {
           last_reviewed_at: string | null
           longevity_text: string | null
           major_risks: string | null
+          manufacturer: string | null
           marketing_misconception: string | null
           mechanism: string | null
           most_likely_disappointment: string | null
           name: string
           pain_level: string | null
+          parent_id: string | null
           primary_purpose: string | null
           provider_variables: string | null
           publication_status: Database["public"]["Enums"]["publication_status"]
@@ -622,6 +688,7 @@ export type Database = {
           sessions_text: string | null
           skin_tone_notes: string | null
           slug: string
+          sort_rank: number
           summary: string | null
           swelling_text: string | null
           tightening_level: string | null
@@ -635,11 +702,13 @@ export type Database = {
         Insert: {
           adds_volume?: string | null
           appointment_time?: string | null
+          at_a_glance?: Json | null
           brand_name?: string | null
           bruising_text?: string | null
           category: string
           created_at?: string
           downtime_text?: string | null
+          entity_type?: Database["public"]["Enums"]["treatment_entity_type"]
           evidence_grade?: string | null
           exercise_restrictions?: string | null
           expected_result_magnitude?: string | null
@@ -650,11 +719,13 @@ export type Database = {
           last_reviewed_at?: string | null
           longevity_text?: string | null
           major_risks?: string | null
+          manufacturer?: string | null
           marketing_misconception?: string | null
           mechanism?: string | null
           most_likely_disappointment?: string | null
           name: string
           pain_level?: string | null
+          parent_id?: string | null
           primary_purpose?: string | null
           provider_variables?: string | null
           publication_status?: Database["public"]["Enums"]["publication_status"]
@@ -663,6 +734,7 @@ export type Database = {
           sessions_text?: string | null
           skin_tone_notes?: string | null
           slug: string
+          sort_rank?: number
           summary?: string | null
           swelling_text?: string | null
           tightening_level?: string | null
@@ -676,11 +748,13 @@ export type Database = {
         Update: {
           adds_volume?: string | null
           appointment_time?: string | null
+          at_a_glance?: Json | null
           brand_name?: string | null
           bruising_text?: string | null
           category?: string
           created_at?: string
           downtime_text?: string | null
+          entity_type?: Database["public"]["Enums"]["treatment_entity_type"]
           evidence_grade?: string | null
           exercise_restrictions?: string | null
           expected_result_magnitude?: string | null
@@ -691,11 +765,13 @@ export type Database = {
           last_reviewed_at?: string | null
           longevity_text?: string | null
           major_risks?: string | null
+          manufacturer?: string | null
           marketing_misconception?: string | null
           mechanism?: string | null
           most_likely_disappointment?: string | null
           name?: string
           pain_level?: string | null
+          parent_id?: string | null
           primary_purpose?: string | null
           provider_variables?: string | null
           publication_status?: Database["public"]["Enums"]["publication_status"]
@@ -704,6 +780,7 @@ export type Database = {
           sessions_text?: string | null
           skin_tone_notes?: string | null
           slug?: string
+          sort_rank?: number
           summary?: string | null
           swelling_text?: string | null
           tightening_level?: string | null
@@ -714,7 +791,15 @@ export type Database = {
           what_it_does_not_change?: string | null
           when_not_appropriate?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "treatments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "treatments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -748,6 +833,12 @@ export type Database = {
       app_role: "admin" | "editor"
       publication_status: "draft" | "review" | "published"
       suggestion_status: "new" | "accepted" | "rejected"
+      treatment_entity_type:
+        | "class"
+        | "brand_family"
+        | "product"
+        | "device"
+        | "procedure"
       verification_status:
         | "unverified"
         | "source_checked"
@@ -884,6 +975,13 @@ export const Constants = {
       app_role: ["admin", "editor"],
       publication_status: ["draft", "review", "published"],
       suggestion_status: ["new", "accepted", "rejected"],
+      treatment_entity_type: [
+        "class",
+        "brand_family",
+        "product",
+        "device",
+        "procedure",
+      ],
       verification_status: [
         "unverified",
         "source_checked",
