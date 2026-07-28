@@ -91,6 +91,7 @@ export const SEARCH_ENTRIES: SearchEntry[] = [
   ...TRENDING_TREATMENTS,
   ...BRAND_ENTRIES,
   ...POPULAR_SEARCHES,
+  ...MORE_COMPARISONS,
   ...PRICE_ENTRIES,
 ];
 
