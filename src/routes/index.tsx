@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { fetchCompareIndex } from "@/lib/content.functions";
 import { TreatmentPicker } from "@/components/treatment-picker";
-import { DemoNotice, Prose, SectionHeading } from "@/components/editorial";
+import { Prose, SectionHeading } from "@/components/editorial";
 import { CoverageRequestForm } from "@/components/demand-forms";
 import { absoluteUrl } from "@/lib/site";
 
@@ -40,12 +40,10 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { treatments, slugs, isDemo } = Route.useLoaderData();
+  const { treatments, slugs } = Route.useLoaderData();
 
   return (
     <>
-      {isDemo ? <DemoNotice /> : null}
-
       <section className="rounded-2xl bg-surface px-5 py-12 text-center sm:px-10 sm:py-16">
         <p className="text-xs font-medium uppercase tracking-[0.14em] text-primary">
           Independent · no sponsorships

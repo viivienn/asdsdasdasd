@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { FOOTER_DISCLAIMER } from "@/components/disclaimers";
-import { ScrollCapture } from "@/components/scroll-capture";
 import { SiteSearch } from "@/components/site-search";
 import { trackAnswerEngineReferral } from "@/lib/analytics";
 import { POPULAR_COMPARISON_SLUGS, comparisonLabel } from "@/lib/content-types";
@@ -94,8 +93,6 @@ export function SiteShell({ children }: { children: ReactNode }) {
       <main id="main" className="mx-auto max-w-6xl px-5 py-10 sm:py-14">
         {children}
       </main>
-
-      <ScrollCapture />
 
       <footer className="mt-16 rule-top border-t border-rule bg-surface">
         <div className="mx-auto max-w-6xl px-5 py-10 text-sm text-muted-foreground">
