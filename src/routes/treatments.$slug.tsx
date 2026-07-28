@@ -6,7 +6,7 @@ import {
   comparisonLabel,
 } from "@/lib/content-types";
 import type { Treatment, TreatmentSource } from "@/lib/content-types";
-import { DemoNotice, EvidenceState } from "@/components/editorial";
+import { EvidenceState } from "@/components/editorial";
 import { CoverageRequestForm } from "@/components/demand-forms";
 import { TreatmentDisclaimer } from "@/components/disclaimers";
 import { absoluteUrl } from "@/lib/site";
@@ -65,8 +65,6 @@ function TreatmentPage() {
 
   return (
     <>
-      {isDemo ? <DemoNotice /> : null}
-
       <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground">
         <ol className="flex flex-wrap gap-1">
           <li>

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { fetchTreatments } from "@/lib/content.functions";
-import { DemoNotice } from "@/components/editorial";
 import type { Treatment } from "@/lib/content-types";
 import { absoluteUrl } from "@/lib/site";
 
@@ -46,7 +45,7 @@ function matches(t: Treatment, filter: string) {
 }
 
 function TreatmentsIndex() {
-  const { data, isDemo } = Route.useLoaderData();
+  const { data } = Route.useLoaderData();
   const [filter, setFilter] = useState<string>("All");
   const treatments = (data as Treatment[])
     .filter((t) => matches(t, filter))
@@ -54,7 +53,6 @@ function TreatmentsIndex() {
 
   return (
     <>
-      {isDemo ? <DemoNotice /> : null}
       <h1 className="font-display text-4xl">Treatments</h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">
         Eight treatments in this release. Each profile answers the same questions in the same order.

@@ -1,21 +1,5 @@
 import type { ReactNode } from "react";
 
-/** Banner shown on every page rendering unsourced demonstration content. */
-export function DemoNotice({ children }: { children?: ReactNode }) {
-  return (
-    <aside
-      role="note"
-      className="mb-8 border border-rose bg-secondary px-4 py-3 text-sm text-rose-foreground"
-    >
-      <p className="font-medium">Prototype preview — demonstration content</p>
-      <p className="mt-1">
-        {children ??
-          "The information on this page is placeholder text used while the interface is being built. It has not been researched, sourced, or medically reviewed, and this page is excluded from search engines."}
-      </p>
-    </aside>
-  );
-}
-
 export function SectionHeading({
   children,
   as: As = "h2",
