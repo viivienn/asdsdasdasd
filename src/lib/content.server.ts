@@ -165,6 +165,7 @@ export interface ComparisonContext {
   comparison: Comparison | null;
   sources: TreatmentSource[];
   reviewed: boolean;
+  media: Record<string, TreatmentMedia>;
 }
 
 function treatmentApproved(t: Treatment | null): boolean {
@@ -182,9 +183,9 @@ export async function getComparisonContext(
   slugB: string,
   canonicalSlug: string,
 ): Promise<ComparisonContext> {
-  const admin = await prototypeClient();
+  const client = publicClient();
 
-  const { data: rows } = await admin
+  const { data: rows } = await client
     .from("treatments")
     .select(TREATMENT_COLUMNS)
     .in("slug", [slugA, slugB]);
@@ -192,7 +193,7 @@ export async function getComparisonContext(
   const a = list.find((t) => t.slug === slugA) ?? null;
   const b = list.find((t) => t.slug === slugB) ?? null;
 
-  const { data: comparisonRow } = await admin
+  const { data: comparisonRow } = await client
     .from("comparisons")
     .select(COMPARISON_COLUMNS)
     .eq("slug", canonicalSlug)
@@ -200,14 +201,16 @@ export async function getComparisonContext(
   const comparison = (comparisonRow as unknown as Comparison) ?? null;
 
   let sources: TreatmentSource[] = [];
+  let media: Record<string, TreatmentMedia> = {};
   if (a && b) {
-    const { data: sourceRows } = await admin
+    const { data: sourceRows } = await client
       .from("treatment_sources")
       .select(
         "id,treatment_id,claim_field,source_title,source_url,source_type,publication_date,evidence_level",
       )
       .in("treatment_id", [a.id, b.id]);
     sources = (sourceRows ?? []) as unknown as TreatmentSource[];
+    media = await listMediaFor([a.id, b.id]);
   }
 
   const sourceIds = new Set(
@@ -228,9 +231,17 @@ export async function getComparisonContext(
     Boolean(a && sourceIds.has(a.id)) &&
     Boolean(b && sourceIds.has(b.id));
 
-  // Unreviewed editorial copy never leaves the server: the generated view is
-  // built only from approved individual treatment records.
-  return { a, b, comparison: reviewed ? comparison : null, sources: reviewed ? sources : [], reviewed };
+  // Editorial comparison copy is only released once the comparison record
+  // itself is reviewed. The attribute view is always built from the two
+  // published treatment records, which are public by definition.
+  return {
+    a,
+    b,
+    comparison: reviewed ? comparison : null,
+    sources,
+    reviewed,
+    media,
+  };
 }
 
 /** Canonical slugs of comparisons that meet every reviewed-publication rule. */
