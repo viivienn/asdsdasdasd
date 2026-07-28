@@ -1,13 +1,9 @@
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { fetchComparisonPair } from "@/lib/content.functions";
 import {
-  COMPARISON_ROWS,
-  COMPARISON_SECTIONS,
-  QUICK_COMPARISON_ROWS,
   POPULAR_COMPARISON_SLUGS,
   canonicalPairSlug,
   comparisonLabel,
-  comparisonRowLabel,
   pairDisallowed,
   parsePairSlug,
   sourcePublisher,
@@ -15,9 +11,11 @@ import {
   type Treatment,
   type TreatmentSource,
 } from "@/lib/content-types";
+import { resolveTemplate } from "@/lib/comparison-templates";
 import { SITE_URL, absoluteUrl, breadcrumbJsonLd, organizationJsonLd } from "@/lib/site";
-import { EvidenceState, Prose } from "@/components/editorial";
-import { ComparisonRequestForm, CoverageRequestForm } from "@/components/demand-forms";
+import { ComparisonGlance } from "@/components/comparison-glance";
+import { ComparisonDetails } from "@/components/comparison-details";
+import { CoverageRequestForm } from "@/components/demand-forms";
 import { ComparisonDisclaimer } from "@/components/disclaimers";
 
 export const Route = createFileRoute("/compare/$slug")({
