@@ -14,6 +14,7 @@ type NavLink = {
 };
 
 const EXPLORE: NavLink[] = [
+  { to: "/explore", label: "Catalog", detail: "Classes, brands, products, devices" },
   { to: "/treatments", label: "Treatments", detail: "Every profile, same questions" },
   { to: "/compare", label: "Comparisons", detail: "Popular side-by-side pages" },
   {

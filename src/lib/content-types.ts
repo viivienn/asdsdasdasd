@@ -2,6 +2,69 @@
 
 export type PublicationStatus = "draft" | "review" | "published";
 
+export type EntityType = "class" | "brand_family" | "product" | "device" | "procedure";
+
+export const ENTITY_LABEL: Record<EntityType, string> = {
+  class: "Treatment class",
+  brand_family: "Brand family",
+  product: "Product",
+  device: "Device",
+  procedure: "Procedure",
+};
+
+export const ENTITY_GROUP_LABEL: Record<EntityType, string> = {
+  class: "Treatment classes",
+  brand_family: "Brand families",
+  product: "Products",
+  device: "Devices & technologies",
+  procedure: "Procedures",
+};
+
+export const ENTITY_ORDER: EntityType[] = [
+  "class",
+  "brand_family",
+  "product",
+  "device",
+  "procedure",
+];
+
+/** One-line explanation of each catalog group, shown on the Explore page. */
+export const ENTITY_DESCRIPTION: Record<EntityType, string> = {
+  class: "Broad categories of treatment, independent of any brand.",
+  brand_family: "A manufacturer's range of related products sold under one name.",
+  product: "A specific formulation or product within a brand family.",
+  device: "A named machine or technology used to deliver a treatment.",
+  procedure: "A technique performed in clinic, not tied to one device or brand.",
+};
+
+export interface AtAGlance {
+  onset?: string;
+  duration?: string;
+  downtime?: string;
+  discomfort?: string;
+  reversibility?: string;
+}
+
+/** Ordered fields of the at-a-glance summary card. */
+export const GLANCE_FIELDS = [
+  { key: "onset", label: "Results appear" },
+  { key: "duration", label: "Typically lasts" },
+  { key: "downtime", label: "Downtime" },
+  { key: "discomfort", label: "Reported discomfort" },
+  { key: "reversibility", label: "Reversibility" },
+] as const satisfies ReadonlyArray<{ key: keyof AtAGlance; label: string }>;
+
+export interface TreatmentMedia {
+  id: string;
+  url: string;
+  alt_text: string;
+  media_role: string;
+  credit: string;
+  source_url: string;
+  license: string;
+  license_url: string | null;
+}
+
 export interface Treatment {
   id: string;
   name: string;
@@ -10,6 +73,11 @@ export interface Treatment {
   treatment_class: string;
   brand_name: string | null;
   generic_name: string | null;
+  manufacturer: string | null;
+  entity_type: EntityType;
+  parent_id: string | null;
+  sort_rank: number;
+  at_a_glance: AtAGlance | null;
   summary: string | null;
   primary_purpose: string | null;
   mechanism: string | null;
@@ -61,6 +129,7 @@ export interface Comparison {
   consider_b_when: string | null;
   neither_when: string | null;
   common_misconception: string | null;
+  row_template: string | null;
   publication_status: PublicationStatus;
   is_sample: boolean;
   last_reviewed_at: string | null;
@@ -214,8 +283,17 @@ const ROW_LABELS: Record<string, string> = Object.fromEntries(
   COMPARISON_ROWS.map((r) => [r.key, r.label]),
 );
 
+const EXTRA_ROW_LABELS: Record<string, string> = {
+  generic_name: "Active ingredient",
+  brand_name: "Brand",
+  manufacturer: "Manufacturer",
+  category: "Category",
+  treatment_class: "Treatment class",
+  summary: "Summary",
+};
+
 export function comparisonRowLabel(key: keyof Treatment): string {
-  return ROW_LABELS[key] ?? String(key).replace(/_/g, " ");
+  return ROW_LABELS[key] ?? EXTRA_ROW_LABELS[key] ?? String(key).replace(/_/g, " ");
 }
 
 /** Publisher shown next to a source, derived from the source URL host. */
@@ -238,12 +316,43 @@ export const COMPARISON_DISPLAY_ORDER: Record<string, [string, string]> = {
   "thermage-vs-ultherapy": ["thermage", "ultherapy"],
   "morpheus8-vs-ultherapy": ["morpheus8", "ultherapy"],
   "hydrafacial-vs-diamondglow": ["hydrafacial", "diamondglow"],
+  "botox-vs-xeomin": ["botox", "xeomin"],
+  "botox-vs-daxxify": ["botox", "daxxify"],
+  "juvederm-vs-restylane": ["juvederm", "restylane"],
+  "juvederm-voluma-vs-restylane-lyft": ["juvederm-voluma", "restylane-lyft"],
+  "juvederm-voluma-vs-sculptra": ["juvederm-voluma", "sculptra"],
 };
 
 export const COMPARISON_SLUGS = Object.keys(COMPARISON_DISPLAY_ORDER);
 
-/** Curated pairs surfaced as "Popular comparisons" in the interface. */
-export const POPULAR_COMPARISON_SLUGS = COMPARISON_SLUGS;
+export type Region = "us" | "ca" | "both";
+
+/**
+ * Curated pairs surfaced as "Popular comparisons", tagged by the market where
+ * the pair is commonly searched. Availability differs between the US and
+ * Canada, so the two strips are not identical.
+ */
+export const POPULAR_COMPARISONS: Array<{ slug: string; region: Region }> = [
+  { slug: "botox-vs-dysport", region: "both" },
+  { slug: "botox-vs-xeomin", region: "both" },
+  { slug: "botox-vs-daxxify", region: "us" },
+  { slug: "juvederm-vs-restylane", region: "both" },
+  { slug: "juvederm-voluma-vs-restylane-lyft", region: "both" },
+  { slug: "juvederm-voluma-vs-sculptra", region: "us" },
+  { slug: "sculptra-vs-radiesse", region: "both" },
+  { slug: "sculptra-vs-ha-filler", region: "both" },
+  { slug: "thermage-vs-ultherapy", region: "both" },
+  { slug: "morpheus8-vs-ultherapy", region: "ca" },
+  { slug: "hydrafacial-vs-diamondglow", region: "us" },
+];
+
+export function popularComparisons(region: Region): string[] {
+  return POPULAR_COMPARISONS.filter((p) => p.region === region || p.region === "both").map(
+    (p) => p.slug,
+  );
+}
+
+export const POPULAR_COMPARISON_SLUGS = POPULAR_COMPARISONS.map((p) => p.slug);
 
 /** Display labels for treatment slugs that are not simple title case. */
 export const TREATMENT_LABELS: Record<string, string> = {

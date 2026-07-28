@@ -1,18 +1,16 @@
 // Server-only data access for editorial content.
 //
-// Two read paths:
-//  1. PUBLIC  — publishable-key client, RLS enforced. Only published,
-//     non-sample rows can ever be returned.
-//  2. PROTOTYPE — service-role client, used ONLY to render clearly-labelled
-//     demonstration content while the editorial data is unsourced. Every page
-//     served from this path is marked `isDemo` and rendered `noindex`, and it
-//     is never included in the sitemap or in structured data.
+// Public pages read through the publishable-key client with RLS enforced, so
+// only published, non-sample rows can ever reach a visitor. The service-role
+// client is used solely for submission bookkeeping and for location lookups
+// that carry no editorial content.
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import type {
   Comparison,
   PriceObservation,
   Treatment,
+  TreatmentMedia,
   TreatmentSource,
 } from "./content-types";
 
@@ -29,7 +27,9 @@ async function prototypeClient() {
 }
 
 const TREATMENT_COLUMNS =
-  "id,name,slug,category,treatment_class,brand_name,generic_name,summary,primary_purpose,mechanism,adds_volume,tightening_level,result_timing,sessions_text,downtime_text,longevity_text,pain_level,reversibility,major_risks,most_likely_disappointment,marketing_misconception,provider_variables,skin_tone_notes,appointment_time,swelling_text,bruising_text,exercise_restrictions,what_it_changes,what_it_does_not_change,expected_result_magnitude,true_substitute_notes,when_not_appropriate,fda_status,evidence_grade,last_reviewed_at,publication_status,is_sample";
+  "id,name,slug,category,treatment_class,brand_name,generic_name,manufacturer,entity_type,parent_id,sort_rank,at_a_glance,summary,primary_purpose,mechanism,adds_volume,tightening_level,result_timing,sessions_text,downtime_text,longevity_text,pain_level,reversibility,major_risks,most_likely_disappointment,marketing_misconception,provider_variables,skin_tone_notes,appointment_time,swelling_text,bruising_text,exercise_restrictions,what_it_changes,what_it_does_not_change,expected_result_magnitude,true_substitute_notes,when_not_appropriate,fda_status,evidence_grade,last_reviewed_at,publication_status,is_sample";
+
+const MEDIA_COLUMNS = "id,treatment_id,url,alt_text,media_role,credit,source_url,license,license_url";
 
 export interface DemoAware<T> {
   data: T;
@@ -58,13 +58,56 @@ export async function listTreatments(): Promise<DemoAware<Treatment[]>> {
   const pub = await publicClient()
     .from("treatments")
     .select(TREATMENT_COLUMNS)
+    .order("sort_rank")
     .order("name");
-  if (pub.data && pub.data.length > 0) {
-    return { data: scrubTreatments(pub.data), isDemo: false };
+  return { data: scrubTreatments(pub.data ?? []), isDemo: false };
+}
+
+export interface CatalogEntry extends Treatment {
+  parent_name: string | null;
+  parent_slug: string | null;
+  media: TreatmentMedia | null;
+}
+
+/**
+ * The public catalog: every published, non-sample record, resolved against its
+ * parent record and its first rights-verified image.
+ */
+export async function listCatalog(): Promise<CatalogEntry[]> {
+  const client = publicClient();
+  const [rows, media] = await Promise.all([
+    client.from("treatments").select(TREATMENT_COLUMNS).order("sort_rank").order("name"),
+    client.from("treatment_media").select(MEDIA_COLUMNS),
+  ]);
+  const list = scrubTreatments(rows.data ?? []);
+  const byId = new Map(list.map((t) => [t.id, t]));
+  const mediaByTreatment = new Map<string, TreatmentMedia>();
+  for (const m of (media.data ?? []) as unknown as Array<TreatmentMedia & { treatment_id: string }>) {
+    if (!mediaByTreatment.has(m.treatment_id)) mediaByTreatment.set(m.treatment_id, m);
   }
-  const admin = await prototypeClient();
-  const proto = await admin.from("treatments").select(TREATMENT_COLUMNS).order("name");
-  return { data: scrubTreatments(proto.data ?? []), isDemo: true };
+  return list.map((t) => {
+    const parent = t.parent_id ? byId.get(t.parent_id) : undefined;
+    return {
+      ...t,
+      parent_name: parent?.name ?? null,
+      parent_slug: parent?.slug ?? null,
+      media: mediaByTreatment.get(t.id) ?? null,
+    };
+  });
+}
+
+/** Rights-verified, published imagery for a set of treatments. */
+export async function listMediaFor(ids: string[]): Promise<Record<string, TreatmentMedia>> {
+  if (ids.length === 0) return {};
+  const { data } = await publicClient()
+    .from("treatment_media")
+    .select(MEDIA_COLUMNS)
+    .in("treatment_id", ids);
+  const out: Record<string, TreatmentMedia> = {};
+  for (const m of (data ?? []) as unknown as Array<TreatmentMedia & { treatment_id: string }>) {
+    if (!out[m.treatment_id]) out[m.treatment_id] = m;
+  }
+  return out;
 }
 
 export async function getTreatmentBySlug(
@@ -90,20 +133,11 @@ export async function getTreatmentBySlug(
     };
   }
 
-  const admin = await prototypeClient();
-  const proto = await admin
-    .from("treatments")
-    .select(TREATMENT_COLUMNS)
-    .eq("slug", slug)
-    .maybeSingle();
-  return {
-    data: { treatment: proto.data ? (scrubTreatments([proto.data])[0] ?? null) : null, sources: [] },
-    isDemo: true,
-  };
+  return { data: { treatment: null, sources: [] }, isDemo: false };
 }
 
 const COMPARISON_COLUMNS =
-  "id,slug,treatment_a_id,treatment_b_id,one_sentence_difference,consider_a_when,consider_b_when,neither_when,common_misconception,publication_status,is_sample,last_reviewed_at";
+  "id,slug,treatment_a_id,treatment_b_id,one_sentence_difference,consider_a_when,consider_b_when,neither_when,common_misconception,row_template,publication_status,is_sample,last_reviewed_at";
 
 export async function getComparisonBySlug(
   slug: string,
@@ -113,25 +147,12 @@ export async function getComparisonBySlug(
     .select(COMPARISON_COLUMNS)
     .eq("slug", slug)
     .maybeSingle();
-  if (pub.data) return { data: pub.data as unknown as Comparison, isDemo: false };
-
-  const admin = await prototypeClient();
-  const proto = await admin
-    .from("comparisons")
-    .select(COMPARISON_COLUMNS)
-    .eq("slug", slug)
-    .maybeSingle();
-  return { data: (proto.data as unknown as Comparison) ?? null, isDemo: true };
+  return { data: (pub.data as unknown as Comparison) ?? null, isDemo: false };
 }
 
 export async function listComparisonSlugs(): Promise<DemoAware<string[]>> {
   const pub = await publicClient().from("comparisons").select("slug");
-  if (pub.data && pub.data.length > 0) {
-    return { data: pub.data.map((r) => r.slug as string), isDemo: false };
-  }
-  const admin = await prototypeClient();
-  const proto = await admin.from("comparisons").select("slug");
-  return { data: (proto.data ?? []).map((r) => r.slug as string), isDemo: true };
+  return { data: (pub.data ?? []).map((r) => r.slug as string), isDemo: false };
 }
 
 /**
@@ -144,6 +165,7 @@ export interface ComparisonContext {
   comparison: Comparison | null;
   sources: TreatmentSource[];
   reviewed: boolean;
+  media: Record<string, TreatmentMedia>;
 }
 
 function treatmentApproved(t: Treatment | null): boolean {
@@ -161,9 +183,9 @@ export async function getComparisonContext(
   slugB: string,
   canonicalSlug: string,
 ): Promise<ComparisonContext> {
-  const admin = await prototypeClient();
+  const client = publicClient();
 
-  const { data: rows } = await admin
+  const { data: rows } = await client
     .from("treatments")
     .select(TREATMENT_COLUMNS)
     .in("slug", [slugA, slugB]);
@@ -171,7 +193,7 @@ export async function getComparisonContext(
   const a = list.find((t) => t.slug === slugA) ?? null;
   const b = list.find((t) => t.slug === slugB) ?? null;
 
-  const { data: comparisonRow } = await admin
+  const { data: comparisonRow } = await client
     .from("comparisons")
     .select(COMPARISON_COLUMNS)
     .eq("slug", canonicalSlug)
@@ -179,14 +201,16 @@ export async function getComparisonContext(
   const comparison = (comparisonRow as unknown as Comparison) ?? null;
 
   let sources: TreatmentSource[] = [];
+  let media: Record<string, TreatmentMedia> = {};
   if (a && b) {
-    const { data: sourceRows } = await admin
+    const { data: sourceRows } = await client
       .from("treatment_sources")
       .select(
         "id,treatment_id,claim_field,source_title,source_url,source_type,publication_date,evidence_level",
       )
       .in("treatment_id", [a.id, b.id]);
     sources = (sourceRows ?? []) as unknown as TreatmentSource[];
+    media = await listMediaFor([a.id, b.id]);
   }
 
   const sourceIds = new Set(
@@ -207,9 +231,17 @@ export async function getComparisonContext(
     Boolean(a && sourceIds.has(a.id)) &&
     Boolean(b && sourceIds.has(b.id));
 
-  // Unreviewed editorial copy never leaves the server: the generated view is
-  // built only from approved individual treatment records.
-  return { a, b, comparison: reviewed ? comparison : null, sources: reviewed ? sources : [], reviewed };
+  // Editorial comparison copy is only released once the comparison record
+  // itself is reviewed. The attribute view is always built from the two
+  // published treatment records, which are public by definition.
+  return {
+    a,
+    b,
+    comparison: reviewed ? comparison : null,
+    sources,
+    reviewed,
+    media,
+  };
 }
 
 /** Canonical slugs of comparisons that meet every reviewed-publication rule. */

@@ -18,6 +18,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TreatmentsIndexRouteImport } from './routes/treatments.index'
+import { Route as ExploreIndexRouteImport } from './routes/explore.index'
 import { Route as CompareIndexRouteImport } from './routes/compare.index'
 import { Route as TreatmentsSlugRouteImport } from './routes/treatments.$slug'
 import { Route as CompareSlugRouteImport } from './routes/compare.$slug'
@@ -71,6 +72,11 @@ const IndexRoute = IndexRouteImport.update({
 const TreatmentsIndexRoute = TreatmentsIndexRouteImport.update({
   id: '/treatments/',
   path: '/treatments/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExploreIndexRoute = ExploreIndexRouteImport.update({
+  id: '/explore/',
+  path: '/explore/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompareIndexRoute = CompareIndexRouteImport.update({
@@ -136,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/compare/$slug': typeof CompareSlugRoute
   '/treatments/$slug': typeof TreatmentsSlugRoute
   '/compare/': typeof CompareIndexRoute
+  '/explore/': typeof ExploreIndexRoute
   '/treatments/': typeof TreatmentsIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -156,6 +163,7 @@ export interface FileRoutesByTo {
   '/compare/$slug': typeof CompareSlugRoute
   '/treatments/$slug': typeof TreatmentsSlugRoute
   '/compare': typeof CompareIndexRoute
+  '/explore': typeof ExploreIndexRoute
   '/treatments': typeof TreatmentsIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -177,6 +185,7 @@ export interface FileRoutesById {
   '/compare/$slug': typeof CompareSlugRoute
   '/treatments/$slug': typeof TreatmentsSlugRoute
   '/compare/': typeof CompareIndexRoute
+  '/explore/': typeof ExploreIndexRoute
   '/treatments/': typeof TreatmentsIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -199,6 +208,7 @@ export interface FileRouteTypes {
     | '/compare/$slug'
     | '/treatments/$slug'
     | '/compare/'
+    | '/explore/'
     | '/treatments/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -219,6 +229,7 @@ export interface FileRouteTypes {
     | '/compare/$slug'
     | '/treatments/$slug'
     | '/compare'
+    | '/explore'
     | '/treatments'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -239,6 +250,7 @@ export interface FileRouteTypes {
     | '/compare/$slug'
     | '/treatments/$slug'
     | '/compare/'
+    | '/explore/'
     | '/treatments/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -260,6 +272,7 @@ export interface RootRouteChildren {
   CompareSlugRoute: typeof CompareSlugRoute
   TreatmentsSlugRoute: typeof TreatmentsSlugRoute
   CompareIndexRoute: typeof CompareIndexRoute
+  ExploreIndexRoute: typeof ExploreIndexRoute
   TreatmentsIndexRoute: typeof TreatmentsIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -330,6 +343,13 @@ declare module '@tanstack/react-router' {
       path: '/treatments'
       fullPath: '/treatments/'
       preLoaderRoute: typeof TreatmentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explore/': {
+      id: '/explore/'
+      path: '/explore'
+      fullPath: '/explore/'
+      preLoaderRoute: typeof ExploreIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/compare/': {
@@ -413,6 +433,7 @@ const rootRouteChildren: RootRouteChildren = {
   CompareSlugRoute: CompareSlugRoute,
   TreatmentsSlugRoute: TreatmentsSlugRoute,
   CompareIndexRoute: CompareIndexRoute,
+  ExploreIndexRoute: ExploreIndexRoute,
   TreatmentsIndexRoute: TreatmentsIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
