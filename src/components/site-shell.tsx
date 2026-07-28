@@ -1,21 +1,92 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { ChevronDown } from "lucide-react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { FOOTER_DISCLAIMER } from "@/components/disclaimers";
 import { SiteSearch } from "@/components/site-search";
 import { trackAnswerEngineReferral } from "@/lib/analytics";
 import { POPULAR_COMPARISON_SLUGS, comparisonLabel } from "@/lib/content-types";
 
-const NAV = [
-  { to: "/compare", label: "Compare" },
-  { to: "/treatments", label: "Treatments" },
+type NavLink = {
+  to: string;
+  params?: Record<string, string>;
+  label: string;
+  detail: string;
+};
+
+const EXPLORE: NavLink[] = [
+  { to: "/treatments", label: "Treatments", detail: "Every profile, same questions" },
+  { to: "/compare", label: "Comparisons", detail: "Popular side-by-side pages" },
   {
     to: "/prices/us/ca/$city/$treatment",
     params: { city: "san-francisco", treatment: "botox" },
-    label: "SF Botox Prices",
+    label: "Local prices",
+    detail: "Publicly listed clinic prices",
   },
-  { to: "/methodology", label: "Methodology" },
-  { to: "/about", label: "About" },
-] as const;
+];
+
+const TOOLS: NavLink[] = [
+  { to: "/compare", label: "Compare any two", detail: "Build a comparison yourself" },
+  { to: "/methodology", label: "Methodology", detail: "How we source and check" },
+  { to: "/medical-disclaimer", label: "Medical disclaimer", detail: "What this site is not" },
+];
+
+const FLAT_NAV: NavLink[] = [...EXPLORE, { to: "/about", label: "About", detail: "" }];
+
+function NavMenu({ label, items }: { label: string; items: NavLink[] }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLLIElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function onDown(e: MouseEvent) {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  return (
+    <li ref={ref} className="relative">
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-1 rounded-full px-3 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+      >
+        {label}
+        <ChevronDown aria-hidden="true" className={`size-4 ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open ? (
+        <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-64 rounded-xl border border-rule bg-popover p-1.5 shadow-lift">
+          <ul>
+            {items.map((item) => (
+              <li key={`${item.to}-${item.label}`}>
+                <Link
+                  to={item.to}
+                  params={item.params}
+                  onClick={() => setOpen(false)}
+                  className="block rounded-lg px-3 py-2 hover:bg-secondary"
+                >
+                  <span className="block text-sm font-medium text-foreground">{item.label}</span>
+                  {item.detail ? (
+                    <span className="block text-xs text-muted-foreground">{item.detail}</span>
+                  ) : null}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </li>
+  );
+}
 
 export function SiteShell({ children }: { children: ReactNode }) {
   useEffect(() => {
@@ -46,20 +117,19 @@ export function SiteShell({ children }: { children: ReactNode }) {
           <div className="hidden min-w-0 flex-1 justify-center lg:flex">
             <SiteSearch />
           </div>
-          <nav aria-label="Primary" className="hidden xl:block">
+          <nav aria-label="Primary" className="hidden lg:block">
             <ul className="flex items-center gap-1 text-sm">
-              {NAV.map((item) => (
-                <li key={item.to}>
-                  <Link
-                    to={item.to}
-                    params={"params" in item ? item.params : undefined}
-                    className="rounded-full px-3 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                    activeProps={{ className: "bg-secondary text-secondary-foreground font-medium" }}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
+              <NavMenu label="Explore" items={EXPLORE} />
+              <NavMenu label="Tools" items={TOOLS} />
+              <li>
+                <Link
+                  to="/about"
+                  className="rounded-full px-3 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                  activeProps={{ className: "bg-secondary text-secondary-foreground font-medium" }}
+                >
+                  About
+                </Link>
+              </li>
             </ul>
           </nav>
           <Link
@@ -72,13 +142,13 @@ export function SiteShell({ children }: { children: ReactNode }) {
         <div className="px-4 pb-3 lg:hidden">
           <SiteSearch />
         </div>
-        <nav aria-label="Primary mobile" className="xl:hidden">
+        <nav aria-label="Primary mobile" className="lg:hidden">
           <ul className="flex gap-1 overflow-x-auto px-4 pb-3 text-sm">
-            {NAV.map((item) => (
-              <li key={item.to} className="shrink-0">
+            {[...FLAT_NAV, ...TOOLS.slice(1)].map((item) => (
+              <li key={`${item.to}-${item.label}`} className="shrink-0">
                 <Link
                   to={item.to}
-                  params={"params" in item ? item.params : undefined}
+                  params={item.params}
                   className="rounded-full border border-rule px-3 py-1.5 text-muted-foreground"
                   activeProps={{ className: "bg-secondary text-secondary-foreground" }}
                 >
