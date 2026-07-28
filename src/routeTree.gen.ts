@@ -14,6 +14,7 @@ import { Route as MethodologyRouteImport } from './routes/methodology'
 import { Route as MedicalDisclaimerRouteImport } from './routes/medical-disclaimer'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as IndexnowKeyDottxtRouteImport } from './routes/indexnow-key[.]txt'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TreatmentsIndexRouteImport } from './routes/treatments.index'
@@ -24,6 +25,7 @@ import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } fr
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as ApiPublicIndexnowRouteImport } from './routes/api/public/indexnow'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as PricesUsCaCityTreatmentRouteImport } from './routes/prices.us.ca.$city.$treatment'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -49,6 +51,11 @@ const McpRoute = McpRouteImport.update({
 const IndexnowKeyDottxtRoute = IndexnowKeyDottxtRouteImport.update({
   id: '/indexnow-key.txt',
   path: '/indexnow-key.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -104,6 +111,11 @@ const Char91DotmcpChar93InvokeToolToolRoute =
     path: '/.mcp/invoke-tool/$tool',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PricesUsCaCityTreatmentRoute = PricesUsCaCityTreatmentRouteImport.update({
   id: '/prices/us/ca/$city/$treatment',
   path: '/prices/us/ca/$city/$treatment',
@@ -113,6 +125,7 @@ const PricesUsCaCityTreatmentRoute = PricesUsCaCityTreatmentRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/auth': typeof AuthRoute
   '/indexnow-key.txt': typeof IndexnowKeyDottxtRoute
   '/mcp': typeof McpRoute
   '/medical-disclaimer': typeof MedicalDisclaimerRoute
@@ -124,6 +137,7 @@ export interface FileRoutesByFullPath {
   '/treatments/$slug': typeof TreatmentsSlugRoute
   '/compare/': typeof CompareIndexRoute
   '/treatments/': typeof TreatmentsIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/indexnow': typeof ApiPublicIndexnowRoute
   '/prices/us/ca/$city/$treatment': typeof PricesUsCaCityTreatmentRoute
@@ -131,6 +145,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/auth': typeof AuthRoute
   '/indexnow-key.txt': typeof IndexnowKeyDottxtRoute
   '/mcp': typeof McpRoute
   '/medical-disclaimer': typeof MedicalDisclaimerRoute
@@ -142,6 +157,7 @@ export interface FileRoutesByTo {
   '/treatments/$slug': typeof TreatmentsSlugRoute
   '/compare': typeof CompareIndexRoute
   '/treatments': typeof TreatmentsIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/indexnow': typeof ApiPublicIndexnowRoute
   '/prices/us/ca/$city/$treatment': typeof PricesUsCaCityTreatmentRoute
@@ -150,6 +166,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/auth': typeof AuthRoute
   '/indexnow-key.txt': typeof IndexnowKeyDottxtRoute
   '/mcp': typeof McpRoute
   '/medical-disclaimer': typeof MedicalDisclaimerRoute
@@ -161,6 +178,7 @@ export interface FileRoutesById {
   '/treatments/$slug': typeof TreatmentsSlugRoute
   '/compare/': typeof CompareIndexRoute
   '/treatments/': typeof TreatmentsIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/indexnow': typeof ApiPublicIndexnowRoute
   '/prices/us/ca/$city/$treatment': typeof PricesUsCaCityTreatmentRoute
@@ -170,6 +188,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/auth'
     | '/indexnow-key.txt'
     | '/mcp'
     | '/medical-disclaimer'
@@ -181,6 +200,7 @@ export interface FileRouteTypes {
     | '/treatments/$slug'
     | '/compare/'
     | '/treatments/'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/indexnow'
     | '/prices/us/ca/$city/$treatment'
@@ -188,6 +208,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/auth'
     | '/indexnow-key.txt'
     | '/mcp'
     | '/medical-disclaimer'
@@ -199,6 +220,7 @@ export interface FileRouteTypes {
     | '/treatments/$slug'
     | '/compare'
     | '/treatments'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/indexnow'
     | '/prices/us/ca/$city/$treatment'
@@ -206,6 +228,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/auth'
     | '/indexnow-key.txt'
     | '/mcp'
     | '/medical-disclaimer'
@@ -217,6 +240,7 @@ export interface FileRouteTypes {
     | '/treatments/$slug'
     | '/compare/'
     | '/treatments/'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/indexnow'
     | '/prices/us/ca/$city/$treatment'
@@ -225,6 +249,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AuthRoute: typeof AuthRoute
   IndexnowKeyDottxtRoute: typeof IndexnowKeyDottxtRoute
   McpRoute: typeof McpRoute
   MedicalDisclaimerRoute: typeof MedicalDisclaimerRoute
@@ -236,6 +261,7 @@ export interface RootRouteChildren {
   TreatmentsSlugRoute: typeof TreatmentsSlugRoute
   CompareIndexRoute: typeof CompareIndexRoute
   TreatmentsIndexRoute: typeof TreatmentsIndexRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicIndexnowRoute: typeof ApiPublicIndexnowRoute
   PricesUsCaCityTreatmentRoute: typeof PricesUsCaCityTreatmentRoute
@@ -276,6 +302,13 @@ declare module '@tanstack/react-router' {
       path: '/indexnow-key.txt'
       fullPath: '/indexnow-key.txt'
       preLoaderRoute: typeof IndexnowKeyDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -348,6 +381,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/prices/us/ca/$city/$treatment': {
       id: '/prices/us/ca/$city/$treatment'
       path: '/prices/us/ca/$city/$treatment'
@@ -361,6 +401,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AuthRoute: AuthRoute,
   IndexnowKeyDottxtRoute: IndexnowKeyDottxtRoute,
   McpRoute: McpRoute,
   MedicalDisclaimerRoute: MedicalDisclaimerRoute,
@@ -373,6 +414,7 @@ const rootRouteChildren: RootRouteChildren = {
   TreatmentsSlugRoute: TreatmentsSlugRoute,
   CompareIndexRoute: CompareIndexRoute,
   TreatmentsIndexRoute: TreatmentsIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicIndexnowRoute: ApiPublicIndexnowRoute,
   PricesUsCaCityTreatmentRoute: PricesUsCaCityTreatmentRoute,
