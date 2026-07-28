@@ -9,6 +9,7 @@ import type { Treatment, TreatmentSource } from "@/lib/content-types";
 import { EvidenceState } from "@/components/editorial";
 import { CoverageRequestForm } from "@/components/demand-forms";
 import { TreatmentDisclaimer } from "@/components/disclaimers";
+import { CompareWith, MatchGate } from "@/components/treatment-actions";
 import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/treatments/$slug")({
@@ -96,6 +97,14 @@ function TreatmentPage() {
             : "Not yet reviewed"}
         </span>
         <EvidenceState state={isDemo ? "unsourced" : "sourced"} />
+      </div>
+
+      <div className="mt-6">
+        <CompareWith slug={slug} name={t.name} />
+      </div>
+
+      <div className="mt-6 max-w-2xl">
+        <MatchGate name={t.name} />
       </div>
 
       <section className="mt-10">

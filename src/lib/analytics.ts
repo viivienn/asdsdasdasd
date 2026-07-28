@@ -12,7 +12,10 @@ export type AnalyticsEvent =
   | "scroll_prompt_submitted"
   | "price_alert_submitted"
   | "alert_signup_success"
-  | "answer_engine_referral";
+  | "answer_engine_referral"
+  | "compare_started"
+  | "match_gate_opened"
+  | "match_gate_signup";
 
 export type AnalyticsProps = Record<string, string | number | boolean | undefined>;
 
