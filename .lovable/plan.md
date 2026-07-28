@@ -1,98 +1,114 @@
-## Aesthetic Index — Release 1: Validation MVP
+## What I verified first
 
-The approved relational architecture is the foundation and is not simplified. This release narrows *what gets built on top of it* to validate three behaviors: comparison-table comprehension, click-through from comparison into local pricing, and coverage requests by city/ZIP.
+- `treatments` has no entity-type or image columns. It carries `category` (free text: "Neuromodulator", "Dermal filler", "Biostimulator / filler", "Energy device", "Facial / exfoliation"), `treatment_class`, `brand_name`, `generic_name`, plus ~30 editorial text fields.
+- 10 treatment rows exist. 8 are `is_sample = true` with `evidence_grade = 'Not yet sourced'` and null `last_reviewed_at`; only `hydrafacial` and `diamondglow` are real and reviewed.
+- 6 comparison rows exist. Only `hydrafacial-vs-diamondglow` is non-sample and reviewed; the other five are sample rows, so they currently render the "Editorial review in progress" branch and are `noindex`.
+- `compare.$slug.tsx` is 736 lines: bottom line, on-page nav, quick table, three "consider when" cards, 8 detailed section tables, cost, local prices, misconception, consultation questions, sources-by-claim, disclaimer, related, coverage form.
+- No `/explore` route exists. `search-index.ts` already models categories/brands/treatments/comparisons but as a hardcoded client-side list, disconnected from the database.
+- Indexability today is gated by `getComparisonContext`'s `reviewed` boolean and `isDemo` from the dual-read path in `content.server.ts`; the sitemap only lists reviewed/non-sample rows.
 
-### Implementation order
-
-Executed in this sequence, stopping at the end for a report.
-
----
-
-### 1. Schema and RLS (Lovable Cloud, committed migrations)
-
-Full relational model as approved — no shortcut tables, no mutable price field.
-
-- **treatments** — identity seeded factually (name, slug, category, treatment_class, brand/generic) for Botox, Dysport, Sculptra, Radiesse, HA filler, Morpheus8, Thermage FLX, Ultherapy. All clinical/narrative columns exist but are seeded only with clearly labeled demonstration text at `publication_status='draft'`, `is_sample=true`, null `evidence_grade`, null `last_reviewed_at`.
-- **treatment_sources** — per-claim sourcing.
-- **comparisons** — editorial distinction fields; `CHECK (treatment_a_id < treatment_b_id)` plus a generated `pair_key` with a unique index so a pair cannot be duplicated in reverse.
-- **locations** — unique on `(country_code, region_code, city_slug)`; San Francisco seeded, `is_indexable=false` until real data lands.
-- **clinics** — unique on `(location_id, clinic_slug)`, with `is_sample`.
-- **price_observations** — immutable observations (new row per change, never an update). Columns: is_sample, currency, advertised_amount, regular_amount, pricing_unit, quantity, effective_unit_price, treatment_area, starts_at_price, membership_required, new_customer_only, minimum_purchase, manufacturer_reward_required, conditions, source_url, source_type, observed_at, expires_at, verification_status, publication_status. Money is `numeric`.
-- **offers** — created for schema completeness with validity window, restrictions, source, verification, approval, is_sample. Not surfaced in this release.
-- **city_requests** and **price_alert_interest** — submission tables for the two forms.
-- **user_roles** + `app_role` enum + `private.has_role(uuid, app_role)` security-definer with `set search_path = ''`, execute revoked from PUBLIC/anon.
-
-`is_sample boolean not null default false` on treatments, comparisons, clinics, price_observations, offers — set per row, never inherited.
-
-Every table: explicit GRANTs → enable RLS → policies. Public SELECT requires `publication_status='published' AND is_sample=false`, plus `is_indexable` for locations and an active window for offers. Submission tables are insert-only for the public with no read access; admin policies use `(select private.has_role(auth.uid(),'admin'))`.
-
-Verification step before moving on: run the security scan and a vitest suite asserting anonymous cannot read drafts, cannot read sample rows, cannot read submissions, cannot mutate editorial data; and non-admin authenticated users cannot reach admin rows.
+Assumption I'm making: sample rows stay in the database as working drafts. They become invisible publicly (no links, no listings, noindex) rather than being deleted, so the editorial pipeline still has something to fill in.
 
 ---
 
-### 2. Design system
+## Smallest safe schema migration
 
-Warm ivory background, charcoal text, muted wine accent, pale blush and muted sage surfaces — oklch semantic tokens in `src/styles.css`. Instrument Serif display / Inter body, loaded via `<link>` in the root route. Thin rules, restrained borders, minimal shadows, generous spacing. No gradients, glassmorphism, illustrations, or scoring imagery.
+One migration, additive only — no column drops, no data loss.
 
----
+**1. `treatments` gains entity typing**
 
-### 3–8. Public routes
+- `entity_type` enum `treatment_entity_type`: `class` | `brand_family` | `product` | `device` | `procedure`. Not null, default `product`, backfilled per row (e.g. `ha-filler` → `class`, `juvederm` → `brand_family`, `juvederm-voluma` → `product`, `ultherapy`/`thermage`/`morpheus8` → `device`, `hydrafacial` → `procedure`).
+- `parent_id uuid references treatments(id)` — product → brand family → class. Lets Voluma inherit Juvéderm's family and the HA-filler class.
+- `manufacturer text` — separates maker from brand name.
+- `sort_rank int not null default 0` for catalog ordering.
+- `at_a_glance jsonb` — small typed object powering the visual summary (score-free: onset, duration, downtime band, pain band, reversibility, adds-volume/tightening flags). No new prose fields.
 
-| Route | Build |
-|---|---|
-| `/` | Product explanation, tagline, treatment selector, entry into comparisons |
-| `/compare` | Hub + two-treatment picker |
-| `/compare/$slug` | One reusable route. Sculptra vs. Radiesse polished first, then the four remaining named pairs through the same template |
-| `/treatments` | Index |
-| `/treatments/$slug` | One reusable route |
-| `/methodology`, `/about` | Real editorial copy, no generated medical claims |
+**2. New `treatment_media` table** (imagery with rights)
 
-Comparison table is a semantic `<table>` on desktop with row headers, collapsing to stacked attribute pairs on mobile. Sources, evidence state, and "demonstration content" state are explicit text-labeled UI states, never color-only. Server-rendered content via TanStack Start route loaders calling public server functions; content is in the initial HTML.
+Columns: `treatment_id`, `url`, `alt_text`, `media_role` (`product_shot` | `device` | `diagram`), `credit`, `source_url`, `license` (`manufacturer_press` | `cc_by` | `cc_by_sa` | `licensed` | `own_work`), `license_url`, `rights_verified_at`, `publication_status`, `is_sample`, timestamps.
+Grants → enable RLS → public SELECT only where `publication_status='published' AND is_sample=false AND rights_verified_at is not null`; admin full access via `private.has_role`. No image is ever rendered without a credit and verified rights.
 
----
+**3. `comparisons` gains `row_template text`**
 
-### 9. `/prices/us/ca/san-francisco/botox`
+Values: `neuromodulator_brands`, `filler_families`, `filler_products`, `lifting_devices`, `resurfacing_devices`, `cross_category`. Nullable; when null the app derives the template from the two entity types (see below), so no backfill is mandatory.
 
-Reads through `locations` → `clinics` → `price_observations` → `treatments`. Renders only observations that are published, non-sample, have a source URL, and have an `observed_at`. Each row shows clinic, advertised amount, pricing unit, quantity, effective unit price, starts-at / new-client / membership / minimum-purchase flags, conditions, source link, and observation date, plus verification and freshness badges.
-
-Since no real observations exist yet, the page ships in its noindex empty-coverage state with a clear explanation. No invented clinic prices, no averages or medians computed from anything. The template is built to accept the 10–15 manually sourced observations you add later.
-
-Comparison pages get a prominent "See publicly listed prices near you" action linking into this flow.
+That's it — no table renames, no changes to `price_observations`, `treatment_sources`, RLS helpers, or submission tables.
 
 ---
 
-### 10. Forms
+## Comparison row templates
 
-**Coverage request** — modal opened from the comparison-page action: email, ZIP, optional city, treatment prefilled from the current page, consent checkbox. Writes to `city_requests`. Confirmation: "Thanks. We'll use your request to prioritize pricing coverage in your area." No fake-door language in copy.
+New `src/lib/comparison-templates.ts` replacing the single fixed `COMPARISON_ROWS` / `COMPARISON_SECTIONS` pair:
 
-**Price-alert interest** — on the SF Botox page: email, ZIP, treatment, optional max price per unit. Labeled "Price monitoring is in development. Join the early-access list." No claim of active monitoring.
-
-Both submit through a server function with Zod validation, length caps, URL/email validation, a honeypot field, sanitization, and basic rate limiting — not direct anonymous table inserts. Submitted rows are never publicly readable.
-
----
-
-### 11. Navigation
-
-Compare · Treatments · SF Botox Prices · Methodology · About. No empty Prices, Offers, Clinics, or Planner entries.
-
----
-
-### SEO
-
-TanStack Start route `head()` only — no React Helmet. Indexable pages get a unique title, meta description, self-referencing canonical on `aestheticindex.co`, one visible H1, Open Graph tags, server-rendered table content, internal links, sources, and a last-verified date.
-
-Sitemap contains only manually approved, non-sample, published pages — at the end of this pass: `/`, `/compare`, `/methodology`, `/about`. Every page carrying demonstration medical content is `noindex`, as is the SF Botox page until it holds enough real sourced pricing. Structured data: WebSite + Organization at root, BreadcrumbList on deep routes; nothing containing sample medical or pricing facts.
+- `resolveTemplate(a, b)` — uses `comparisons.row_template` when set, otherwise derives from `entity_type` + `category` of both records; falls back to `cross_category`.
+- Each template defines: 4–6 **glance** attributes (the visual summary) and grouped **detail** rows.
+  - `neuromodulator_brands`: units/dosing basis, onset, peak, duration, spread characteristics, diffusion, protein load, approved areas.
+  - `filler_families`: base material, family breadth, crosslinking approach, typical areas, longevity range, reversibility.
+  - `filler_products`: G-prime/firmness descriptor, indicated area, typical volume, longevity, lidocaine, reversibility.
+  - `lifting_devices`: energy type, tissue depth, sessions, discomfort, downtime, onset, durability.
+  - `resurfacing_devices`: mechanism, depth, sessions, downtime, redness, skin-tone considerations.
+  - `cross_category`: the current generic set, trimmed.
+- Cross-category renders an explicit "these are not like-for-like" line instead of pretending row parity.
 
 ---
 
-### Final checks and report
+## Route and component changes
 
-Security scan + RLS tests, mobile responsiveness pass, accessibility pass (keyboard operation, focus indicators, labeled inputs, table semantics, contrast, no color-only meaning), and SEO verification.
+**Simplified comparison page — `src/routes/compare.$slug.tsx`**
 
-Then stop and report: routes created, tables and policies created, which pages contain sample content, which are indexable, which are noindex, forms created, security tests run, remaining manual data needed, and any technical problems or assumptions.
+Cut from ~736 lines to a thin route plus components. New order:
 
-No automatic continuation into crawling, offers, clinic pages, additional cities, authentication, admin tooling, or monetization.
+1. Breadcrumb + H1 + reviewed date badge
+2. **Glance card** (`src/components/comparison-glance.tsx`) — two columns, imagery when licensed media exists, one-line difference, and 4–6 template attributes as short labelled values. No scores, no color-only meaning.
+3. **"Choose A when / Choose B when / Neither"** — three compact cards, kept
+4. **Expandable details** (`src/components/comparison-details.tsx`) — one `<details>` per section, semantic `<table>` inside, claim-level sources inline. Server-rendered inside `<details>` so SSR content is still in the HTML for crawlers; first section open by default.
+5. Local prices link, sources, medical disclaimer, related comparisons
 
-### Note
+Removed from the page: the long on-page nav, the duplicate quick-vs-detailed double table, the "cost" essay, the "questions to ask at consultation" block (moved to `/methodology`), and the review-request form on the unreviewed branch.
 
-Connecting GitHub is a manual step on your side (Plus (+) menu → GitHub → Connect project) — worth doing before the migrations land so the schema history syncs from the start, but it won't block me.
+**Explore — new `src/routes/explore.index.tsx` (+ `explore.$type.$slug.tsx` for class/brand hubs)**
+
+Server-loaded catalog grouped by `entity_type`: Classes · Brand families · Products · Devices · Procedures, with a secondary category filter. Each card shows name, parent chain, and licensed thumbnail if present. Only published, non-sample records are listed. Header "Explore" dropdown points here; `/treatments` stays as the A–Z alias and loses its hardcoded "Eight treatments in this release" copy.
+
+**Catalog data — `src/lib/content.server.ts` / `content.functions.ts`**
+
+Add `listCatalog()` returning entity-typed, parent-resolved rows plus media, and `getTreatmentMedia()`. The `isDemo` service-role fallback path is **removed** for public listings: public pages read only the RLS-enforced client. Detail pages for incomplete records still render (via the existing gated path) but stay `noindex` and are excluded from all listings, search, and the sitemap.
+
+**Search — `src/lib/search-index.ts`**
+
+Replace the hardcoded arrays with a loader-provided index built from the catalog, keeping the existing grouped-overlay UI. Group headings become the five entity types plus Comparisons and Local prices.
+
+**Popular US/CA comparisons — `src/lib/content-types.ts`**
+
+Extend `COMPARISON_DISPLAY_ORDER` with the high-intent pairs: botox-vs-dysport, botox-vs-xeomin, botox-vs-daxxify, juvederm-vs-restylane, voluma-vs-sculptra, sculptra-vs-radiesse, kybella-vs-coolsculpting, morpheus8-vs-ultherapy, thermage-vs-ultherapy, hydrafacial-vs-diamondglow. A `region` tag (`us` | `ca` | `both`) drives a "Popular in Canada" strip on `/compare` (Canadian availability differs — e.g. Daxxify). Pairs without complete records are listed only once their records qualify.
+
+**Notices removal**
+
+Delete the "Editorial review in progress" aside in `compare.$slug.tsx` and the demonstration/prototype language in `treatments.$slug.tsx` and `content.server.ts` comments. `EvidenceState`'s `unsourced` variant is removed from public rendering; the last-reviewed date remains as the only quality signal.
+
+---
+
+## Preserved safeguards
+
+SSR loaders (no client fetching), RLS-enforced public reads, `treatment_sources` claim-level citations, `ComparisonDisclaimer` on every comparison and treatment page, `/medical-disclaimer` with `max-snippet:0`, absolute canonicals, and the sitemap's reviewed-only filter. Incomplete records: `noindex, follow`, absent from sitemap, search, Explore, and related-links.
+
+---
+
+## Delete or simplify
+
+- `COMPARISON_ROWS` (25-row mega-table) and `QUICK_COMPARISON_ROWS` — superseded by templates.
+- The unreviewed-branch JSX in `compare.$slug.tsx` (~60 lines) and its review-request form.
+- The `isDemo` / service-role prototype read path in `content.server.ts` for listings.
+- Hardcoded arrays in `search-index.ts` and the `FILTERS` constant in `treatments.index.tsx`.
+- The `LABELS` map in `compare.index.tsx`, duplicating `content-types.ts`.
+- Consultation-questions block, moved out of the comparison page.
+
+---
+
+## Phases
+
+1. Migration: entity typing, `treatment_media`, `row_template`, backfill of the 10 existing rows.
+2. Catalog server functions + Explore routes + search rewired to the database.
+3. Comparison templates + glance card + expandable details; remove the long editorial flow.
+4. Notice removal and noindex/link-suppression audit for incomplete records.
+5. Popular US/CA pairs, imagery ingestion with rights metadata, sitemap and SEO verification, accessibility pass (`<details>` keyboard operation, table semantics, no color-only meaning).
