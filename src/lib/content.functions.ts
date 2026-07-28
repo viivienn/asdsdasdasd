@@ -8,6 +8,15 @@ export const fetchTreatments = createServerFn({ method: "GET" }).handler(async (
   return listTreatments();
 });
 
+export const fetchCatalog = createServerFn({ method: "GET" }).handler(async () => {
+  const { listCatalog, listReviewedComparisonSlugs } = await import("./content.server");
+  const [entries, reviewedSlugs] = await Promise.all([
+    listCatalog(),
+    listReviewedComparisonSlugs(),
+  ]);
+  return { entries, reviewedSlugs };
+});
+
 export const fetchCompareIndex = createServerFn({ method: "GET" }).handler(async () => {
   const { listTreatments, listComparisonSlugs, listReviewedComparisonSlugs } = await import(
     "./content.server"
