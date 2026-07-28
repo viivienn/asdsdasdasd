@@ -9,12 +9,14 @@ import {
   type TreatmentMedia,
 } from "@/lib/content-types";
 
+import { absoluteUrl } from "@/lib/site";
+
 interface CatalogEntryView extends Treatment {
   parent_name: string | null;
   parent_slug: string | null;
   media: TreatmentMedia | null;
 }
-import { absoluteUrl } from "@/lib/site";
+
 
 export const Route = createFileRoute("/explore/")({
   loader: () => fetchCatalog(),
