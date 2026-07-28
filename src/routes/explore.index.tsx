@@ -1,6 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { fetchCatalog } from "@/lib/content.functions";
-import { ENTITY_GROUP_ORDER, ENTITY_LABEL, ENTITY_DESCRIPTION } from "@/lib/content-types";
+import {
+  ENTITY_ORDER,
+  ENTITY_GROUP_LABEL,
+  ENTITY_DESCRIPTION,
+  type EntityType,
+} from "@/lib/content-types";
 import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/explore/")({
@@ -40,12 +45,12 @@ function Explore() {
         brand family, a specific product, a device, or a procedure.
       </p>
 
-      {ENTITY_GROUP_ORDER.map((type) => {
+      {ENTITY_ORDER.map((type: EntityType) => {
         const group = entries.filter((e) => e.entity_type === type);
         if (group.length === 0) return null;
         return (
           <section key={type} className="mt-12">
-            <h2 className="text-2xl">{ENTITY_LABEL[type]}</h2>
+            <h2 className="text-2xl">{ENTITY_GROUP_LABEL[type]}</h2>
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
               {ENTITY_DESCRIPTION[type]}
             </p>

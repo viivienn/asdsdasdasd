@@ -28,6 +28,15 @@ export const ENTITY_ORDER: EntityType[] = [
   "procedure",
 ];
 
+/** One-line explanation of each catalog group, shown on the Explore page. */
+export const ENTITY_DESCRIPTION: Record<EntityType, string> = {
+  class: "Broad categories of treatment, independent of any brand.",
+  brand_family: "A manufacturer's range of related products sold under one name.",
+  product: "A specific formulation or product within a brand family.",
+  device: "A named machine or technology used to deliver a treatment.",
+  procedure: "A technique performed in clinic, not tied to one device or brand.",
+};
+
 export interface AtAGlance {
   onset?: string;
   duration?: string;
