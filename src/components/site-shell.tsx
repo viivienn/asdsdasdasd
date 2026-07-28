@@ -32,7 +32,7 @@ const TOOLS: NavLink[] = [
 
 const FLAT_NAV: NavLink[] = [...EXPLORE, { to: "/about", label: "About", detail: "" }];
 
-function NavMenu({ label, items }: { label: string; items: NavLink[] }) {
+function NavMenu({ label, items, align = "left" }: { label: string; items: NavLink[]; align?: "left" | "right" }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLLIElement>(null);
 
@@ -57,28 +57,34 @@ function NavMenu({ label, items }: { label: string; items: NavLink[] }) {
       <button
         type="button"
         aria-expanded={open}
+        aria-haspopup="menu"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1 rounded-full px-3 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+        className="flex items-center gap-1 rounded-full px-2.5 py-1 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
       >
         {label}
-        <ChevronDown aria-hidden="true" className={`size-4 ${open ? "rotate-180" : ""}`} />
+        <ChevronDown aria-hidden="true" className={`size-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open ? (
-        <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-64 rounded-xl border border-rule bg-popover p-1.5 shadow-lift">
-          <ul>
-            {items.map((item) => (
+        <div
+          className={`absolute top-[calc(100%+0.5rem)] z-50 w-60 rounded-xl border border-rule bg-popover p-1 shadow-lift ${align === "right" ? "right-0" : "left-0"}`}
+        >
+          <ul className="space-y-0.5">
+            {items.map((item, index) => (
               <li key={`${item.to}-${item.label}`}>
                 <Link
                   to={item.to}
                   params={item.params}
                   onClick={() => setOpen(false)}
-                  className="block rounded-lg px-3 py-2 hover:bg-secondary"
+                  className="block rounded-lg px-2.5 py-2 transition-colors hover:bg-secondary"
                 >
                   <span className="block text-sm font-medium text-foreground">{item.label}</span>
                   {item.detail ? (
                     <span className="block text-xs text-muted-foreground">{item.detail}</span>
                   ) : null}
                 </Link>
+                {index < items.length - 1 ? (
+                  <div className="mx-2.5 my-1 border-b border-rule" />
+                ) : null}
               </li>
             ))}
           </ul>
