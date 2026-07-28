@@ -46,9 +46,11 @@ export default defineTool({
       (EDITABLE as readonly string[]).includes(k),
     );
     if (entries.length === 0) return fail("No editable fields supplied.");
+    const patch = Object.fromEntries(entries) as Record<string, string>;
     const { data, error } = await supabaseForUser(ctx)
       .from("treatments")
-      .update(Object.fromEntries(entries))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .update(patch as any)
       .eq("slug", slug)
       .select("slug," + entries.map(([k]) => k).join(","));
     if (error) return fail(error.message);

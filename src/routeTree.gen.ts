@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as MethodologyRouteImport } from './routes/methodology'
 import { Route as MedicalDisclaimerRouteImport } from './routes/medical-disclaimer'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as IndexnowKeyDottxtRouteImport } from './routes/indexnow-key[.]txt'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -19,7 +20,10 @@ import { Route as TreatmentsIndexRouteImport } from './routes/treatments.index'
 import { Route as CompareIndexRouteImport } from './routes/compare.index'
 import { Route as TreatmentsSlugRouteImport } from './routes/treatments.$slug'
 import { Route as CompareSlugRouteImport } from './routes/compare.$slug'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as ApiPublicIndexnowRouteImport } from './routes/api/public/indexnow'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as PricesUsCaCityTreatmentRouteImport } from './routes/prices.us.ca.$city.$treatment'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -35,6 +39,11 @@ const MethodologyRoute = MethodologyRouteImport.update({
 const MedicalDisclaimerRoute = MedicalDisclaimerRouteImport.update({
   id: '/medical-disclaimer',
   path: '/medical-disclaimer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexnowKeyDottxtRoute = IndexnowKeyDottxtRouteImport.update({
@@ -72,11 +81,29 @@ const CompareSlugRoute = CompareSlugRouteImport.update({
   path: '/compare/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicIndexnowRoute = ApiPublicIndexnowRouteImport.update({
   id: '/api/public/indexnow',
   path: '/api/public/indexnow',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const PricesUsCaCityTreatmentRoute = PricesUsCaCityTreatmentRouteImport.update({
   id: '/prices/us/ca/$city/$treatment',
   path: '/prices/us/ca/$city/$treatment',
@@ -87,13 +114,17 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/indexnow-key.txt': typeof IndexnowKeyDottxtRoute
+  '/mcp': typeof McpRoute
   '/medical-disclaimer': typeof MedicalDisclaimerRoute
   '/methodology': typeof MethodologyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/compare/$slug': typeof CompareSlugRoute
   '/treatments/$slug': typeof TreatmentsSlugRoute
   '/compare/': typeof CompareIndexRoute
   '/treatments/': typeof TreatmentsIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/indexnow': typeof ApiPublicIndexnowRoute
   '/prices/us/ca/$city/$treatment': typeof PricesUsCaCityTreatmentRoute
 }
@@ -101,13 +132,17 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/indexnow-key.txt': typeof IndexnowKeyDottxtRoute
+  '/mcp': typeof McpRoute
   '/medical-disclaimer': typeof MedicalDisclaimerRoute
   '/methodology': typeof MethodologyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/compare/$slug': typeof CompareSlugRoute
   '/treatments/$slug': typeof TreatmentsSlugRoute
   '/compare': typeof CompareIndexRoute
   '/treatments': typeof TreatmentsIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/indexnow': typeof ApiPublicIndexnowRoute
   '/prices/us/ca/$city/$treatment': typeof PricesUsCaCityTreatmentRoute
 }
@@ -116,13 +151,17 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/indexnow-key.txt': typeof IndexnowKeyDottxtRoute
+  '/mcp': typeof McpRoute
   '/medical-disclaimer': typeof MedicalDisclaimerRoute
   '/methodology': typeof MethodologyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/compare/$slug': typeof CompareSlugRoute
   '/treatments/$slug': typeof TreatmentsSlugRoute
   '/compare/': typeof CompareIndexRoute
   '/treatments/': typeof TreatmentsIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/indexnow': typeof ApiPublicIndexnowRoute
   '/prices/us/ca/$city/$treatment': typeof PricesUsCaCityTreatmentRoute
 }
@@ -132,13 +171,17 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/indexnow-key.txt'
+    | '/mcp'
     | '/medical-disclaimer'
     | '/methodology'
     | '/sitemap.xml'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/compare/$slug'
     | '/treatments/$slug'
     | '/compare/'
     | '/treatments/'
+    | '/.mcp/invoke-tool/$tool'
     | '/api/public/indexnow'
     | '/prices/us/ca/$city/$treatment'
   fileRoutesByTo: FileRoutesByTo
@@ -146,13 +189,17 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/indexnow-key.txt'
+    | '/mcp'
     | '/medical-disclaimer'
     | '/methodology'
     | '/sitemap.xml'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/compare/$slug'
     | '/treatments/$slug'
     | '/compare'
     | '/treatments'
+    | '/.mcp/invoke-tool/$tool'
     | '/api/public/indexnow'
     | '/prices/us/ca/$city/$treatment'
   id:
@@ -160,13 +207,17 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/indexnow-key.txt'
+    | '/mcp'
     | '/medical-disclaimer'
     | '/methodology'
     | '/sitemap.xml'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/compare/$slug'
     | '/treatments/$slug'
     | '/compare/'
     | '/treatments/'
+    | '/.mcp/invoke-tool/$tool'
     | '/api/public/indexnow'
     | '/prices/us/ca/$city/$treatment'
   fileRoutesById: FileRoutesById
@@ -175,13 +226,17 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   IndexnowKeyDottxtRoute: typeof IndexnowKeyDottxtRoute
+  McpRoute: typeof McpRoute
   MedicalDisclaimerRoute: typeof MedicalDisclaimerRoute
   MethodologyRoute: typeof MethodologyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   CompareSlugRoute: typeof CompareSlugRoute
   TreatmentsSlugRoute: typeof TreatmentsSlugRoute
   CompareIndexRoute: typeof CompareIndexRoute
   TreatmentsIndexRoute: typeof TreatmentsIndexRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicIndexnowRoute: typeof ApiPublicIndexnowRoute
   PricesUsCaCityTreatmentRoute: typeof PricesUsCaCityTreatmentRoute
 }
@@ -207,6 +262,13 @@ declare module '@tanstack/react-router' {
       path: '/medical-disclaimer'
       fullPath: '/medical-disclaimer'
       preLoaderRoute: typeof MedicalDisclaimerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/indexnow-key.txt': {
@@ -258,11 +320,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompareSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/indexnow': {
       id: '/api/public/indexnow'
       path: '/api/public/indexnow'
       fullPath: '/api/public/indexnow'
       preLoaderRoute: typeof ApiPublicIndexnowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/prices/us/ca/$city/$treatment': {
@@ -279,13 +362,18 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   IndexnowKeyDottxtRoute: IndexnowKeyDottxtRoute,
+  McpRoute: McpRoute,
   MedicalDisclaimerRoute: MedicalDisclaimerRoute,
   MethodologyRoute: MethodologyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   CompareSlugRoute: CompareSlugRoute,
   TreatmentsSlugRoute: TreatmentsSlugRoute,
   CompareIndexRoute: CompareIndexRoute,
   TreatmentsIndexRoute: TreatmentsIndexRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicIndexnowRoute: ApiPublicIndexnowRoute,
   PricesUsCaCityTreatmentRoute: PricesUsCaCityTreatmentRoute,
 }
