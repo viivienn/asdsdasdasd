@@ -1,14 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { ChevronRight, Lock, X } from "lucide-react";
+import { Check, ChevronRight, GitCompare, Lock, Plus, Search, X } from "lucide-react";
 import {
-  directCompatibleComparisons,
+  canonicalPairSlug,
+  comparisonOtherSlug,
   type AvailableComparison,
   type TreatmentPickerRecord,
 } from "@/lib/content-types";
+import { TreatmentVisual } from "@/components/treatment-visual";
 import { trackEvent } from "@/lib/analytics";
 
-/** Pick a second treatment and jump to the canonical comparison URL. */
+/** Skinsort-style compare sheet: pick a second treatment, jump to the canonical comparison URL. */
 export function CompareWith({
   slug,
   name,
@@ -20,50 +22,189 @@ export function CompareWith({
   treatments: TreatmentPickerRecord[];
   comparisons: AvailableComparison[];
 }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const [other, setOther] = useState("");
   const navigate = useNavigate();
-  const treatmentBySlug = new Map(treatments.map((treatment) => [treatment.slug, treatment]));
-  const options = directCompatibleComparisons(slug, treatments, comparisons).flatMap((pair) => {
-    const treatment = treatmentBySlug.get(pair.treatmentSlug);
-    return treatment ? [{ ...pair, name: treatment.name }] : [];
+  const inputRef = useRef<HTMLInputElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  const current = treatments.find((treatment) => treatment.slug === slug);
+
+  const options = useMemo(() => {
+    const reviewed = new Map<string, string>();
+    for (const comparison of comparisons) {
+      const otherSlug = comparisonOtherSlug(comparison, slug);
+      if (otherSlug && !reviewed.has(otherSlug)) reviewed.set(otherSlug, comparison.slug);
+    }
+    const groups = new Set(current?.comparison_groups ?? []);
+    const peerKey = `${current?.treatment_class ?? ""}|${current?.category ?? ""}`.toLowerCase();
+    return treatments
+      .filter((treatment) => treatment.slug !== slug)
+      .filter(
+        (treatment) =>
+          reviewed.has(treatment.slug) ||
+          treatment.comparison_groups.some((group) => groups.has(group)) ||
+          `${treatment.treatment_class ?? ""}|${treatment.category ?? ""}`.toLowerCase() ===
+            peerKey,
+      )
+      .map((treatment) => ({
+        treatment,
+        comparisonSlug: reviewed.get(treatment.slug) ?? canonicalPairSlug(slug, treatment.slug),
+        reviewed: reviewed.has(treatment.slug),
+      }))
+      .sort((a, b) => Number(b.reviewed) - Number(a.reviewed) || a.treatment.name.localeCompare(b.treatment.name));
+  }, [comparisons, current, slug, treatments]);
+
+  const visible = options.filter(({ treatment }) => {
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+    return `${treatment.name} ${treatment.category ?? ""} ${treatment.brand_name ?? ""}`
+      .toLowerCase()
+      .includes(q);
   });
-  const comparisonSlug = options.find((option) => option.treatmentSlug === other)?.comparisonSlug;
+  const selected = options.find((option) => option.treatment.slug === other);
+
+  useEffect(() => {
+    if (open) inputRef.current?.focus();
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
 
   if (!options.length) return null;
 
+  function close() {
+    setOpen(false);
+    setQuery("");
+    setOther("");
+    triggerRef.current?.focus();
+  }
+
   return (
-    <form
-      className="flex flex-wrap items-center gap-2"
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (!other || !comparisonSlug) return;
-        trackEvent("compare_started", { from: slug, to: other });
-        navigate({ to: "/compare/$slug", params: { slug: comparisonSlug } });
-      }}
-    >
-      <label htmlFor="compare-with" className="sr-only">
-        Compare {name} with another treatment
-      </label>
-      <select
-        id="compare-with"
-        value={other}
-        onChange={(e) => setOther(e.target.value)}
-        className="h-10 rounded-full border border-input bg-card px-4 text-sm focus-visible:outline-2 focus-visible:outline-primary"
-      >
-        <option value="">Compare with…</option>
-        {options.map((t) => (
-          <option key={t.treatmentSlug} value={t.treatmentSlug}>
-            {t.name}
-          </option>
-        ))}
-      </select>
+    <>
       <button
-        type="submit"
-        className="inline-flex h-10 items-center rounded-full border border-input bg-card px-4 text-sm font-medium hover:border-primary"
+        ref={triggerRef}
+        type="button"
+        onClick={() => setOpen(true)}
+        className="inline-flex h-10 items-center gap-2 rounded-full border border-input bg-card px-4 text-sm font-medium transition-colors hover:border-primary"
       >
+        <GitCompare aria-hidden="true" className="size-4" />
         Compare
       </button>
-    </form>
+
+      {open ? (
+        <div className="fixed inset-0 z-50 grid place-items-end bg-foreground/40 p-0 sm:place-items-center sm:p-4">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="compare-sheet-heading"
+            className="flex h-[88dvh] w-full max-w-lg flex-col rounded-t-2xl bg-card shadow-lift sm:h-[70dvh] sm:rounded-2xl"
+          >
+            <div className="flex items-start justify-between gap-3 border-b border-rule p-4">
+              <div className="min-w-0">
+                <h2 id="compare-sheet-heading" className="font-display text-lg">
+                  Compare {name} with…
+                </h2>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Similar options in the same comparison group.
+                </p>
+              </div>
+              <button
+                type="button"
+                aria-label="Close"
+                onClick={close}
+                className="grid size-9 shrink-0 place-items-center rounded-full text-muted-foreground hover:text-foreground"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            <div className="p-4 pb-2">
+              <label className="flex h-11 items-center gap-2 rounded-full border border-input bg-background px-4">
+                <Search aria-hidden="true" className="size-4 text-muted-foreground" />
+                <span className="sr-only">Search treatments to compare</span>
+                <input
+                  ref={inputRef}
+                  type="search"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Search for something to compare"
+                  className="w-full bg-transparent text-sm outline-none [&::-webkit-search-cancel-button]:hidden"
+                />
+              </label>
+            </div>
+
+            <ul className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
+              {visible.map(({ treatment, reviewed }) => {
+                const isSelected = other === treatment.slug;
+                return (
+                  <li key={treatment.id}>
+                    <button
+                      type="button"
+                      onClick={() => setOther(isSelected ? "" : treatment.slug)}
+                      aria-pressed={isSelected}
+                      className={`flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors ${
+                        isSelected ? "bg-secondary" : "hover:bg-muted"
+                      }`}
+                    >
+                      <TreatmentVisual name={treatment.name} media={treatment.media} />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-medium">{treatment.name}</span>
+                        <span className="block truncate text-xs text-muted-foreground">
+                          {treatment.category}
+                          {reviewed ? " · Reviewed comparison" : ""}
+                        </span>
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        className={`grid size-8 shrink-0 place-items-center rounded-full ${
+                          isSelected
+                            ? "bg-primary text-primary-foreground"
+                            : "border border-rule text-muted-foreground"
+                        }`}
+                      >
+                        {isSelected ? <Check className="size-4" /> : <Plus className="size-4" />}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+              {visible.length === 0 ? (
+                <li className="px-4 py-8 text-center text-sm text-muted-foreground">
+                  Nothing matches that search.
+                </li>
+              ) : null}
+            </ul>
+
+            <div className="border-t border-rule p-4">
+              <button
+                type="button"
+                disabled={!selected}
+                onClick={() => {
+                  if (!selected) return;
+                  trackEvent("compare_started", { from: slug, to: selected.treatment.slug });
+                  setOpen(false);
+                  navigate({ to: "/compare/$slug", params: { slug: selected.comparisonSlug } });
+                }}
+                className="h-11 w-full rounded-full bg-primary text-sm font-medium text-primary-foreground transition-opacity disabled:opacity-40"
+              >
+                {selected ? `Compare with ${selected.treatment.name}` : "Select something to compare"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
   );
 }
 
