@@ -2,41 +2,43 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { fetchTreatment } from "@/lib/content.functions";
 import {
   TREATMENT_PROFILE_ROWS,
-  COMPARISON_DISPLAY_ORDER,
-  comparisonLabel,
+  comparisonOtherSlug,
+  type Treatment,
+  type TreatmentSource,
 } from "@/lib/content-types";
-import type { Treatment, TreatmentSource } from "@/lib/content-types";
 import { EvidenceState } from "@/components/editorial";
 import { CoverageRequestForm } from "@/components/demand-forms";
 import { TreatmentDisclaimer } from "@/components/disclaimers";
 import { CompareWith, MatchGate } from "@/components/treatment-actions";
+import { TreatmentVisual } from "@/components/treatment-visual";
 import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/treatments/$slug")({
   loader: async ({ params }) => {
-    const res = await fetchTreatment({ data: { slug: params.slug } });
-    if (!res.data.treatment) throw notFound();
-    return res;
+    const result = await fetchTreatment({ data: { slug: params.slug } });
+    if (!result.data.treatment) throw notFound();
+    return result;
   },
   head: ({ params, loaderData }) => {
-    if (!loaderData?.data.treatment) {
+    const treatment = loaderData?.data.treatment;
+    if (!treatment) {
       return {
-        meta: [{ title: "Unavailable — Aesthetic Index" }, { name: "robots", content: "noindex" }],
+        meta: [{ title: "Unavailable | Aesthetic Index" }, { name: "robots", content: "noindex" }],
       };
     }
-    const t = loaderData.data.treatment;
     const description =
-      t.summary ??
-      `What ${t.name} changes, what it does not change, how long it lasts, and what can go wrong.`;
+      treatment.summary ??
+      `What ${treatment.name} changes, how it works, downtime, longevity, and risks.`;
+    const reviewed = Boolean(treatment.last_reviewed_at && loaderData.data.sources.length);
     return {
       meta: [
-        { title: `${t.name} — what it does, downtime, risks | Aesthetic Index` },
+        { title: `${treatment.name}: Results, Downtime & Risks | Aesthetic Index` },
         { name: "description", content: description.slice(0, 155) },
-        { property: "og:title", content: `${t.name}` },
+        { property: "og:title", content: treatment.name },
         { property: "og:description", content: description.slice(0, 155) },
         { property: "og:url", content: absoluteUrl(`/treatments/${params.slug}`) },
         { property: "og:type", content: "article" },
-        ...(loaderData.isDemo ? [{ name: "robots", content: "noindex, nofollow" }] : []),
+        { name: "robots", content: reviewed ? "index, follow" : "noindex, follow" },
       ],
       links: [{ rel: "canonical", href: absoluteUrl(`/treatments/${params.slug}`) }],
     };
@@ -57,12 +59,17 @@ export const Route = createFileRoute("/treatments/$slug")({
 
 function TreatmentPage() {
   const { slug } = Route.useParams();
-  const { data, isDemo } = Route.useLoaderData();
-  const t = data.treatment as Treatment;
+  const { data, experience } = Route.useLoaderData();
+  const treatment = data.treatment as Treatment;
   const sources = data.sources as TreatmentSource[];
-  const related = Object.entries(COMPARISON_DISPLAY_ORDER).filter(([, pair]) =>
-    pair.includes(slug),
+  const pickerTreatment = experience.treatments.find((entry) => entry.slug === slug);
+  const related = experience.comparisons.filter((comparison) =>
+    [comparison.treatment_a_slug, comparison.treatment_b_slug].includes(slug),
   );
+  const profileRows = TREATMENT_PROFILE_ROWS.filter((row) => {
+    const value = treatment[row.key];
+    return typeof value === "string" && value.trim();
+  });
 
   return (
     <>
@@ -80,103 +87,114 @@ function TreatmentPage() {
             </Link>
           </li>
           <li aria-hidden="true">/</li>
-          <li aria-current="page">{t.name}</li>
+          <li aria-current="page">{treatment.name}</li>
         </ol>
       </nav>
 
-      <h1 className="mt-4 font-display text-4xl">{t.name}</h1>
-      {t.summary ? (
-        <p className="mt-3 max-w-2xl text-lg text-muted-foreground">{t.summary}</p>
-      ) : null}
-      <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-        <span className="uppercase tracking-wider">{t.treatment_class}</span>
-        <span>
-          Last reviewed:{" "}
-          {t.last_reviewed_at
-            ? new Date(t.last_reviewed_at).toLocaleDateString()
-            : "Not yet reviewed"}
-        </span>
-        <EvidenceState state={isDemo ? "unsourced" : "sourced"} />
-      </div>
+      <header className="mt-5 grid gap-5 sm:grid-cols-[8rem_1fr] sm:items-center">
+        <TreatmentVisual
+          name={treatment.name}
+          media={pickerTreatment?.media ?? null}
+          className="size-28 sm:size-32"
+          showCredit
+        />
+        <div>
+          <h1 className="font-display text-4xl">{treatment.name}</h1>
+          {treatment.summary ? (
+            <p className="mt-3 max-w-2xl text-lg text-muted-foreground">{treatment.summary}</p>
+          ) : null}
+          <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+            <span className="uppercase tracking-wider">{treatment.treatment_class}</span>
+            {treatment.last_reviewed_at ? (
+              <span>Reviewed {new Date(treatment.last_reviewed_at).toLocaleDateString()}</span>
+            ) : null}
+            {sources.length ? <EvidenceState state="sourced" /> : null}
+          </div>
+        </div>
+      </header>
 
-      <div className="mt-6">
-        <CompareWith slug={slug} name={t.name} />
-      </div>
+      {pickerTreatment ? (
+        <div className="mt-7">
+          <CompareWith
+            slug={slug}
+            name={treatment.name}
+            treatments={experience.treatments}
+            comparisons={experience.comparisons}
+          />
+        </div>
+      ) : null}
 
       <div className="mt-6 max-w-2xl">
-        <MatchGate name={t.name} />
+        <MatchGate name={treatment.name} />
       </div>
 
-      <section className="mt-10">
-        <h2 className="text-2xl">Profile</h2>
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full border-collapse text-sm">
-            <caption className="sr-only">{t.name} attributes</caption>
-            <tbody>
-              {TREATMENT_PROFILE_ROWS.map((row) => {
-                const value = t[row.key];
-                return (
-                  <tr key={row.key} className="border-b border-rule align-top">
+      {profileRows.length ? (
+        <section className="mt-10">
+          <h2 className="text-2xl">At a glance</h2>
+          <div className="mt-4 overflow-hidden rounded-xl border border-rule bg-card">
+            <table className="w-full border-collapse text-sm">
+              <caption className="sr-only">{treatment.name} attributes</caption>
+              <tbody>
+                {profileRows.map((row) => (
+                  <tr key={row.key} className="border-b border-rule align-top last:border-0">
                     <th
                       scope="row"
-                      className="w-1/3 py-3 pr-4 text-left font-normal text-muted-foreground"
+                      className="w-1/3 bg-muted/35 px-4 py-3 text-left font-normal text-muted-foreground"
                     >
                       {row.label}
                     </th>
-                    <td className="py-3">
-                      {typeof value === "string" && value.trim() !== "" ? (
-                        value
-                      ) : (
-                        <span className="text-muted-foreground">Not yet recorded</span>
-                      )}
-                    </td>
+                    <td className="px-4 py-3 leading-6">{String(treatment[row.key])}</td>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </section>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      ) : null}
 
-      <section className="mt-12">
-        <h2 className="text-2xl">Sources</h2>
-        {sources.length === 0 ? (
-          <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-            No sources are recorded for this profile yet. Until they are, this page is prototype
-            content and is excluded from search engines.
-          </p>
-        ) : (
+      {sources.length ? (
+        <section className="mt-12">
+          <h2 className="text-2xl">Sources</h2>
           <ul className="mt-3 space-y-2 text-sm">
-            {sources.map((s) => (
-              <li key={s.id}>
-                <a href={s.source_url} rel="nofollow noopener" className="underline underline-offset-4">
-                  {s.source_title}
+            {sources.map((source) => (
+              <li key={source.id}>
+                <a
+                  href={source.source_url}
+                  rel="nofollow noopener"
+                  target="_blank"
+                  className="underline underline-offset-4"
+                >
+                  {source.source_title}
                 </a>
                 <span className="ml-2 text-muted-foreground">
-                  {s.source_type}
-                  {s.evidence_level ? ` · ${s.evidence_level}` : ""}
+                  {source.source_type}
+                  {source.evidence_level ? ` · ${source.evidence_level}` : ""}
                 </span>
               </li>
             ))}
           </ul>
-        )}
-      </section>
+        </section>
+      ) : null}
 
-      {related.length > 0 ? (
+      {related.length ? (
         <section className="mt-12">
           <h2 className="text-2xl">Related comparisons</h2>
           <ul className="mt-3 flex flex-wrap gap-2 text-sm">
-            {related.map(([s]) => (
-              <li key={s}>
-                <Link
-                  to="/compare/$slug"
-                  params={{ slug: s }}
-                  className="inline-block border border-rule bg-card px-3 py-1.5 hover:border-primary"
-                >
-                  {comparisonLabel(s)}
-                </Link>
-              </li>
-            ))}
+            {related.map((comparison) => {
+              const otherSlug = comparisonOtherSlug(comparison, slug);
+              const other = experience.treatments.find((entry) => entry.slug === otherSlug);
+              return (
+                <li key={comparison.slug}>
+                  <Link
+                    to="/compare/$slug"
+                    params={{ slug: comparison.slug }}
+                    className="inline-block rounded-full border border-rule bg-card px-3 py-1.5 hover:border-primary"
+                  >
+                    {treatment.name} vs. {other?.name ?? otherSlug}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </section>
       ) : null}

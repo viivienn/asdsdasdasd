@@ -33,12 +33,12 @@ function Methodology() {
         <p>
           Every factual row on a treatment or comparison page is meant to trace back to a recorded
           source: manufacturer instructions for use, regulatory clearance documents, peer-reviewed
-          literature, or professional society guidance. A row with no recorded source is displayed
-          as “Not yet recorded” rather than filled with plausible text.
+          literature, or professional society guidance. Missing fields are omitted from the public
+          comparison rather than filled with plausible text.
         </p>
         <p>
-          Pages whose rows are not yet sourced are labelled as prototype content and excluded from
-          search engines and the sitemap.
+          Incomplete comparisons are excluded from normal navigation, search engines, and the
+          sitemap until the relevant records, distinction, sources, and review date are complete.
         </p>
 
         <h2 className="mt-10 text-2xl">How evidence grades work</h2>

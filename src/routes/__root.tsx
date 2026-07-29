@@ -13,6 +13,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteShell } from "../components/site-shell";
 import { SITE, SITE_URL, organizationJsonLd } from "../lib/site";
+import { fetchSearchIndex } from "../lib/content.functions";
+import { buildSearchIndex } from "../lib/search-index";
 
 function NotFoundComponent() {
   return (
@@ -75,6 +77,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  loader: () => fetchSearchIndex(),
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -145,10 +148,16 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const experience = Route.useLoaderData();
+  const searchIndex = buildSearchIndex(
+    experience.treatments,
+    experience.comparisons,
+    experience.popularComparisons,
+  );
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SiteShell>
+      <SiteShell searchIndex={searchIndex} popularComparisons={experience.popularComparisons}>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
       </SiteShell>

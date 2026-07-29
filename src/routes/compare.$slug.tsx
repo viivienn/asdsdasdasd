@@ -1,10 +1,7 @@
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { fetchComparisonPair } from "@/lib/content.functions";
 import {
-  POPULAR_COMPARISON_SLUGS,
-  canonicalPairSlug,
   comparisonLabel,
-  pairDisallowed,
   parsePairSlug,
   sourcePublisher,
   treatmentLabel,
@@ -21,63 +18,36 @@ import { ComparisonDisclaimer } from "@/components/disclaimers";
 export const Route = createFileRoute("/compare/$slug")({
   loader: async ({ params }) => {
     const pair = parsePairSlug(params.slug);
-    if (!pair) throw notFound();
-    const [a, b] = pair;
+    if (!pair || pair[0] === pair[1]) throw notFound();
 
-    const canonical = canonicalPairSlug(a, b);
-    if (canonical !== params.slug) {
-      throw redirect({ to: "/compare/$slug", params: { slug: canonical }, statusCode: 301 });
+    const result = await fetchComparisonPair({ data: { a: pair[0], b: pair[1] } });
+    if (!result.a || !result.b || !result.comparison || !result.reviewed) throw notFound();
+    if (result.canonicalSlug !== params.slug) {
+      throw redirect({
+        to: "/compare/$slug",
+        params: { slug: result.canonicalSlug },
+        statusCode: 301,
+      });
     }
-
-    if (pairDisallowed(a, b)) {
-      return { unsupported: true as const, slugA: a, slugB: b };
-    }
-
-    const res = await fetchComparisonPair({ data: { a, b, canonicalSlug: canonical } });
-    // A pair is only a real page when both treatment records exist.
-    if (!res.a || !res.b) throw notFound();
-    return { unsupported: false as const, slugA: a, slugB: b, ...res };
+    return result;
   },
   head: ({ params, loaderData }) => {
-    if (!loaderData) {
+    if (!loaderData?.a || !loaderData?.b || !loaderData.comparison) {
       return {
         meta: [
-          { title: "Comparison unavailable — Aesthetic Index" },
+          { title: "Comparison unavailable | Aesthetic Index" },
           { name: "robots", content: "noindex, follow" },
         ],
       };
     }
-    const label = comparisonLabel(params.slug, [
-      "a" in loaderData ? loaderData.a?.name : undefined,
-      "b" in loaderData ? loaderData.b?.name : undefined,
-    ]);
 
-    if (loaderData.unsupported || !("reviewed" in loaderData) || !loaderData.reviewed) {
-      return {
-        meta: [
-          { title: `${label} — Aesthetic Index` },
-          {
-            name: "description",
-            content: `A preliminary side-by-side view of ${label}, generated from individual treatment records.`.slice(
-              0,
-              155,
-            ),
-          },
-          { name: "robots", content: "noindex, follow" },
-          { property: "og:title", content: label },
-          { property: "og:type", content: "website" },
-          { property: "og:url", content: absoluteUrl(`/compare/${params.slug}`) },
-        ],
-        links: [{ rel: "canonical", href: absoluteUrl(`/compare/${params.slug}`) }],
-      };
-    }
-
-    const nameA = treatmentLabel(loaderData.slugA, loaderData.a?.name);
-    const nameB = treatmentLabel(loaderData.slugB, loaderData.b?.name);
+    const nameA = loaderData.a.name;
+    const nameB = loaderData.b.name;
     const title = `${nameA} vs. ${nameB}: Results, Risks, Downtime & Cost | Aesthetic Index`;
-    const description = `Compare ${nameA} and ${nameB} by purpose, results, downtime, risks, reversibility, longevity, and publicly listed local pricing.`;
+    const description = `Compare ${nameA} and ${nameB} by purpose, results, downtime, risks, reversibility, longevity, and pricing basis.`;
     const url = absoluteUrl(`/compare/${params.slug}`);
-    const reviewedAt = loaderData.comparison?.last_reviewed_at ?? undefined;
+    const reviewedAt = loaderData.comparison.last_reviewed_at ?? undefined;
+
     return {
       meta: [
         { title },
@@ -106,7 +76,6 @@ export const Route = createFileRoute("/compare/$slug")({
                 "@id": url,
                 url,
                 headline: `${nameA} vs. ${nameB}`,
-                name: `${nameA} vs. ${nameB}`,
                 description,
                 inLanguage: "en",
                 isAccessibleForFree: true,
@@ -117,11 +86,11 @@ export const Route = createFileRoute("/compare/$slug")({
                   { "@type": "MedicalTherapy", name: nameA },
                   { "@type": "MedicalTherapy", name: nameB },
                 ],
-                citation: (loaderData.sources as TreatmentSource[] | undefined)?.map((s) => ({
+                citation: loaderData.sources.map((source) => ({
                   "@type": "CreativeWork",
-                  name: s.source_title,
-                  url: s.source_url,
-                  datePublished: s.publication_date ?? undefined,
+                  name: source.source_title,
+                  url: source.source_url,
+                  datePublished: source.publication_date ?? undefined,
                 })),
               },
             ],
@@ -140,17 +109,17 @@ function NotFoundComparison() {
     <div>
       <h1 className="font-display text-3xl">This comparison is not currently available.</h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">
-        We don't have treatment records for both of these treatments.
+        Only completed, source-supported comparisons appear publicly.
       </p>
       <ul className="mt-4 flex flex-wrap gap-4 text-sm">
         <li>
-          <Link to="/treatments" className="underline underline-offset-4">
-            Browse treatments
+          <Link to="/compare" className="underline underline-offset-4">
+            Browse comparisons
           </Link>
         </li>
         <li>
-          <Link to="/compare" className="underline underline-offset-4">
-            Popular comparisons
+          <Link to="/treatments" className="underline underline-offset-4">
+            Browse treatments
           </Link>
         </li>
         <li>
@@ -160,6 +129,79 @@ function NotFoundComparison() {
         </li>
       </ul>
     </div>
+  );
+}
+
+function ComparisonPage() {
+  const data = Route.useLoaderData();
+  const { slug } = Route.useParams();
+  const a = data.a as Treatment;
+  const b = data.b as Treatment;
+  const comparison = data.comparison!;
+  const label = `${a.name} vs. ${b.name}`;
+  const template = resolveTemplate(a, b, comparison.row_template);
+  const sources = data.sources as TreatmentSource[];
+
+  return (
+    <>
+      <Breadcrumb label={label} />
+
+      <header className="mt-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="font-display text-4xl">{label}</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Last reviewed{" "}
+            {comparison.last_reviewed_at
+              ? new Date(comparison.last_reviewed_at).toLocaleDateString()
+              : ""}
+          </p>
+        </div>
+        <Link
+          to="/compare"
+          className="rounded-full border border-rule bg-card px-4 py-2 text-sm font-medium hover:border-primary"
+        >
+          Change comparison
+        </Link>
+      </header>
+
+      <ComparisonGlance
+        a={a}
+        b={b}
+        nameA={a.name}
+        nameB={b.name}
+        oneLine={comparison.one_sentence_difference ?? ""}
+        media={data.media ?? {}}
+      />
+
+      <ComparisonDetails
+        a={a}
+        b={b}
+        nameA={a.name}
+        nameB={b.name}
+        template={template}
+        sources={sources}
+        label={label}
+        comparison={comparison}
+      />
+
+      <section id="sources" className="mt-12 scroll-mt-24">
+        <h2 className="text-2xl">Sources</h2>
+        <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
+          Sources are grouped by treatment so the support for each record stays visible.
+        </p>
+        <SourcesByTreatment sources={sources} a={a} b={b} />
+      </section>
+
+      <section id="medical-disclaimer" className="scroll-mt-24">
+        <ComparisonDisclaimer />
+      </section>
+
+      <section id="local-prices" className="mt-12 scroll-mt-24">
+        <CoverageRequestForm treatmentSlug={a.slug} />
+      </section>
+
+      <RelatedComparisons currentSlug={slug} reviewedSlugs={data.reviewedSlugs ?? []} />
+    </>
   );
 }
 
@@ -185,137 +227,6 @@ function Breadcrumb({ label }: { label: string }) {
   );
 }
 
-function ComparisonPage() {
-  const data = Route.useLoaderData();
-  const { slug } = Route.useParams();
-
-  if (data.unsupported) {
-    return (
-      <div>
-        <h1 className="font-display text-3xl">We don't publish this comparison.</h1>
-        <p className="mt-3 max-w-2xl text-muted-foreground">
-          These two selections are the same record, so a side-by-side view would not tell you
-          anything.
-        </p>
-        <Link to="/compare" className="mt-4 inline-block underline underline-offset-4">
-          Back to comparisons
-        </Link>
-      </div>
-    );
-  }
-
-  const { a, b, slugA, slugB, comparison, reviewedSlugs } = data;
-  const nameA = treatmentLabel(slugA, a?.name);
-  const nameB = treatmentLabel(slugB, b?.name);
-  const label = `${nameA} vs. ${nameB}`;
-  const template = resolveTemplate(a, b, comparison?.row_template);
-  const sources = (data.sources ?? []) as TreatmentSource[];
-  const media = data.media ?? {};
-
-  return (
-    <>
-      <Breadcrumb label={label} />
-
-      <header className="mt-4">
-        <h1 className="font-display text-4xl">{label}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {template.label} · compared on the attributes that actually differ
-        </p>
-      </header>
-
-      <ComparisonGlance
-        a={a}
-        b={b}
-        nameA={nameA}
-        nameB={nameB}
-        template={template}
-        oneLine={comparison?.one_sentence_difference ?? null}
-        media={media}
-      />
-
-      {comparison?.consider_a_when || comparison?.consider_b_when ? (
-        <section className="mt-8 grid gap-4 sm:grid-cols-2">
-          {comparison?.consider_a_when ? (
-            <div className="rounded-xl border border-rule p-4">
-              <h2 className="text-base font-medium">People often choose {nameA} when</h2>
-              <p className="mt-2 text-sm">{comparison.consider_a_when}</p>
-            </div>
-          ) : null}
-          {comparison?.consider_b_when ? (
-            <div className="rounded-xl border border-rule p-4">
-              <h2 className="text-base font-medium">People often choose {nameB} when</h2>
-              <p className="mt-2 text-sm">{comparison.consider_b_when}</p>
-            </div>
-          ) : null}
-        </section>
-      ) : null}
-
-      <ComparisonDetails
-        a={a}
-        b={b}
-        nameA={nameA}
-        nameB={nameB}
-        template={template}
-        sources={sources}
-        label={label}
-      />
-
-      <section id="local-prices" className="mt-12 scroll-mt-24">
-        <h2 className="text-2xl">Local prices</h2>
-        <p className="mt-3 max-w-3xl text-sm text-muted-foreground">
-          We do not publish national averages. Cost is shown only where a clinic advertises a price
-          publicly, recorded with the page it came from and the date it was observed. Pricing units
-          differ between treatments, so amounts are not directly interchangeable.
-        </p>
-        <ul className="mt-3 flex flex-wrap gap-3 text-sm">
-          <li>
-            <Link
-              to="/prices/us/ca/$city/$treatment"
-              params={{ city: "san-francisco", treatment: "botox" }}
-              className="inline-block rounded-md border border-rule bg-card px-3 py-1.5 hover:border-primary"
-            >
-              San Francisco Botox prices
-            </Link>
-          </li>
-          <li>
-            <Link to="/methodology" className="underline underline-offset-4">
-              How prices are collected
-            </Link>
-          </li>
-        </ul>
-      </section>
-
-      <section id="sources" className="mt-12 scroll-mt-24">
-        <h2 className="text-2xl">Sources</h2>
-        <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-          Sources are grouped by the specific claim they support, not pooled into one
-          undifferentiated list.
-        </p>
-        <SourcesByClaim sources={sources} a={a} b={b} nameA={nameA} nameB={nameB} />
-        <ul className="mt-4 flex flex-wrap gap-3 text-sm">
-          {[slugA, slugB].map((s) => (
-            <li key={s}>
-              <Link to="/treatments/$slug" params={{ slug: s }} className="underline underline-offset-4">
-                {treatmentLabel(s)} record
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section id="medical-disclaimer" className="scroll-mt-24">
-        <ComparisonDisclaimer />
-      </section>
-
-      <RelatedComparisons currentSlug={slug} reviewedSlugs={reviewedSlugs ?? []} />
-
-      <section className="mt-12">
-        <CoverageRequestForm treatmentSlug={slugA} />
-      </section>
-    </>
-  );
-}
-
 function RelatedComparisons({
   currentSlug,
   reviewedSlugs,
@@ -323,22 +234,20 @@ function RelatedComparisons({
   currentSlug: string;
   reviewedSlugs: string[];
 }) {
-  const related = reviewedSlugs.filter((s) => s !== currentSlug).slice(0, 6);
-  const fallback = POPULAR_COMPARISON_SLUGS.filter((s) => s !== currentSlug).slice(0, 6);
-  const list = related.length > 0 ? related : fallback;
-  if (list.length === 0) return null;
+  const related = reviewedSlugs.filter((candidate) => candidate !== currentSlug).slice(0, 6);
+  if (related.length === 0) return null;
   return (
     <section className="mt-12">
-      <h2 className="text-2xl">Related comparisons</h2>
+      <h2 className="text-2xl">More comparisons</h2>
       <ul className="mt-3 flex flex-wrap gap-2 text-sm">
-        {list.map((s) => (
-          <li key={s}>
+        {related.map((candidate) => (
+          <li key={candidate}>
             <Link
               to="/compare/$slug"
-              params={{ slug: s }}
-              className="inline-block rounded-md border border-rule bg-card px-3 py-1.5 hover:border-primary"
+              params={{ slug: candidate }}
+              className="inline-block rounded-full border border-rule bg-card px-3 py-1.5 hover:border-primary"
             >
-              {comparisonLabel(s)}
+              {comparisonLabel(candidate)}
             </Link>
           </li>
         ))}
@@ -347,54 +256,48 @@ function RelatedComparisons({
   );
 }
 
-/** Full source list, grouped by treatment and by the claim each source supports. */
-function SourcesByClaim({
+function SourcesByTreatment({
   sources,
   a,
   b,
-  nameA,
-  nameB,
 }: {
   sources: TreatmentSource[];
-  a: Treatment | null;
-  b: Treatment | null;
-  nameA: string;
-  nameB: string;
+  a: Treatment;
+  b: Treatment;
 }) {
-  const groups = [
-    { id: a?.id, name: nameA },
-    { id: b?.id, name: nameB },
-  ];
   return (
     <div className="mt-4 grid gap-6 md:grid-cols-2">
-      {groups.map((group) => {
-        const rows = sources.filter((s) => group.id && s.treatment_id === group.id);
+      {[a, b].map((treatment) => {
+        const rows = sources.filter((source) => source.treatment_id === treatment.id);
         return (
-          <div key={group.name}>
-            <h3 className="text-base font-medium">{group.name}</h3>
-            {rows.length === 0 ? (
-              <p className="mt-2 text-sm text-muted-foreground">No sources recorded yet.</p>
-            ) : (
-              <ul className="mt-2 space-y-2 text-sm">
-                {rows.map((s) => (
-                  <li key={s.id}>
-                    <a
-                      href={s.source_url}
-                      rel="nofollow noopener"
-                      target="_blank"
-                      className="underline underline-offset-4"
-                    >
-                      {s.source_title}
-                    </a>
-                    <span className="text-muted-foreground">
-                      {" "}
-                      — {sourcePublisher(s.source_url)}
-                      {s.publication_date ? `, ${s.publication_date.slice(0, 10)}` : ""}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
+          <div key={treatment.id}>
+            <h3 className="text-base font-medium">{treatment.name}</h3>
+            <ul className="mt-2 space-y-2 text-sm">
+              {rows.map((source) => (
+                <li key={source.id}>
+                  <a
+                    href={source.source_url}
+                    rel="nofollow noopener"
+                    target="_blank"
+                    className="underline underline-offset-4"
+                  >
+                    {source.source_title}
+                  </a>
+                  <span className="text-muted-foreground">
+                    {" "}
+                    · {sourcePublisher(source.source_url)}
+                    {source.publication_date ? `, ${source.publication_date.slice(0, 10)}` : ""}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <Link
+              to="/treatments/$slug"
+              params={{ slug: treatment.slug }}
+              className="mt-3 inline-block text-sm underline underline-offset-4"
+            >
+              {treatmentLabel(treatment.slug, treatment.name)} profile
+            </Link>
           </div>
         );
       })}

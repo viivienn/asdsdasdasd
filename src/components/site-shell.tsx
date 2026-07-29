@@ -4,7 +4,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { FOOTER_DISCLAIMER } from "@/components/disclaimers";
 import { SiteSearch } from "@/components/site-search";
 import { trackAnswerEngineReferral } from "@/lib/analytics";
-import { POPULAR_COMPARISON_SLUGS, comparisonLabel } from "@/lib/content-types";
+import type { PopularComparison } from "@/lib/content-types";
+import type { SearchIndex } from "@/lib/search-index";
 
 type NavLink = {
   to: string;
@@ -33,7 +34,15 @@ const TOOLS: NavLink[] = [
 
 const FLAT_NAV: NavLink[] = [...EXPLORE, { to: "/about", label: "About", detail: "" }];
 
-function NavMenu({ label, items, align = "left" }: { label: string; items: NavLink[]; align?: "left" | "right" }) {
+function NavMenu({
+  label,
+  items,
+  align = "left",
+}: {
+  label: string;
+  items: NavLink[];
+  align?: "left" | "right";
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLLIElement>(null);
 
@@ -63,7 +72,10 @@ function NavMenu({ label, items, align = "left" }: { label: string; items: NavLi
         className="flex items-center gap-1 rounded-full px-2.5 py-1 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
       >
         {label}
-        <ChevronDown aria-hidden="true" className={`size-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
+        <ChevronDown
+          aria-hidden="true"
+          className={`size-3.5 transition-transform ${open ? "rotate-180" : ""}`}
+        />
       </button>
       {open ? (
         <div
@@ -95,7 +107,15 @@ function NavMenu({ label, items, align = "left" }: { label: string; items: NavLi
   );
 }
 
-export function SiteShell({ children }: { children: ReactNode }) {
+export function SiteShell({
+  children,
+  searchIndex,
+  popularComparisons,
+}: {
+  children: ReactNode;
+  searchIndex: SearchIndex;
+  popularComparisons: PopularComparison[];
+}) {
   useEffect(() => {
     trackAnswerEngineReferral();
   }, []);
@@ -122,7 +142,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
             </span>
           </Link>
           <div className="hidden min-w-0 flex-1 justify-center lg:flex">
-            <SiteSearch />
+            <SiteSearch index={searchIndex} />
           </div>
           <nav aria-label="Primary" className="hidden lg:block">
             <ul className="flex items-center gap-0.5">
@@ -147,7 +167,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
           </Link>
         </div>
         <div className="px-4 pb-3 lg:hidden">
-          <SiteSearch />
+          <SiteSearch index={searchIndex} />
         </div>
         <nav aria-label="Primary mobile" className="lg:hidden">
           <ul className="flex gap-1 overflow-x-auto px-4 pb-3 text-sm">
@@ -174,25 +194,30 @@ export function SiteShell({ children }: { children: ReactNode }) {
       <footer className="mt-16 rule-top border-t border-rule bg-surface">
         <div className="mx-auto max-w-6xl px-5 py-10 text-sm text-muted-foreground">
           <p className="max-w-3xl">{FOOTER_DISCLAIMER}</p>
-          <nav aria-label="Popular comparisons" className="mt-6">
-            <h2 className="text-xs uppercase tracking-wider">Popular comparisons</h2>
-            <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-1">
-              {POPULAR_COMPARISON_SLUGS.map((slug) => (
-                <li key={slug}>
-                  <Link
-                    to="/compare/$slug"
-                    params={{ slug }}
-                    className="hover:text-foreground hover:underline"
-                  >
-                    {comparisonLabel(slug)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          {popularComparisons.length ? (
+            <nav aria-label="Popular comparisons" className="mt-6">
+              <h2 className="text-xs uppercase tracking-wider">Popular comparisons</h2>
+              <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-1">
+                {popularComparisons.map((comparison) => (
+                  <li key={comparison.slug}>
+                    <Link
+                      to="/compare/$slug"
+                      params={{ slug: comparison.slug }}
+                      className="hover:text-foreground hover:underline"
+                    >
+                      {comparison.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ) : null}
           <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-1">
             <li>
-              <Link to="/medical-disclaimer" className="underline underline-offset-4 hover:text-foreground">
+              <Link
+                to="/medical-disclaimer"
+                className="underline underline-offset-4 hover:text-foreground"
+              >
                 Medical Disclaimer
               </Link>
             </li>

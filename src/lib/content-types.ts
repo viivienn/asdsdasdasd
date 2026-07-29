@@ -1,6 +1,8 @@
 // Client-safe shared types and helpers for editorial content.
 
 export type PublicationStatus = "draft" | "review" | "published";
+export type ComparisonMode = "direct" | "curated_cross_category";
+export type MarketCode = "US" | "CA";
 
 export type EntityType = "class" | "brand_family" | "product" | "device" | "procedure";
 
@@ -103,6 +105,7 @@ export interface Treatment {
   expected_result_magnitude: string | null;
   true_substitute_notes: string | null;
   when_not_appropriate: string | null;
+  pricing_basis: string | null;
   fda_status: string | null;
   evidence_grade: string | null;
   last_reviewed_at: string | null;
@@ -124,12 +127,15 @@ export interface TreatmentSource {
 export interface Comparison {
   id: string;
   slug: string;
+  treatment_a_id: string;
+  treatment_b_id: string;
   one_sentence_difference: string | null;
   consider_a_when: string | null;
   consider_b_when: string | null;
   neither_when: string | null;
   common_misconception: string | null;
   row_template: string | null;
+  comparison_mode: ComparisonMode;
   publication_status: PublicationStatus;
   is_sample: boolean;
   last_reviewed_at: string | null;
@@ -210,16 +216,16 @@ export const TREATMENT_PROFILE_ROWS = [
  * Deliberately short: the distinctions people ask for most often.
  */
 export const QUICK_COMPARISON_ROWS = [
-  { key: "primary_purpose", label: "Primary purpose" },
-  { key: "treatment_class", label: "Treatment class" },
-  { key: "adds_volume", label: "Adds volume" },
-  { key: "tightening_level", label: "Tightening effect" },
-  { key: "result_timing", label: "Results onset" },
-  { key: "sessions_text", label: "Typical sessions" },
+  { key: "primary_purpose", label: "Best known for" },
+  { key: "treatment_class", label: "Treatment type" },
+  { key: "what_it_changes", label: "What it changes" },
+  { key: "mechanism", label: "How it works" },
+  { key: "result_timing", label: "Results begin" },
+  { key: "sessions_text", label: "Typical course" },
   { key: "downtime_text", label: "Downtime" },
   { key: "longevity_text", label: "Longevity" },
   { key: "reversibility", label: "Reversibility" },
-  { key: "evidence_grade", label: "Evidence status" },
+  { key: "pricing_basis", label: "Pricing basis" },
 ] as const satisfies ReadonlyArray<{ key: keyof Treatment; label: string }>;
 
 /**
@@ -289,6 +295,7 @@ const EXTRA_ROW_LABELS: Record<string, string> = {
   manufacturer: "Manufacturer",
   category: "Category",
   treatment_class: "Treatment class",
+  pricing_basis: "Pricing basis",
   summary: "Summary",
 };
 
@@ -304,55 +311,6 @@ export function sourcePublisher(url: string): string {
     return "Unknown publisher";
   }
 }
-
-/**
- * Comparison slugs are permanent URLs. Display order is taken from the slug so
- * the stored canonical pair order (a_id < b_id) never leaks into the UI.
- */
-export const COMPARISON_DISPLAY_ORDER: Record<string, [string, string]> = {
-  "sculptra-vs-radiesse": ["sculptra", "radiesse"],
-  "sculptra-vs-ha-filler": ["sculptra", "ha-filler"],
-  "botox-vs-dysport": ["botox", "dysport"],
-  "thermage-vs-ultherapy": ["thermage", "ultherapy"],
-  "morpheus8-vs-ultherapy": ["morpheus8", "ultherapy"],
-  "hydrafacial-vs-diamondglow": ["hydrafacial", "diamondglow"],
-  "botox-vs-xeomin": ["botox", "xeomin"],
-  "botox-vs-daxxify": ["botox", "daxxify"],
-  "juvederm-vs-restylane": ["juvederm", "restylane"],
-  "juvederm-voluma-vs-restylane-lyft": ["juvederm-voluma", "restylane-lyft"],
-  "juvederm-voluma-vs-sculptra": ["juvederm-voluma", "sculptra"],
-};
-
-export const COMPARISON_SLUGS = Object.keys(COMPARISON_DISPLAY_ORDER);
-
-export type Region = "us" | "ca" | "both";
-
-/**
- * Curated pairs surfaced as "Popular comparisons", tagged by the market where
- * the pair is commonly searched. Availability differs between the US and
- * Canada, so the two strips are not identical.
- */
-export const POPULAR_COMPARISONS: Array<{ slug: string; region: Region }> = [
-  { slug: "botox-vs-dysport", region: "both" },
-  { slug: "botox-vs-xeomin", region: "both" },
-  { slug: "botox-vs-daxxify", region: "us" },
-  { slug: "juvederm-vs-restylane", region: "both" },
-  { slug: "juvederm-voluma-vs-restylane-lyft", region: "both" },
-  { slug: "juvederm-voluma-vs-sculptra", region: "us" },
-  { slug: "sculptra-vs-radiesse", region: "both" },
-  { slug: "sculptra-vs-ha-filler", region: "both" },
-  { slug: "thermage-vs-ultherapy", region: "both" },
-  { slug: "morpheus8-vs-ultherapy", region: "ca" },
-  { slug: "hydrafacial-vs-diamondglow", region: "us" },
-];
-
-export function popularComparisons(region: Region): string[] {
-  return POPULAR_COMPARISONS.filter((p) => p.region === region || p.region === "both").map(
-    (p) => p.slug,
-  );
-}
-
-export const POPULAR_COMPARISON_SLUGS = POPULAR_COMPARISONS.map((p) => p.slug);
 
 /** Display labels for treatment slugs that are not simple title case. */
 export const TREATMENT_LABELS: Record<string, string> = {
@@ -383,22 +341,14 @@ export function treatmentLabel(slug: string, name?: string | null): string {
   );
 }
 
-/**
- * One permanent URL per unordered pair. Curated slugs keep their historical
- * order; every other pair is normalized alphabetically.
- */
+/** One deterministic fallback URL per unordered pair. Stored comparison slugs take precedence. */
 export function canonicalPairSlug(a: string, b: string): string {
-  for (const [slug, pair] of Object.entries(COMPARISON_DISPLAY_ORDER)) {
-    if ((pair[0] === a && pair[1] === b) || (pair[0] === b && pair[1] === a)) return slug;
-  }
   const [x, y] = [a, b].sort((p, q) => p.localeCompare(q));
   return `${x}-vs-${y}`;
 }
 
-/** Split a comparison slug into its two treatment slugs, in display order. */
+/** Split a comparison slug into its two treatment slugs. */
 export function parsePairSlug(slug: string): [string, string] | null {
-  const known = COMPARISON_DISPLAY_ORDER[slug];
-  if (known) return known;
   const idx = slug.indexOf("-vs-");
   if (idx <= 0) return null;
   const a = slug.slice(0, idx);
@@ -417,4 +367,62 @@ export function comparisonLabel(slug: string, names?: [string?, string?]): strin
 /** Pairs we deliberately refuse to render because the comparison misleads. */
 export function pairDisallowed(a: string, b: string): boolean {
   return a === b;
+}
+
+export interface TreatmentPickerRecord extends Treatment {
+  media: TreatmentMedia | null;
+  comparison_groups: string[];
+  markets: MarketCode[];
+}
+
+export interface PopularComparison {
+  slug: string;
+  label: string;
+  markets: MarketCode[];
+  sort_rank: number;
+}
+
+export interface AvailableComparison {
+  slug: string;
+  treatment_a_slug: string;
+  treatment_b_slug: string;
+  comparison_mode: ComparisonMode;
+  last_reviewed_at: string;
+}
+
+export interface ComparisonExperience {
+  treatments: TreatmentPickerRecord[];
+  comparisons: AvailableComparison[];
+  popularComparisons: PopularComparison[];
+}
+
+export function comparisonOtherSlug(
+  comparison: Pick<AvailableComparison, "treatment_a_slug" | "treatment_b_slug">,
+  selectedSlug: string,
+): string | null {
+  if (comparison.treatment_a_slug === selectedSlug) return comparison.treatment_b_slug;
+  if (comparison.treatment_b_slug === selectedSlug) return comparison.treatment_a_slug;
+  return null;
+}
+
+export function directCompatibleComparisons(
+  selectedSlug: string,
+  treatments: Pick<TreatmentPickerRecord, "slug" | "comparison_groups">[],
+  comparisons: AvailableComparison[],
+): Array<{ treatmentSlug: string; comparisonSlug: string }> {
+  const selected = treatments.find((t) => t.slug === selectedSlug);
+  if (!selected) return [];
+  const selectedGroups = new Set(selected.comparison_groups);
+  const treatmentsBySlug = new Map(treatments.map((t) => [t.slug, t]));
+  const seen = new Set<string>();
+
+  return comparisons.flatMap((comparison) => {
+    if (comparison.comparison_mode !== "direct") return [];
+    const otherSlug = comparisonOtherSlug(comparison, selectedSlug);
+    if (!otherSlug || seen.has(otherSlug)) return [];
+    const other = treatmentsBySlug.get(otherSlug);
+    if (!other || !other.comparison_groups.some((group) => selectedGroups.has(group))) return [];
+    seen.add(otherSlug);
+    return [{ treatmentSlug: otherSlug, comparisonSlug: comparison.slug }];
+  });
 }

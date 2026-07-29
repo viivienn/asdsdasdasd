@@ -12,7 +12,14 @@ import type {
   Treatment,
   TreatmentMedia,
   TreatmentSource,
+  TreatmentPickerRecord,
+  PopularComparison,
+  MarketCode,
+  AvailableComparison,
+  ComparisonExperience,
 } from "./content-types";
+import { canonicalPairSlug } from "./content-types";
+import { isReviewedComparison } from "./comparison-model";
 
 function publicClient() {
   const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
@@ -27,9 +34,34 @@ async function prototypeClient() {
 }
 
 const TREATMENT_COLUMNS =
-  "id,name,slug,category,treatment_class,brand_name,generic_name,manufacturer,entity_type,parent_id,sort_rank,at_a_glance,summary,primary_purpose,mechanism,adds_volume,tightening_level,result_timing,sessions_text,downtime_text,longevity_text,pain_level,reversibility,major_risks,most_likely_disappointment,marketing_misconception,provider_variables,skin_tone_notes,appointment_time,swelling_text,bruising_text,exercise_restrictions,what_it_changes,what_it_does_not_change,expected_result_magnitude,true_substitute_notes,when_not_appropriate,fda_status,evidence_grade,last_reviewed_at,publication_status,is_sample";
+  "id,name,slug,category,treatment_class,brand_name,generic_name,manufacturer,entity_type,parent_id,sort_rank,at_a_glance,summary,primary_purpose,mechanism,adds_volume,tightening_level,result_timing,sessions_text,downtime_text,longevity_text,pain_level,reversibility,major_risks,most_likely_disappointment,marketing_misconception,provider_variables,skin_tone_notes,appointment_time,swelling_text,bruising_text,exercise_restrictions,what_it_changes,what_it_does_not_change,expected_result_magnitude,true_substitute_notes,when_not_appropriate,pricing_basis,fda_status,evidence_grade,last_reviewed_at,publication_status,is_sample";
 
-const MEDIA_COLUMNS = "id,treatment_id,url,alt_text,media_role,credit,source_url,license,license_url";
+const LEGACY_TREATMENT_COLUMNS = TREATMENT_COLUMNS.replace(",pricing_basis", "");
+
+async function loadTreatmentRows(
+  client: ReturnType<typeof publicClient>,
+  options: { slug?: string; slugs?: string[]; ordered?: boolean } = {},
+): Promise<Treatment[]> {
+  // Dynamic column fallback keeps the app readable before Lovable applies the migration.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const schema = client as any;
+  const run = async (columns: string) => {
+    let query = schema.from("treatments").select(columns);
+    if (options.slug) query = query.eq("slug", options.slug);
+    if (options.slugs) query = query.in("slug", options.slugs);
+    if (options.ordered) query = query.order("sort_rank").order("name");
+    return query;
+  };
+  let result = await run(TREATMENT_COLUMNS);
+  if (result.error) result = await run(LEGACY_TREATMENT_COLUMNS);
+  return scrubTreatments(result.data ?? []).map((treatment) => ({
+    ...treatment,
+    pricing_basis: treatment.pricing_basis ?? null,
+  }));
+}
+
+const MEDIA_COLUMNS =
+  "id,treatment_id,url,alt_text,media_role,credit,source_url,license,license_url";
 
 export interface DemoAware<T> {
   data: T;
@@ -39,8 +71,8 @@ export interface DemoAware<T> {
 const PLACEHOLDER = /demonstration text|pending sourcing|pending research/i;
 
 /**
- * Placeholder editorial strings never reach a public page. A missing value is
- * rendered as "Not yet recorded" instead of prototype copy.
+ * Placeholder editorial strings never reach a public page. Public components
+ * omit missing values instead of showing prototype copy.
  */
 function scrubTreatment<T extends Record<string, unknown>>(row: T): T {
   const out: Record<string, unknown> = { ...row };
@@ -55,12 +87,8 @@ function scrubTreatments(rows: unknown[]): Treatment[] {
 }
 
 export async function listTreatments(): Promise<DemoAware<Treatment[]>> {
-  const pub = await publicClient()
-    .from("treatments")
-    .select(TREATMENT_COLUMNS)
-    .order("sort_rank")
-    .order("name");
-  return { data: scrubTreatments(pub.data ?? []), isDemo: false };
+  const data = await loadTreatmentRows(publicClient(), { ordered: true });
+  return { data, isDemo: false };
 }
 
 export interface CatalogEntry extends Treatment {
@@ -76,13 +104,15 @@ export interface CatalogEntry extends Treatment {
 export async function listCatalog(): Promise<CatalogEntry[]> {
   const client = publicClient();
   const [rows, media] = await Promise.all([
-    client.from("treatments").select(TREATMENT_COLUMNS).order("sort_rank").order("name"),
+    loadTreatmentRows(client, { ordered: true }),
     client.from("treatment_media").select(MEDIA_COLUMNS),
   ]);
-  const list = scrubTreatments(rows.data ?? []);
+  const list = rows;
   const byId = new Map(list.map((t) => [t.id, t]));
   const mediaByTreatment = new Map<string, TreatmentMedia>();
-  for (const m of (media.data ?? []) as unknown as Array<TreatmentMedia & { treatment_id: string }>) {
+  for (const m of (media.data ?? []) as unknown as Array<
+    TreatmentMedia & { treatment_id: string }
+  >) {
     if (!mediaByTreatment.has(m.treatment_id)) mediaByTreatment.set(m.treatment_id, m);
   }
   return list.map((t) => {
@@ -113,20 +143,18 @@ export async function listMediaFor(ids: string[]): Promise<Record<string, Treatm
 export async function getTreatmentBySlug(
   slug: string,
 ): Promise<DemoAware<{ treatment: Treatment | null; sources: TreatmentSource[] }>> {
-  const pub = await publicClient()
-    .from("treatments")
-    .select(TREATMENT_COLUMNS)
-    .eq("slug", slug)
-    .maybeSingle();
+  const client = publicClient();
+  const rows = await loadTreatmentRows(client, { slug });
+  const treatment = rows[0] ?? null;
 
-  if (pub.data) {
-    const sources = await publicClient()
+  if (treatment) {
+    const sources = await client
       .from("treatment_sources")
       .select("id,claim_field,source_title,source_url,source_type,publication_date,evidence_level")
-      .eq("treatment_id", (pub.data as unknown as Treatment).id);
+      .eq("treatment_id", treatment.id);
     return {
       data: {
-        treatment: scrubTreatments([pub.data])[0] ?? null,
+        treatment,
         sources: (sources.data ?? []) as unknown as TreatmentSource[],
       },
       isDemo: false,
@@ -137,11 +165,138 @@ export async function getTreatmentBySlug(
 }
 
 const COMPARISON_COLUMNS =
+  "id,slug,treatment_a_id,treatment_b_id,one_sentence_difference,consider_a_when,consider_b_when,neither_when,common_misconception,row_template,comparison_mode,publication_status,is_sample,last_reviewed_at";
+
+const LEGACY_COMPARISON_COLUMNS =
   "id,slug,treatment_a_id,treatment_b_id,one_sentence_difference,consider_a_when,consider_b_when,neither_when,common_misconception,row_template,publication_status,is_sample,last_reviewed_at";
 
-export async function getComparisonBySlug(
-  slug: string,
-): Promise<DemoAware<Comparison | null>> {
+async function loadComparisonRows(client: ReturnType<typeof publicClient>): Promise<Comparison[]> {
+  // Dynamic column fallback keeps the app readable before Lovable applies the migration.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const schema = client as any;
+  const current = await schema.from("comparisons").select(COMPARISON_COLUMNS);
+  if (!current.error) return (current.data ?? []) as Comparison[];
+
+  // Allows the app to stay readable while Lovable applies this branch's
+  // migration. Market-aware compatibility remains disabled until then.
+  const legacy = await schema.from("comparisons").select(LEGACY_COMPARISON_COLUMNS);
+  return ((legacy.data ?? []) as Array<Omit<Comparison, "comparison_mode">>).map((row) => ({
+    ...row,
+    comparison_mode: "direct",
+  }));
+}
+
+function reviewedComparisonsFromRows(
+  treatments: Treatment[],
+  comparisons: Comparison[],
+  sources: TreatmentSource[],
+): AvailableComparison[] {
+  const treatmentsById = new Map(treatments.map((treatment) => [treatment.id, treatment]));
+  return comparisons.flatMap((comparison) => {
+    const a = treatmentsById.get(comparison.treatment_a_id) ?? null;
+    const b = treatmentsById.get(comparison.treatment_b_id) ?? null;
+    if (!isReviewedComparison(a, b, comparison, sources) || !a || !b) return [];
+    return [
+      {
+        slug: comparison.slug,
+        treatment_a_slug: a.slug,
+        treatment_b_slug: b.slug,
+        comparison_mode: comparison.comparison_mode,
+        last_reviewed_at: comparison.last_reviewed_at as string,
+      },
+    ];
+  });
+}
+
+/**
+ * Picker and Explore data comes entirely from public database rows. A missing
+ * market mapping means "not recorded", never "unavailable".
+ */
+export async function listComparisonExperience(): Promise<ComparisonExperience> {
+  const client = publicClient();
+  const [
+    treatmentsResult,
+    mediaResult,
+    groupsResult,
+    marketsResult,
+    comparisonRows,
+    comparisonMarketsResult,
+    sourcesResult,
+  ] = await Promise.all([
+    loadTreatmentRows(client, { ordered: true }),
+    client.from("treatment_media").select(MEDIA_COLUMNS),
+    client.from("treatment_comparison_groups").select("treatment_id,comparison_groups!inner(slug)"),
+    client.from("treatment_markets").select("treatment_id,country_code"),
+    loadComparisonRows(client),
+    client.from("comparison_markets").select("comparison_id,country_code,sort_rank"),
+    client
+      .from("treatment_sources")
+      .select(
+        "id,treatment_id,claim_field,source_title,source_url,source_type,publication_date,evidence_level",
+      ),
+  ]);
+
+  const base = treatmentsResult;
+  const sources = (sourcesResult.data ?? []) as unknown as TreatmentSource[];
+  const comparisons = reviewedComparisonsFromRows(base, comparisonRows, sources);
+  const comparisonById = new Map(comparisonRows.map((comparison) => [comparison.id, comparison]));
+  const availableBySlug = new Map(comparisons.map((comparison) => [comparison.slug, comparison]));
+  const treatmentBySlug = new Map(base.map((treatment) => [treatment.slug, treatment]));
+  const media = new Map<string, TreatmentMedia>();
+  for (const row of mediaResult.data ?? []) {
+    if (!media.has(row.treatment_id)) media.set(row.treatment_id, row as TreatmentMedia);
+  }
+  const groups = new Map<string, string[]>();
+  for (const row of groupsResult.data ?? []) {
+    const values = groups.get(row.treatment_id) ?? [];
+    const relation = row.comparison_groups as unknown as
+      { slug: string } | Array<{ slug: string }> | null;
+    const slug = Array.isArray(relation) ? relation[0]?.slug : relation?.slug;
+    if (slug) values.push(slug);
+    groups.set(row.treatment_id, values);
+  }
+  const markets = new Map<string, MarketCode[]>();
+  for (const row of marketsResult.data ?? []) {
+    const values = markets.get(row.treatment_id) ?? [];
+    values.push(row.country_code as MarketCode);
+    markets.set(row.treatment_id, values);
+  }
+
+  const popularMap = new Map<string, PopularComparison>();
+  for (const row of comparisonMarketsResult.data ?? []) {
+    const stored = comparisonById.get(row.comparison_id);
+    if (!stored) continue;
+    const comparison = availableBySlug.get(stored.slug);
+    if (!comparison) continue;
+    const a = treatmentBySlug.get(comparison.treatment_a_slug);
+    const b = treatmentBySlug.get(comparison.treatment_b_slug);
+    const existing = popularMap.get(comparison.slug) ?? {
+      slug: comparison.slug,
+      label: `${a?.name ?? comparison.treatment_a_slug} vs. ${
+        b?.name ?? comparison.treatment_b_slug
+      }`,
+      markets: [] as MarketCode[],
+      sort_rank: row.sort_rank ?? 0,
+    };
+    existing.markets.push(row.country_code as MarketCode);
+    popularMap.set(existing.slug, existing);
+  }
+
+  return {
+    treatments: base.map((t) => ({
+      ...t,
+      media: media.get(t.id) ?? null,
+      comparison_groups: groups.get(t.id) ?? [],
+      markets: markets.get(t.id) ?? [],
+    })),
+    comparisons,
+    popularComparisons: [...popularMap.values()].sort(
+      (a, b) => a.sort_rank - b.sort_rank || a.label.localeCompare(b.label),
+    ),
+  };
+}
+
+export async function getComparisonBySlug(slug: string): Promise<DemoAware<Comparison | null>> {
   const pub = await publicClient()
     .from("comparisons")
     .select(COMPARISON_COLUMNS)
@@ -166,39 +321,33 @@ export interface ComparisonContext {
   sources: TreatmentSource[];
   reviewed: boolean;
   media: Record<string, TreatmentMedia>;
-}
-
-function treatmentApproved(t: Treatment | null): boolean {
-  return Boolean(t && t.publication_status === "published" && t.is_sample === false);
+  canonicalSlug: string;
 }
 
 /**
  * Resolves a treatment pair into a comparison context. Treatment existence is
- * checked against the full catalogue (so unknown slugs 404), while the
- * `reviewed` flag is computed strictly: it is the single gate for indexable,
- * editorially complete comparison pages.
+ * checked against the public catalogue, then the stored pair determines the
+ * permanent URL. Unreviewed pairs never become normal picker destinations.
  */
 export async function getComparisonContext(
   slugA: string,
   slugB: string,
-  canonicalSlug: string,
 ): Promise<ComparisonContext> {
   const client = publicClient();
 
-  const { data: rows } = await client
-    .from("treatments")
-    .select(TREATMENT_COLUMNS)
-    .in("slug", [slugA, slugB]);
-  const list = scrubTreatments(rows ?? []);
+  const list = await loadTreatmentRows(client, { slugs: [slugA, slugB] });
   const a = list.find((t) => t.slug === slugA) ?? null;
   const b = list.find((t) => t.slug === slugB) ?? null;
 
-  const { data: comparisonRow } = await client
-    .from("comparisons")
-    .select(COMPARISON_COLUMNS)
-    .eq("slug", canonicalSlug)
-    .maybeSingle();
-  const comparison = (comparisonRow as unknown as Comparison) ?? null;
+  const comparisonRows = await loadComparisonRows(client);
+  const comparison =
+    a && b
+      ? (comparisonRows.find(
+          (row) =>
+            (row.treatment_a_id === a.id && row.treatment_b_id === b.id) ||
+            (row.treatment_a_id === b.id && row.treatment_b_id === a.id),
+        ) ?? null)
+      : null;
 
   let sources: TreatmentSource[] = [];
   let media: Record<string, TreatmentMedia> = {};
@@ -213,34 +362,15 @@ export async function getComparisonContext(
     media = await listMediaFor([a.id, b.id]);
   }
 
-  const sourceIds = new Set(
-    (sources as unknown as Array<{ treatment_id?: string }>).map((s) => s.treatment_id ?? ""),
-  );
-
-  const reviewed =
-    treatmentApproved(a) &&
-    treatmentApproved(b) &&
-    Boolean(comparison) &&
-    comparison!.publication_status === "published" &&
-    comparison!.is_sample === false &&
-    Boolean(comparison!.one_sentence_difference) &&
-    Boolean(comparison!.consider_a_when) &&
-    Boolean(comparison!.consider_b_when) &&
-    Boolean(comparison!.neither_when) &&
-    Boolean(comparison!.last_reviewed_at) &&
-    Boolean(a && sourceIds.has(a.id)) &&
-    Boolean(b && sourceIds.has(b.id));
-
-  // Editorial comparison copy is only released once the comparison record
-  // itself is reviewed. The attribute view is always built from the two
-  // published treatment records, which are public by definition.
+  const reviewed = isReviewedComparison(a, b, comparison, sources);
   return {
     a,
     b,
-    comparison: reviewed ? comparison : null,
+    comparison,
     sources,
     reviewed,
     media,
+    canonicalSlug: comparison?.slug ?? canonicalPairSlug(slugA, slugB),
   };
 }
 
@@ -250,25 +380,22 @@ export async function listReviewedComparisonSlugs(): Promise<string[]> {
 }
 
 /** Reviewed comparisons with the real review date used as sitemap lastmod. */
-export async function listReviewedComparisons(): Promise<
-  Array<{ slug: string; last_reviewed_at: string }>
-> {
-  const pub = await publicClient()
-    .from("comparisons")
-    .select(COMPARISON_COLUMNS);
-  const rows = (pub.data ?? []) as unknown as Comparison[];
-  return rows
-    .filter(
-      (c) =>
-        c.publication_status === "published" &&
-        c.is_sample === false &&
-        Boolean(c.one_sentence_difference) &&
-        Boolean(c.consider_a_when) &&
-        Boolean(c.consider_b_when) &&
-        Boolean(c.neither_when) &&
-        Boolean(c.last_reviewed_at),
-    )
-    .map((c) => ({ slug: c.slug, last_reviewed_at: c.last_reviewed_at as string }));
+export async function listReviewedComparisons(): Promise<AvailableComparison[]> {
+  const client = publicClient();
+  const [treatmentsResult, comparisons, sourcesResult] = await Promise.all([
+    loadTreatmentRows(client),
+    loadComparisonRows(client),
+    client
+      .from("treatment_sources")
+      .select(
+        "id,treatment_id,claim_field,source_title,source_url,source_type,publication_date,evidence_level",
+      ),
+  ]);
+  return reviewedComparisonsFromRows(
+    treatmentsResult,
+    comparisons,
+    (sourcesResult.data ?? []) as unknown as TreatmentSource[],
+  );
 }
 
 /**
@@ -281,7 +408,9 @@ export async function listIndexablePricePages(): Promise<
   const client = publicClient();
   const rows = await client
     .from("price_observations")
-    .select("observed_at,locations!inner(city_slug,country_code,region_code,is_indexable),treatments!inner(slug)");
+    .select(
+      "observed_at,locations!inner(city_slug,country_code,region_code,is_indexable),treatments!inner(slug)",
+    );
   const map = new Map<string, { city: string; treatment: string; lastmod: string }>();
   for (const r of (rows.data ?? []) as unknown as Array<{
     observed_at: string;

@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
-import { SiteShell } from "@/components/site-shell";
 
 function safeNext(next: string | undefined): string {
   if (!next) return "/";
@@ -87,7 +86,7 @@ function AuthPage() {
   }
 
   return (
-    <SiteShell>
+    <>
       <div className="mx-auto max-w-md">
         <h1 className="font-display text-2xl font-semibold tracking-tight">
           {mode === "signin" ? "Sign in" : "Create an account"}
@@ -172,6 +171,6 @@ function AuthPage() {
           {mode === "signin" ? "Need an account? Sign up" : "Already have an account? Sign in"}
         </button>
       </div>
-    </SiteShell>
+    </>
   );
 }
