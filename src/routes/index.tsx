@@ -6,6 +6,7 @@ import { CoverageRequestForm } from "@/components/demand-forms";
 import { SiteSearch } from "@/components/site-search";
 import { buildSearchIndex } from "@/lib/search-index";
 import { absoluteUrl } from "@/lib/site";
+import type { PopularComparison } from "@/lib/content-types";
 
 export const Route = createFileRoute("/")({
   loader: () => fetchCompareIndex(),
@@ -67,7 +68,7 @@ function Home() {
         <section className="mt-14">
           <SectionHeading>Popular comparisons</SectionHeading>
           <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {popularComparisons.map((comparison) => (
+            {popularComparisons.map((comparison: PopularComparison) => (
               <li key={comparison.slug}>
                 <Link
                   to="/compare/$slug"

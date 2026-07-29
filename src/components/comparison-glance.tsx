@@ -1,7 +1,48 @@
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, Check, CircleSlash, Minus } from "lucide-react";
 import { QUICK_COMPARISON_ROWS, type Treatment, type TreatmentMedia } from "@/lib/content-types";
 import { displayValue, nonEmptyComparisonRows } from "@/lib/comparison-model";
 import { TreatmentVisual } from "@/components/treatment-visual";
+
+type Status = "yes" | "no" | "limited" | null;
+
+/** Presentational only: reads a leading yes/no/limited word so the row can carry a symbol. */
+function statusOf(value: string | null): Status {
+  if (!value) return null;
+  const head = value.toLowerCase().trimStart();
+  if (/^(yes|reversible|approved|available)\b/.test(head)) return "yes";
+  if (/^(no|not|none|irreversible|unavailable)\b/.test(head)) return "no";
+  if (/^(limited|partial|partially|somewhat|varies|sometimes)\b/.test(head)) return "limited";
+  return null;
+}
+
+function StatusMark({ status }: { status: Status }) {
+  if (!status) return null;
+  const config = {
+    yes: { Icon: Check, className: "bg-sage text-sage-foreground", label: "Yes" },
+    no: { Icon: CircleSlash, className: "bg-rose text-rose-foreground", label: "No" },
+    limited: { Icon: Minus, className: "bg-muted text-muted-foreground", label: "Limited" },
+  }[status];
+  return (
+    <span
+      className={`mr-1.5 inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 align-middle text-[0.68rem] font-semibold uppercase tracking-[0.04em] ${config.className}`}
+    >
+      <config.Icon aria-hidden="true" className="size-3" />
+      {config.label}
+    </span>
+  );
+}
+
+function Cell({ treatment, rowKey }: { treatment: Treatment; rowKey: keyof Treatment }) {
+  const value = displayValue(treatment, rowKey);
+  if (!value) return <span className="text-muted-foreground">—</span>;
+  const status = statusOf(value);
+  return (
+    <>
+      <StatusMark status={status} />
+      <span>{value}</span>
+    </>
+  );
+}
 
 export function ComparisonGlance({
   a,
@@ -22,35 +63,51 @@ export function ComparisonGlance({
 
   return (
     <>
-      <section aria-label="Compared treatments" className="mt-6">
-        <div className="grid grid-cols-2 gap-3 sm:gap-5">
+      {oneLine ? (
+        <section id="bottom-line" aria-labelledby="bottom-line-heading" className="mt-5 scroll-mt-24">
+          <h2 id="bottom-line-heading" className="sr-only">
+            Main difference
+          </h2>
+          <p className="max-w-3xl text-[0.95rem] leading-6 text-muted-foreground sm:text-base">
+            {oneLine}
+          </p>
+        </section>
+      ) : null}
+
+      <section
+        id="quick-comparison"
+        aria-labelledby="quick-comparison-heading"
+        className="mt-6 scroll-mt-24 border-y border-rule"
+      >
+        <h2 id="quick-comparison-heading" className="sr-only">
+          Quick comparison
+        </h2>
+
+        <div className="grid grid-cols-2 divide-x divide-rule border-b border-rule">
           <TreatmentHeader treatment={a} name={nameA} media={media[a.id] ?? null} />
           <TreatmentHeader treatment={b} name={nameB} media={media[b.id] ?? null} />
         </div>
-      </section>
 
-      <section id="bottom-line" aria-labelledby="bottom-line-heading" className="mt-6 scroll-mt-24">
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
-          Bottom line
-        </p>
-        <h2 id="bottom-line-heading" className="sr-only">
-          Main difference
-        </h2>
-        <p className="mt-2 max-w-4xl text-base leading-7 sm:text-lg">{oneLine}</p>
+        <dl className="divide-y divide-rule">
+          {rows.map((row) => (
+            <div key={row.key} className="py-2.5">
+              <dt className="px-3 text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                {row.label}
+              </dt>
+              <dd className="mt-1 grid grid-cols-2 divide-x divide-rule">
+                <p className="min-w-0 break-words px-3 text-sm leading-6">
+                  <span className="sr-only">{nameA}: </span>
+                  <Cell treatment={a} rowKey={row.key} />
+                </p>
+                <p className="min-w-0 break-words px-3 text-sm leading-6">
+                  <span className="sr-only">{nameB}: </span>
+                  <Cell treatment={b} rowKey={row.key} />
+                </p>
+              </dd>
+            </div>
+          ))}
+        </dl>
       </section>
-
-      {rows.length ? (
-        <section
-          id="quick-comparison"
-          aria-labelledby="quick-comparison-heading"
-          className="mt-7 scroll-mt-24"
-        >
-          <h2 id="quick-comparison-heading" className="font-display text-2xl">
-            Quick comparison
-          </h2>
-          <QuickComparisonTable a={a} b={b} nameA={nameA} nameB={nameB} rows={rows} />
-        </section>
-      ) : null}
 
       <BenefitsAndTradeoffs a={a} b={b} nameA={nameA} nameB={nameB} />
     </>
@@ -67,90 +124,13 @@ function TreatmentHeader({
   media: TreatmentMedia | null;
 }) {
   return (
-    <article className="flex min-w-0 flex-col items-center gap-3 rounded-2xl border border-rule bg-card p-3 text-center sm:flex-row sm:p-4 sm:text-left">
-      <div className="w-fit shrink-0">
-        <TreatmentVisual name={name} media={media} className="size-20 sm:size-24" showCredit />
-      </div>
-      <div className="min-w-0">
-        <h2 className="truncate font-display text-lg sm:text-xl">{name}</h2>
-        <p className="mt-1 truncate text-xs uppercase tracking-[0.1em] text-muted-foreground">
-          {treatment.manufacturer || treatment.brand_name || treatment.category}
-        </p>
-      </div>
+    <article className="flex min-w-0 flex-col items-center gap-2 px-3 py-4 text-center">
+      <TreatmentVisual name={name} media={media} className="size-16 sm:size-20" />
+      <h3 className="min-w-0 break-words font-display text-base leading-tight sm:text-lg">{name}</h3>
+      <p className="min-w-0 break-words text-[0.68rem] uppercase tracking-[0.1em] text-muted-foreground">
+        {treatment.manufacturer || treatment.brand_name || treatment.category}
+      </p>
     </article>
-  );
-}
-
-function QuickComparisonTable({
-  a,
-  b,
-  nameA,
-  nameB,
-  rows,
-}: {
-  a: Treatment;
-  b: Treatment;
-  nameA: string;
-  nameB: string;
-  rows: Array<(typeof QUICK_COMPARISON_ROWS)[number]>;
-}) {
-  return (
-    <div className="mt-4 overflow-hidden rounded-2xl border border-rule bg-card">
-      <table className="hidden w-full border-collapse text-sm md:table">
-        <caption className="sr-only">
-          Quick attribute comparison of {nameA} and {nameB}
-        </caption>
-        <thead>
-          <tr className="border-b border-rule bg-muted/55 text-left">
-            <th scope="col" className="w-[24%] px-4 py-3 font-medium">
-              Attribute
-            </th>
-            <th scope="col" className="w-[38%] px-4 py-3 font-medium">
-              {nameA}
-            </th>
-            <th scope="col" className="w-[38%] px-4 py-3 font-medium">
-              {nameB}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.key} className="border-b border-rule align-top last:border-0">
-              <th
-                scope="row"
-                className="bg-muted/25 px-4 py-3 text-left font-medium text-muted-foreground"
-              >
-                {row.label}
-              </th>
-              <td className="px-4 py-3 leading-6">{displayValue(a, row.key)}</td>
-              <td className="border-l border-rule px-4 py-3 leading-6">
-                {displayValue(b, row.key)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <div className="md:hidden">
-        {rows.map((row) => (
-          <section key={row.key} className="border-b border-rule last:border-0">
-            <h3 className="bg-muted/55 px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-              {row.label}
-            </h3>
-            <dl className="grid grid-cols-2 divide-x divide-rule">
-              <div className="min-w-0 px-3 py-3">
-                <dt className="mb-1 text-xs font-medium text-muted-foreground">{nameA}</dt>
-                <dd className="text-sm leading-5">{displayValue(a, row.key)}</dd>
-              </div>
-              <div className="min-w-0 px-3 py-3">
-                <dt className="mb-1 text-xs font-medium text-muted-foreground">{nameB}</dt>
-                <dd className="text-sm leading-5">{displayValue(b, row.key)}</dd>
-              </div>
-            </dl>
-          </section>
-        ))}
-      </div>
-    </div>
   );
 }
 
@@ -165,7 +145,7 @@ function BenefitsAndTradeoffs({
   nameA: string;
   nameB: string;
 }) {
-  const cards = [
+  const columns = [
     { treatment: a, name: nameA },
     { treatment: b, name: nameB },
   ].map(({ treatment, name }) => ({
@@ -177,35 +157,37 @@ function BenefitsAndTradeoffs({
     ].filter((value): value is string => Boolean(value)),
   }));
 
-  if (cards.every((card) => !card.benefit && !card.tradeoffs.length)) return null;
+  if (columns.every((column) => !column.benefit && !column.tradeoffs.length)) return null;
 
   return (
     <section className="mt-8" aria-labelledby="tradeoffs-heading">
-      <h2 id="tradeoffs-heading" className="font-display text-2xl">
+      <h2 id="tradeoffs-heading" className="text-xl">
         Benefits and trade-offs
       </h2>
-      <div className="mt-4 grid gap-3 md:grid-cols-2">
-        {cards.map((card) => (
-          <article key={card.name} className="rounded-2xl border border-rule bg-card p-4">
-            <h3 className="font-medium">{card.name}</h3>
-            <ul className="mt-3 space-y-2 text-sm leading-6">
-              {card.benefit ? (
-                <li className="flex gap-2 rounded-xl bg-sage px-3 py-2 text-sage-foreground">
-                  <CheckCircle2 aria-hidden="true" className="mt-1 size-4 shrink-0" />
-                  <span>{card.benefit}</span>
+      <div className="mt-3 grid gap-x-4 gap-y-5 sm:grid-cols-2">
+        {columns.map((column) => (
+          <div key={column.name} className="min-w-0">
+            <h3 className="text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+              {column.name}
+            </h3>
+            <ul className="mt-2 space-y-1.5 text-sm leading-6">
+              {column.benefit ? (
+                <li className="flex gap-2 rounded-lg bg-sage px-2.5 py-1.5 text-sage-foreground">
+                  <Check aria-hidden="true" className="mt-1 size-3.5 shrink-0" />
+                  <span className="min-w-0 break-words">{column.benefit}</span>
                 </li>
               ) : null}
-              {card.tradeoffs.map((tradeoff) => (
+              {column.tradeoffs.map((tradeoff) => (
                 <li
                   key={tradeoff}
-                  className="flex gap-2 rounded-xl bg-rose px-3 py-2 text-rose-foreground"
+                  className="flex gap-2 rounded-lg bg-rose px-2.5 py-1.5 text-rose-foreground"
                 >
-                  <AlertCircle aria-hidden="true" className="mt-1 size-4 shrink-0" />
-                  <span>{tradeoff}</span>
+                  <AlertTriangle aria-hidden="true" className="mt-1 size-3.5 shrink-0" />
+                  <span className="min-w-0 break-words">{tradeoff}</span>
                 </li>
               ))}
             </ul>
-          </article>
+          </div>
         ))}
       </div>
     </section>
