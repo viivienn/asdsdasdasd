@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { z } from "zod";
 import { fetchCatalog } from "@/lib/content.functions";
@@ -11,6 +11,7 @@ import {
 } from "@/lib/content-types";
 import { TreatmentVisual } from "@/components/treatment-visual";
 import { SectionHeading } from "@/components/editorial";
+import { GOAL_FILTERS, matchesGoal, slugifyType as slugify } from "@/lib/taxonomy";
 import { absoluteUrl } from "@/lib/site";
 
 interface CatalogEntryView extends Treatment {
@@ -21,21 +22,7 @@ interface CatalogEntryView extends Treatment {
   markets: MarketCode[];
 }
 
-const searchSchema = z.object({ type: z.string().optional() });
-const GOAL_FILTERS = [
-  { slug: "expression-lines", label: "Expression lines", keywords: ["neuromodulator"] },
-  {
-    slug: "volume-contour",
-    label: "Volume & contour",
-    keywords: ["filler", "biostimulator", "collagen stimulator"],
-  },
-  { slug: "lift-tighten", label: "Lift & tighten", keywords: ["energy device"] },
-  {
-    slug: "texture-pores",
-    label: "Texture & pores",
-    keywords: ["facial", "exfoliation", "microneedling"],
-  },
-] as const;
+const searchSchema = z.object({ type: z.string().optional(), goal: z.string().optional() });
 
 export const Route = createFileRoute("/explore/")({
   validateSearch: (search) => searchSchema.parse(search),
@@ -64,10 +51,11 @@ function Explore() {
     popularComparisons: Array<{ slug: string; label: string; markets: MarketCode[] }>;
   };
   const search = Route.useSearch();
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [market, setMarket] = useState<MarketCode>("US");
-  const [goal, setGoal] = useState("");
   const selectedType = search.type ?? "";
+  const goal = search.goal ?? "";
 
   const visible = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -81,12 +69,9 @@ function Explore() {
         return false;
       }
       if (goal) {
-        const goalFilter = GOAL_FILTERS.find((item) => item.slug === goal);
         const haystack =
           `${entry.category} ${entry.treatment_class} ${entry.primary_purpose ?? ""}`.toLowerCase();
-        if (goalFilter && !goalFilter.keywords.some((keyword) => haystack.includes(keyword))) {
-          return false;
-        }
+        if (!matchesGoal(haystack, goal)) return false;
       }
       return (
         !normalized ||
@@ -168,14 +153,23 @@ function Explore() {
                 <button
                   type="button"
                   aria-pressed={goal === item.slug}
-                  onClick={() => setGoal((current) => (current === item.slug ? "" : item.slug))}
+                  onClick={() =>
+                    navigate({
+                      to: ".",
+                      search: (prev) => ({
+                        ...prev,
+                        goal: goal === item.slug ? undefined : item.slug,
+                      }),
+                    })
+                  }
                   className={`block h-full w-full rounded-xl border p-4 text-left text-sm ${
                     goal === item.slug
                       ? "border-primary bg-secondary text-secondary-foreground"
                       : "border-rule bg-card hover:border-primary"
                   }`}
                 >
-                  {item.label}
+                  <span className="block font-medium">{item.label}</span>
+                  <span className="mt-1 block text-xs text-muted-foreground">{item.detail}</span>
                 </button>
               </li>
             ))}
@@ -273,9 +267,3 @@ function CatalogSection({ title, entries }: { title: string; entries: CatalogEnt
   );
 }
 
-function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
