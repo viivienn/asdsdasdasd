@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { z } from "zod";
 import { fetchCatalog } from "@/lib/content.functions";
@@ -51,7 +51,7 @@ function Explore() {
     popularComparisons: Array<{ slug: string; label: string; markets: MarketCode[] }>;
   };
   const search = Route.useSearch();
-  const navigate = useNavigate();
+  const navigate = Route.useNavigate();
   const [query, setQuery] = useState("");
   const [market, setMarket] = useState<MarketCode>("US");
   const selectedType = search.type ?? "";
