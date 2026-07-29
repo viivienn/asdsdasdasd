@@ -214,6 +214,16 @@ function reviewedComparisonsFromRows(
  */
 export async function listComparisonExperience(): Promise<ComparisonExperience> {
   const client = publicClient();
+  // These relational tables are not present in the generated types yet, so they
+  // are read through a narrowly typed passthrough.
+  type GroupRow = { treatment_id: string; comparison_groups: { slug: string } | Array<{ slug: string }> | null };
+  type TreatmentMarketRow = { treatment_id: string; country_code: string };
+  type ComparisonMarketRow = { comparison_id: string; country_code: string; sort_rank: number | null };
+  const untyped = client as unknown as {
+    from: (table: string) => {
+      select: (columns: string) => PromiseLike<{ data: unknown[] | null }>;
+    };
+  };
   const [
     treatmentsResult,
     mediaResult,
@@ -225,10 +235,12 @@ export async function listComparisonExperience(): Promise<ComparisonExperience> 
   ] = await Promise.all([
     loadTreatmentRows(client, { ordered: true }),
     client.from("treatment_media").select(MEDIA_COLUMNS),
-    client.from("treatment_comparison_groups").select("treatment_id,comparison_groups!inner(slug)"),
-    client.from("treatment_markets").select("treatment_id,country_code"),
+    untyped
+      .from("treatment_comparison_groups")
+      .select("treatment_id,comparison_groups!inner(slug)"),
+    untyped.from("treatment_markets").select("treatment_id,country_code"),
     loadComparisonRows(client),
-    client.from("comparison_markets").select("comparison_id,country_code,sort_rank"),
+    untyped.from("comparison_markets").select("comparison_id,country_code,sort_rank"),
     client
       .from("treatment_sources")
       .select(
@@ -247,23 +259,22 @@ export async function listComparisonExperience(): Promise<ComparisonExperience> 
     if (!media.has(row.treatment_id)) media.set(row.treatment_id, row as TreatmentMedia);
   }
   const groups = new Map<string, string[]>();
-  for (const row of groupsResult.data ?? []) {
+  for (const row of (groupsResult.data ?? []) as GroupRow[]) {
     const values = groups.get(row.treatment_id) ?? [];
-    const relation = row.comparison_groups as unknown as
-      { slug: string } | Array<{ slug: string }> | null;
+    const relation = row.comparison_groups;
     const slug = Array.isArray(relation) ? relation[0]?.slug : relation?.slug;
     if (slug) values.push(slug);
     groups.set(row.treatment_id, values);
   }
   const markets = new Map<string, MarketCode[]>();
-  for (const row of marketsResult.data ?? []) {
+  for (const row of (marketsResult.data ?? []) as TreatmentMarketRow[]) {
     const values = markets.get(row.treatment_id) ?? [];
     values.push(row.country_code as MarketCode);
     markets.set(row.treatment_id, values);
   }
 
   const popularMap = new Map<string, PopularComparison>();
-  for (const row of comparisonMarketsResult.data ?? []) {
+  for (const row of (comparisonMarketsResult.data ?? []) as ComparisonMarketRow[]) {
     const stored = comparisonById.get(row.comparison_id);
     if (!stored) continue;
     const comparison = availableBySlug.get(stored.slug);
