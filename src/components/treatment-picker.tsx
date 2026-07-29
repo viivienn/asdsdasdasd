@@ -150,22 +150,18 @@ export function TreatmentPicker({
                 : "Change comparison"}
           </button>
         </DialogTrigger>
-        <DialogContent className="bottom-0 left-0 top-auto h-[100dvh] max-w-none translate-x-0 translate-y-0 grid-rows-[auto_auto_auto_1fr_auto] gap-0 rounded-none p-0 sm:bottom-auto sm:left-1/2 sm:top-1/2 sm:h-[min(46rem,88vh)] sm:max-w-2xl sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl">
-          <DialogHeader className="border-b border-rule px-5 pb-4 pt-5 text-left">
+        <DialogContent className="bottom-0 left-0 top-auto h-[100dvh] max-h-[100dvh] w-full max-w-none translate-x-0 translate-y-0 grid-rows-[auto_auto_auto_1fr_auto] gap-0 overflow-hidden rounded-none p-0 sm:bottom-auto sm:left-1/2 sm:top-1/2 sm:h-[min(44rem,88vh)] sm:max-w-xl sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl">
+          <DialogHeader className="border-b border-rule px-4 pb-3 pt-4 text-left sm:px-5">
             <DialogTitle>
-              {selected.length === 0 ? "Choose a treatment" : "Build your comparison"}
+              {selected.length === 0 ? "Choose a treatment" : "Add a comparator"}
             </DialogTitle>
-            <DialogDescription aria-live="polite">
-              {selected.length === 0
-                ? "Start with any treatment that has a completed direct comparison."
-                : selected.length === 1
-                  ? `Only completed, like-for-like comparisons with ${selected[0].name} are shown.`
-                  : "Two treatments selected."}
+            <DialogDescription aria-live="polite" className="text-xs">
+              {selected.length === 2 ? "Two selected" : "Like-for-like matches only"}
             </DialogDescription>
           </DialogHeader>
 
           {selected.length ? (
-            <div className="grid gap-2 border-b border-rule bg-muted/45 px-5 py-3 sm:grid-cols-2">
+            <div className="grid gap-2 border-b border-rule bg-accent/50 px-4 py-3 sm:grid-cols-2 sm:px-5">
               {selected.map((treatment) => (
                 <SelectedTreatment
                   key={treatment.id}
@@ -178,23 +174,23 @@ export function TreatmentPicker({
           ) : null}
 
           {selected.length < 2 ? (
-            <label className="mx-5 my-4 flex items-center gap-2 rounded-xl border border-input bg-background px-3 py-2.5">
+            <label className="mx-4 my-3 flex items-center gap-2 rounded-xl border border-input bg-background px-3 py-2.5 sm:mx-5">
               <Search aria-hidden="true" className="size-4 text-muted-foreground" />
               <span className="sr-only">Search treatments</span>
               <input
                 autoFocus
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search name, family or manufacturer"
+                placeholder="Search treatments"
                 className="w-full bg-transparent text-sm outline-none"
               />
             </label>
           ) : (
-            <div className="h-4" />
+            <div className="h-3" />
           )}
 
           <ul
-            className="overflow-y-auto px-5 pb-4"
+            className="overflow-y-auto overscroll-contain px-4 pb-4 sm:px-5"
             role="listbox"
             aria-label="Available treatments"
             onKeyDown={onOptionsKeyDown}
@@ -231,32 +227,32 @@ export function TreatmentPicker({
               : null}
             {selected.length < 2 && options.length === 0 ? (
               <li className="py-10 text-center text-sm text-muted-foreground">
-                No completed direct comparisons match this search.
+                No matches.
               </li>
             ) : null}
           </ul>
 
-          <div className="sticky bottom-0 border-t border-rule bg-background p-4">
+          <div className="sticky bottom-0 border-t border-rule bg-background p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
             <button
               type="button"
               disabled={selected.length !== 2 || !comparisonSlug}
               onClick={compare}
-              className="min-h-12 w-full rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-40"
+              className="min-h-12 w-full rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground"
             >
-              {selected.length === 2 ? "Compare treatments" : `Select ${2 - selected.length} more`}
+              {selected.length === 2 ? "Compare" : `Select ${2 - selected.length} more`}
             </button>
           </div>
         </DialogContent>
       </Dialog>
-
-      <button
-        type="button"
-        disabled={selected.length !== 2 || !comparisonSlug}
-        onClick={compare}
-        className="mt-3 min-h-12 w-full rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-40"
-      >
-        Compare treatments
-      </button>
+      {selected.length === 2 && comparisonSlug ? (
+        <button
+          type="button"
+          onClick={compare}
+          className="mt-3 min-h-12 w-full rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+        >
+          Compare
+        </button>
+      ) : null}
     </div>
   );
 }
