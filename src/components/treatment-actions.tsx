@@ -1,24 +1,44 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { ChevronRight, Lock, X } from "lucide-react";
-import { canonicalPairSlug } from "@/lib/content-types";
-import { TRENDING_TREATMENTS } from "@/lib/search-index";
+import {
+  directCompatibleComparisons,
+  type AvailableComparison,
+  type TreatmentPickerRecord,
+} from "@/lib/content-types";
 import { trackEvent } from "@/lib/analytics";
 
 /** Pick a second treatment and jump to the canonical comparison URL. */
-export function CompareWith({ slug, name }: { slug: string; name: string }) {
+export function CompareWith({
+  slug,
+  name,
+  treatments,
+  comparisons,
+}: {
+  slug: string;
+  name: string;
+  treatments: TreatmentPickerRecord[];
+  comparisons: AvailableComparison[];
+}) {
   const [other, setOther] = useState("");
   const navigate = useNavigate();
-  const options = TRENDING_TREATMENTS.filter((t) => t.slug !== slug);
+  const treatmentBySlug = new Map(treatments.map((treatment) => [treatment.slug, treatment]));
+  const options = directCompatibleComparisons(slug, treatments, comparisons).flatMap((pair) => {
+    const treatment = treatmentBySlug.get(pair.treatmentSlug);
+    return treatment ? [{ ...pair, name: treatment.name }] : [];
+  });
+  const comparisonSlug = options.find((option) => option.treatmentSlug === other)?.comparisonSlug;
+
+  if (!options.length) return null;
 
   return (
     <form
       className="flex flex-wrap items-center gap-2"
       onSubmit={(e) => {
         e.preventDefault();
-        if (!other) return;
+        if (!other || !comparisonSlug) return;
         trackEvent("compare_started", { from: slug, to: other });
-        navigate({ to: "/compare/$slug", params: { slug: canonicalPairSlug(slug, other) } });
+        navigate({ to: "/compare/$slug", params: { slug: comparisonSlug } });
       }}
     >
       <label htmlFor="compare-with" className="sr-only">
@@ -32,8 +52,8 @@ export function CompareWith({ slug, name }: { slug: string; name: string }) {
       >
         <option value="">Compare with…</option>
         {options.map((t) => (
-          <option key={t.slug} value={t.slug}>
-            {t.label}
+          <option key={t.treatmentSlug} value={t.treatmentSlug}>
+            {t.name}
           </option>
         ))}
       </select>
@@ -122,8 +142,8 @@ export function MatchGate({ name }: { name: string }) {
               Create a free account
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Saving treatments and local price tracking are coming soon. Leave an email and we
-              will let you know when it opens. Everything already on this page stays free to read.
+              Saving treatments and local price tracking are coming soon. Leave an email and we will
+              let you know when it opens. Everything already on this page stays free to read.
             </p>
             {done ? (
               <p role="status" className="mt-5 text-sm font-medium">

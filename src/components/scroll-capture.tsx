@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { submitCityRequest } from "@/lib/content.functions";
-import { TRENDING_TREATMENTS } from "@/lib/search-index";
 import { trackEvent } from "@/lib/analytics";
 
 const DISMISS_KEY = "ai_scroll_capture_dismissed";
@@ -14,7 +13,11 @@ const DISMISS_KEY = "ai_scroll_capture_dismissed";
  * crawlable. The prompt only offers to email the reader when verified local
  * pricing reaches their area.
  */
-export function ScrollCapture() {
+export function ScrollCapture({
+  treatments = [],
+}: {
+  treatments?: Array<{ slug: string; name: string }>;
+}) {
   const [visible, setVisible] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
   const [email, setEmail] = useState("");
@@ -143,14 +146,15 @@ export function ScrollCapture() {
             className="mt-2 text-sm text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
             Thanks — we'll email you once publicly listed prices are verified for{" "}
-            {treatmentLabel(treatment)} in {city || "your area"}. Nothing on this site is hidden
-            behind an account.
+            {treatmentLabel(treatment, treatments)} in {city || "your area"}. Nothing on this site
+            is hidden behind an account.
           </p>
         ) : step === 1 ? (
           <>
             <p id="sc-description" className="mt-2 text-sm text-muted-foreground">
-              <span className="font-medium text-foreground">Step 1 of 2</span> — where should we send alerts? Coverage is live for San Francisco and
-              expands by demand. Every page stays free to read — no account required.
+              <span className="font-medium text-foreground">Step 1 of 2</span> — where should we
+              send alerts? Coverage is live for San Francisco and expands by demand. Every page
+              stays free to read — no account required.
             </p>
             <form
               className="mt-4 flex flex-col gap-3 sm:flex-row"
@@ -211,8 +215,9 @@ export function ScrollCapture() {
         ) : (
           <>
             <p id="sc-description" className="mt-2 text-sm text-muted-foreground">
-              <span className="font-medium text-foreground">Step 2 of 2</span> — which city and treatment should we watch? This keeps your alerts
-              targeted; you can leave either blank for all coverage near {postalCode}.
+              <span className="font-medium text-foreground">Step 2 of 2</span> — which city and
+              treatment should we watch? This keeps your alerts targeted; you can leave either blank
+              for all coverage near {postalCode}.
             </p>
             <form
               className="mt-4 grid gap-3 sm:grid-cols-2"
@@ -282,9 +287,9 @@ export function ScrollCapture() {
                   className="mt-1 w-full border border-input bg-background px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 >
                   <option value="">Any treatment</option>
-                  {TRENDING_TREATMENTS.map((t) => (
+                  {treatments.map((t) => (
                     <option key={t.slug} value={t.slug}>
-                      {t.label}
+                      {t.name}
                     </option>
                   ))}
                 </select>
@@ -328,7 +333,7 @@ export function ScrollCapture() {
   );
 }
 
-function treatmentLabel(slug: string) {
+function treatmentLabel(slug: string, treatments: Array<{ slug: string; name: string }>) {
   if (!slug) return "your treatments";
-  return TRENDING_TREATMENTS.find((t) => t.slug === slug)?.label ?? slug;
+  return treatments.find((t) => t.slug === slug)?.name ?? slug;
 }

@@ -9,36 +9,46 @@ export const fetchTreatments = createServerFn({ method: "GET" }).handler(async (
 });
 
 export const fetchCatalog = createServerFn({ method: "GET" }).handler(async () => {
-  const { listCatalog, listReviewedComparisonSlugs } = await import("./content.server");
-  const [entries, reviewedSlugs] = await Promise.all([
-    listCatalog(),
-    listReviewedComparisonSlugs(),
-  ]);
-  return { entries, reviewedSlugs };
+  const { listCatalog, listComparisonExperience } = await import("./content.server");
+  const [entries, experience] = await Promise.all([listCatalog(), listComparisonExperience()]);
+  const experienceById = new Map(
+    experience.treatments.map((treatment) => [treatment.id, treatment]),
+  );
+  return {
+    entries: entries.map((entry) => ({
+      ...entry,
+      comparison_groups: experienceById.get(entry.id)?.comparison_groups ?? [],
+      markets: experienceById.get(entry.id)?.markets ?? [],
+      media: experienceById.get(entry.id)?.media ?? entry.media,
+    })),
+    comparisons: experience.comparisons,
+    popularComparisons: experience.popularComparisons,
+  };
 });
 
 export const fetchCompareIndex = createServerFn({ method: "GET" }).handler(async () => {
-  const { listTreatments, listComparisonSlugs, listReviewedComparisonSlugs } = await import(
-    "./content.server"
-  );
-  const [treatments, slugs, reviewedSlugs] = await Promise.all([
-    listTreatments(),
-    listComparisonSlugs(),
-    listReviewedComparisonSlugs(),
-  ]);
+  const { listComparisonExperience } = await import("./content.server");
+  const experience = await listComparisonExperience();
   return {
-    treatments: treatments.data,
-    slugs: slugs.data,
-    reviewedSlugs,
-    isDemo: treatments.isDemo,
+    ...experience,
+    reviewedSlugs: experience.comparisons.map((comparison) => comparison.slug),
   };
+});
+
+export const fetchSearchIndex = createServerFn({ method: "GET" }).handler(async () => {
+  const { listComparisonExperience } = await import("./content.server");
+  return listComparisonExperience();
 });
 
 export const fetchTreatment = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => z.object({ slug: z.string().max(80) }).parse(input))
   .handler(async ({ data }) => {
-    const { getTreatmentBySlug } = await import("./content.server");
-    return getTreatmentBySlug(data.slug);
+    const { getTreatmentBySlug, listComparisonExperience } = await import("./content.server");
+    const [record, experience] = await Promise.all([
+      getTreatmentBySlug(data.slug),
+      listComparisonExperience(),
+    ]);
+    return { ...record, experience };
   });
 
 export const fetchComparison = createServerFn({ method: "GET" })
@@ -67,14 +77,13 @@ export const fetchComparisonPair = createServerFn({ method: "GET" })
       .object({
         a: z.string().max(80),
         b: z.string().max(80),
-        canonicalSlug: z.string().max(160),
       })
       .parse(input),
   )
   .handler(async ({ data }) => {
     const { getComparisonContext, listReviewedComparisonSlugs } = await import("./content.server");
     const [context, reviewedSlugs] = await Promise.all([
-      getComparisonContext(data.a, data.b, data.canonicalSlug),
+      getComparisonContext(data.a, data.b),
       listReviewedComparisonSlugs(),
     ]);
     return { ...context, reviewedSlugs };
@@ -82,7 +91,12 @@ export const fetchComparisonPair = createServerFn({ method: "GET" })
 
 const cityRequestSchema = z.object({
   email: z.string().trim().email().max(254),
-  postal_code: z.string().trim().min(3).max(12).regex(/^[A-Za-z0-9 -]+$/),
+  postal_code: z
+    .string()
+    .trim()
+    .min(3)
+    .max(12)
+    .regex(/^[A-Za-z0-9 -]+$/),
   city: z.string().trim().max(80).optional().or(z.literal("")),
   treatment_slug: z
     .string()
@@ -116,7 +130,12 @@ export const submitCityRequest = createServerFn({ method: "POST" })
 
 const priceAlertSchema = z.object({
   email: z.string().trim().email().max(254),
-  postal_code: z.string().trim().min(3).max(12).regex(/^[A-Za-z0-9 -]+$/),
+  postal_code: z
+    .string()
+    .trim()
+    .min(3)
+    .max(12)
+    .regex(/^[A-Za-z0-9 -]+$/),
   treatment_slug: z
     .string()
     .trim()

@@ -1,4 +1,12 @@
-export type SearchKind = "comparison" | "treatment" | "category" | "brand" | "price";
+import {
+  ENTITY_LABEL,
+  comparisonOtherSlug,
+  type AvailableComparison,
+  type PopularComparison,
+  type TreatmentPickerRecord,
+} from "./content-types.ts";
+
+export type SearchKind = "comparison" | "treatment" | "category" | "brand" | "device";
 
 export type SearchEntry = {
   label: string;
@@ -7,126 +15,127 @@ export type SearchEntry = {
   slug: string;
 };
 
-export const POPULAR_SEARCHES: SearchEntry[] = [
-  { label: "Botox vs. Dysport", sub: "Comparison", kind: "comparison", slug: "botox-vs-dysport" },
-  {
-    label: "Sculptra vs. Radiesse",
-    sub: "Comparison",
-    kind: "comparison",
-    slug: "sculptra-vs-radiesse",
-  },
-  {
-    label: "Thermage vs. Ultherapy",
-    sub: "Comparison",
-    kind: "comparison",
-    slug: "thermage-vs-ultherapy",
-  },
-  {
-    label: "Morpheus8 vs. Ultherapy",
-    sub: "Comparison",
-    kind: "comparison",
-    slug: "morpheus8-vs-ultherapy",
-  },
-  {
-    label: "Sculptra vs. HA filler",
-    sub: "Comparison",
-    kind: "comparison",
-    slug: "sculptra-vs-ha-filler",
-  },
-];
+export interface SearchIndex {
+  entries: SearchEntry[];
+  categories: SearchEntry[];
+  popular: SearchEntry[];
+  featuredTreatments: SearchEntry[];
+}
 
-export const MORE_COMPARISONS: SearchEntry[] = [
-  {
-    label: "HydraFacial vs. DiamondGlow",
-    sub: "Comparison",
-    kind: "comparison",
-    slug: "hydrafacial-vs-diamondglow",
-  },
-];
+export function buildSearchIndex(
+  treatments: TreatmentPickerRecord[],
+  comparisons: AvailableComparison[],
+  popularComparisons: PopularComparison[],
+): SearchIndex {
+  const treatmentBySlug = new Map(treatments.map((treatment) => [treatment.slug, treatment]));
 
-/** Treatment classes — the "ingredient"-level concept: what kind of thing it is. */
-export const CATEGORY_ENTRIES: SearchEntry[] = [
-  { label: "Filler", sub: "Category", kind: "category", slug: "filler" },
-  { label: "Neuromodulator", sub: "Category", kind: "category", slug: "neuromodulator" },
-  { label: "Collagen stimulator", sub: "Category", kind: "category", slug: "collagen-stimulator" },
-  { label: "Energy device", sub: "Category", kind: "category", slug: "energy-device" },
-  { label: "Exfoliation facial", sub: "Category", kind: "category", slug: "exfoliation-facial" },
-];
+  const treatmentEntries: SearchEntry[] = treatments.map((treatment) => ({
+    label: treatment.name,
+    sub: `${ENTITY_LABEL[treatment.entity_type]} · ${treatment.category}`,
+    kind:
+      treatment.entity_type === "brand_family"
+        ? "brand"
+        : treatment.entity_type === "device"
+          ? "device"
+          : "treatment",
+    slug: treatment.slug,
+  }));
 
-/** Brands — a family of products from one maker. */
-export const BRAND_ENTRIES: SearchEntry[] = [
-  { label: "Juvederm", sub: "Brand · HA filler", kind: "brand", slug: "juvederm" },
-  { label: "Restylane", sub: "Brand · HA filler", kind: "brand", slug: "restylane" },
-  { label: "Allergan", sub: "Brand", kind: "brand", slug: "botox" },
-  { label: "Galderma", sub: "Brand", kind: "brand", slug: "dysport" },
-];
+  const categories = [...new Set(treatments.map((treatment) => treatment.category).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b))
+    .map<SearchEntry>((category) => ({
+      label: category,
+      sub: "Treatment type",
+      kind: "category",
+      slug: category
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, ""),
+    }));
 
-export const TRENDING_TREATMENTS: SearchEntry[] = [
-  { label: "Botox", sub: "Neuromodulator", kind: "treatment", slug: "botox" },
-  { label: "Daxxify", sub: "Neuromodulator", kind: "treatment", slug: "daxxify" },
-  { label: "Juvederm", sub: "HA filler", kind: "treatment", slug: "juvederm" },
-  { label: "Sculptra", sub: "Collagen stimulator", kind: "treatment", slug: "sculptra" },
-  { label: "Radiesse", sub: "Collagen stimulator", kind: "treatment", slug: "radiesse" },
-  { label: "Restylane", sub: "HA filler", kind: "treatment", slug: "restylane" },
-  { label: "Dysport", sub: "Neuromodulator", kind: "treatment", slug: "dysport" },
-  { label: "Xeomin", sub: "Neuromodulator", kind: "treatment", slug: "xeomin" },
-  { label: "Thermage", sub: "Energy device", kind: "treatment", slug: "thermage" },
-  { label: "Ultherapy", sub: "Energy device", kind: "treatment", slug: "ultherapy" },
-  { label: "Morpheus8", sub: "Energy device", kind: "treatment", slug: "morpheus8" },
-  { label: "HydraFacial", sub: "Exfoliation facial", kind: "treatment", slug: "hydrafacial" },
-  { label: "DiamondGlow", sub: "Exfoliation facial", kind: "treatment", slug: "diamondglow" },
-];
+  const comparisonEntries: SearchEntry[] = comparisons.flatMap((comparison) => {
+    const a = treatmentBySlug.get(comparison.treatment_a_slug);
+    const otherSlug = comparisonOtherSlug(comparison, comparison.treatment_a_slug);
+    const b = otherSlug ? treatmentBySlug.get(otherSlug) : undefined;
+    if (!a || !b) return [];
+    return [
+      {
+        label: `${a.name} vs. ${b.name}`,
+        sub: "Comparison",
+        kind: "comparison" as const,
+        slug: comparison.slug,
+      },
+    ];
+  });
 
-export const PRICE_ENTRIES: SearchEntry[] = [
-  {
-    label: "Botox prices in San Francisco",
-    sub: "Publicly listed prices",
-    kind: "price",
-    slug: "botox",
-  },
-];
+  const comparisonEntryBySlug = new Map(
+    comparisonEntries.map((comparison) => [comparison.slug, comparison]),
+  );
+  const popular = popularComparisons
+    .map((comparison) => comparisonEntryBySlug.get(comparison.slug))
+    .filter((entry): entry is SearchEntry => Boolean(entry));
 
-export const SEARCH_ENTRIES: SearchEntry[] = [
-  ...CATEGORY_ENTRIES,
-  ...TRENDING_TREATMENTS,
-  ...BRAND_ENTRIES,
-  ...POPULAR_SEARCHES,
-  ...MORE_COMPARISONS,
-  ...PRICE_ENTRIES,
-];
+  const featuredTreatments = [...treatments]
+    .sort((a, b) => a.sort_rank - b.sort_rank || a.name.localeCompare(b.name))
+    .slice(0, 4)
+    .map((treatment) => treatmentEntries.find((entry) => entry.slug === treatment.slug))
+    .filter((entry): entry is SearchEntry => Boolean(entry));
+
+  const seen = new Set<string>();
+  const entries = [...categories, ...treatmentEntries, ...comparisonEntries].filter((entry) => {
+    const key = `${entry.kind}:${entry.slug}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  return { entries, categories, popular, featuredTreatments };
+}
 
 const KIND_RANK: Record<SearchKind, number> = {
   category: 0,
   treatment: 1,
   brand: 2,
-  comparison: 3,
-  price: 4,
+  device: 3,
+  comparison: 4,
 };
 
 export const GROUP_LABEL: Record<SearchKind, string> = {
-  category: "Categories",
+  category: "Treatment types",
   treatment: "Treatments",
   brand: "Brands",
+  device: "Devices",
   comparison: "Comparisons",
-  price: "Local prices",
 };
 
-export function searchEntries(query: string, limit = 8): SearchEntry[] {
-  const q = query.trim().toLowerCase();
-  if (!q) return [];
-  const scored = SEARCH_ENTRIES.map((e) => {
-    const label = e.label.toLowerCase();
-    const score = label.startsWith(q) ? 0 : label.includes(q) ? 1 : e.sub.toLowerCase().includes(q) ? 2 : -1;
-    return { e, score };
-  }).filter((x) => x.score >= 0);
-  scored.sort((a, b) => a.score - b.score || KIND_RANK[a.e.kind] - KIND_RANK[b.e.kind]);
-  return scored.slice(0, limit).map((x) => x.e);
+export function searchEntries(entries: SearchEntry[], query: string, limit = 8): SearchEntry[] {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) return [];
+  const scored = entries
+    .map((entry) => {
+      const label = entry.label.toLowerCase();
+      const score = label.startsWith(normalized)
+        ? 0
+        : label.includes(normalized)
+          ? 1
+          : entry.sub.toLowerCase().includes(normalized)
+            ? 2
+            : -1;
+      return { entry, score };
+    })
+    .filter((result) => result.score >= 0);
+  scored.sort(
+    (a, b) =>
+      a.score - b.score ||
+      KIND_RANK[a.entry.kind] - KIND_RANK[b.entry.kind] ||
+      a.entry.label.localeCompare(b.entry.label),
+  );
+  return scored.slice(0, limit).map((result) => result.entry);
 }
 
-/** Groups results in a stable order for the search overlay. */
 export function groupEntries(entries: SearchEntry[]): { kind: SearchKind; items: SearchEntry[] }[] {
-  const order: SearchKind[] = ["category", "treatment", "brand", "comparison", "price"];
+  const order: SearchKind[] = ["category", "treatment", "brand", "device", "comparison"];
   return order
-    .map((kind) => ({ kind, items: entries.filter((e) => e.kind === kind) }))
-    .filter((g) => g.items.length > 0);
+    .map((kind) => ({ kind, items: entries.filter((entry) => entry.kind === kind) }))
+    .filter((group) => group.items.length > 0);
 }

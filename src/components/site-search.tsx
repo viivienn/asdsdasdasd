@@ -1,14 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { FlaskConical, GitCompare, MapPin, Search, Sparkles, Tag, X } from "lucide-react";
+import { FlaskConical, GitCompare, ScanLine, Search, Sparkles, Tag, X } from "lucide-react";
 import {
-  CATEGORY_ENTRIES,
   GROUP_LABEL,
-  POPULAR_SEARCHES,
-  TRENDING_TREATMENTS,
   groupEntries,
   searchEntries,
   type SearchEntry,
+  type SearchIndex,
   type SearchKind,
 } from "@/lib/search-index";
 
@@ -16,8 +14,8 @@ const KIND_ICON: Record<SearchKind, typeof Search> = {
   category: FlaskConical,
   treatment: Sparkles,
   brand: Tag,
+  device: ScanLine,
   comparison: GitCompare,
-  price: MapPin,
 };
 
 function useEntryNavigate() {
@@ -25,15 +23,10 @@ function useEntryNavigate() {
   return (entry: SearchEntry) => {
     if (entry.kind === "comparison") {
       navigate({ to: "/compare/$slug", params: { slug: entry.slug } });
-    } else if (entry.kind === "treatment" || entry.kind === "brand") {
+    } else if (entry.kind === "treatment" || entry.kind === "brand" || entry.kind === "device") {
       navigate({ to: "/treatments/$slug", params: { slug: entry.slug } });
-    } else if (entry.kind === "category") {
-      navigate({ to: "/treatments" });
     } else {
-      navigate({
-        to: "/prices/us/ca/$city/$treatment",
-        params: { city: "san-francisco", treatment: entry.slug },
-      });
+      navigate({ to: "/explore", search: { type: entry.slug } });
     }
   };
 }
@@ -100,7 +93,13 @@ function GroupLabel({ children }: { children: string }) {
   );
 }
 
-export function SiteSearch({ variant = "header" }: { variant?: "header" | "hero" }) {
+export function SiteSearch({
+  index,
+  variant = "header",
+}: {
+  index: SearchIndex;
+  variant?: "header" | "hero";
+}) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
@@ -108,12 +107,12 @@ export function SiteSearch({ variant = "header" }: { variant?: "header" | "hero"
   const inputRef = useRef<HTMLInputElement>(null);
   const go = useEntryNavigate();
 
-  const results = searchEntries(query);
+  const results = searchEntries(index.entries, query);
   const groups = groupEntries(results);
   const showingResults = query.trim().length > 0;
   const flat: SearchEntry[] = showingResults
     ? groups.flatMap((g) => g.items)
-    : [...CATEGORY_ENTRIES, ...POPULAR_SEARCHES, ...TRENDING_TREATMENTS.slice(0, 4)];
+    : [...index.categories, ...index.popular, ...index.featuredTreatments];
 
   useEffect(() => setActive(0), [query]);
 
@@ -172,7 +171,10 @@ export function SiteSearch({ variant = "header" }: { variant?: "header" | "hero"
   const indexOf = (entry: SearchEntry) => flat.indexOf(entry);
 
   return (
-    <div ref={containerRef} className={`relative ${hero ? "w-full" : "w-full max-w-sm xl:max-w-xs"}`}>
+    <div
+      ref={containerRef}
+      className={`relative ${hero ? "w-full" : "w-full max-w-sm xl:max-w-xs"}`}
+    >
       <div
         className={`flex items-center gap-2.5 rounded-full border bg-card px-4 ${
           hero ? "h-14 text-base" : "h-10 text-sm"
@@ -242,7 +244,7 @@ export function SiteSearch({ variant = "header" }: { variant?: "header" | "hero"
             <>
               <GroupLabel>Browse by category</GroupLabel>
               <ul>
-                {CATEGORY_ENTRIES.map((entry) => (
+                {index.categories.map((entry) => (
                   <ResultRow
                     key={entry.slug}
                     entry={entry}
@@ -252,21 +254,25 @@ export function SiteSearch({ variant = "header" }: { variant?: "header" | "hero"
                   />
                 ))}
               </ul>
-              <GroupLabel>Popular comparisons</GroupLabel>
+              {index.popular.length ? (
+                <>
+                  <GroupLabel>Popular comparisons</GroupLabel>
+                  <ul>
+                    {index.popular.map((entry) => (
+                      <ResultRow
+                        key={entry.slug}
+                        entry={entry}
+                        active={indexOf(entry) === active}
+                        onSelect={() => select(entry)}
+                        onHover={() => setActive(indexOf(entry))}
+                      />
+                    ))}
+                  </ul>
+                </>
+              ) : null}
+              <GroupLabel>Explore treatments</GroupLabel>
               <ul>
-                {POPULAR_SEARCHES.map((entry) => (
-                  <ResultRow
-                    key={entry.slug}
-                    entry={entry}
-                    active={indexOf(entry) === active}
-                    onSelect={() => select(entry)}
-                    onHover={() => setActive(indexOf(entry))}
-                  />
-                ))}
-              </ul>
-              <GroupLabel>Trending treatments</GroupLabel>
-              <ul>
-                {TRENDING_TREATMENTS.slice(0, 4).map((entry) => (
+                {index.featuredTreatments.map((entry) => (
                   <ResultRow
                     key={entry.slug}
                     entry={entry}
