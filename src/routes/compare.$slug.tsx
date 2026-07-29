@@ -146,10 +146,10 @@ function ComparisonPage() {
     <>
       <Breadcrumb label={label} />
 
-      <header className="mt-4 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="font-display text-4xl">{label}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
+      <header className="mt-3 flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="font-display text-2xl leading-tight sm:text-3xl">{label}</h1>
+          <p className="mt-1 text-xs text-muted-foreground">
             Last reviewed{" "}
             {comparison.last_reviewed_at
               ? new Date(comparison.last_reviewed_at).toLocaleDateString()
@@ -158,9 +158,9 @@ function ComparisonPage() {
         </div>
         <Link
           to="/compare"
-          className="rounded-full border border-rule bg-card px-4 py-2 text-sm font-medium hover:border-primary"
+          className="inline-flex min-h-10 items-center rounded-full border border-rule bg-card px-4 text-sm font-medium hover:border-primary"
         >
-          Change comparison
+          Change
         </Link>
       </header>
 
@@ -184,19 +184,26 @@ function ComparisonPage() {
         comparison={comparison}
       />
 
-      <section id="sources" className="mt-12 scroll-mt-24">
-        <h2 className="text-2xl">Sources</h2>
-        <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-          Sources are grouped by treatment so the support for each record stays visible.
-        </p>
-        <SourcesByTreatment sources={sources} a={a} b={b} />
+      <section id="sources" className="mt-10 scroll-mt-24 border-t border-rule pt-5 text-sm">
+        <details className="group">
+          <summary className="cursor-pointer list-none text-sm font-medium text-muted-foreground marker:hidden">
+            <span className="inline-flex w-full items-center justify-between gap-3">
+              Sources
+              <span aria-hidden="true" className="text-xs">
+                <span className="group-open:hidden">Show</span>
+                <span className="hidden group-open:inline">Hide</span>
+              </span>
+            </span>
+          </summary>
+          <SourcesByTreatment sources={sources} a={a} b={b} />
+        </details>
       </section>
 
-      <section id="medical-disclaimer" className="scroll-mt-24">
+      <section id="medical-disclaimer" className="scroll-mt-24 text-sm text-muted-foreground">
         <ComparisonDisclaimer />
       </section>
 
-      <section id="local-prices" className="mt-12 scroll-mt-24">
+      <section id="local-prices" className="mt-10 scroll-mt-24">
         <CoverageRequestForm treatmentSlug={a.slug} />
       </section>
 
@@ -237,8 +244,8 @@ function RelatedComparisons({
   const related = reviewedSlugs.filter((candidate) => candidate !== currentSlug).slice(0, 6);
   if (related.length === 0) return null;
   return (
-    <section className="mt-12">
-      <h2 className="text-2xl">More comparisons</h2>
+    <section className="mt-10">
+      <h2 className="text-xl">More comparisons</h2>
       <ul className="mt-3 flex flex-wrap gap-2 text-sm">
         {related.map((candidate) => (
           <li key={candidate}>
