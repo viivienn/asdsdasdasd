@@ -156,10 +156,10 @@ function Explore() {
                   onClick={() =>
                     navigate({
                       to: ".",
-                      search: (prev) => ({
-                        ...prev,
+                      search: {
+                        type: search.type,
                         goal: goal === item.slug ? undefined : item.slug,
-                      }),
+                      },
                     })
                   }
                   className={`block h-full w-full rounded-xl border p-4 text-left text-sm ${
