@@ -157,7 +157,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SiteShell searchIndex={searchIndex} popularComparisons={experience.popularComparisons}>
+      <SiteShell
+        searchIndex={searchIndex}
+        popularComparisons={experience.popularComparisons}
+        treatments={experience.treatments}
+      >
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
       </SiteShell>
