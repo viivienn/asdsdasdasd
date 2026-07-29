@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Check, ChevronRight, GitCompare, Lock, Plus, Search, X } from "lucide-react";
 import {
   canonicalPairSlug,
-  directCompatibleComparisons,
+  comparisonOtherSlug,
   type AvailableComparison,
   type TreatmentPickerRecord,
 } from "@/lib/content-types";
@@ -32,19 +32,21 @@ export function CompareWith({
   const current = treatments.find((treatment) => treatment.slug === slug);
 
   const options = useMemo(() => {
-    const reviewed = new Map(
-      directCompatibleComparisons(slug, treatments, comparisons).map((pair) => [
-        pair.treatmentSlug,
-        pair.comparisonSlug,
-      ]),
-    );
+    const reviewed = new Map<string, string>();
+    for (const comparison of comparisons) {
+      const otherSlug = comparisonOtherSlug(comparison, slug);
+      if (otherSlug && !reviewed.has(otherSlug)) reviewed.set(otherSlug, comparison.slug);
+    }
     const groups = new Set(current?.comparison_groups ?? []);
+    const peerKey = `${current?.treatment_class ?? ""}|${current?.category ?? ""}`.toLowerCase();
     return treatments
       .filter((treatment) => treatment.slug !== slug)
       .filter(
         (treatment) =>
           reviewed.has(treatment.slug) ||
-          treatment.comparison_groups.some((group) => groups.has(group)),
+          treatment.comparison_groups.some((group) => groups.has(group)) ||
+          `${treatment.treatment_class ?? ""}|${treatment.category ?? ""}`.toLowerCase() ===
+            peerKey,
       )
       .map((treatment) => ({
         treatment,
