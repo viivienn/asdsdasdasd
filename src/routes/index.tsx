@@ -1,12 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { fetchCompareIndex } from "@/lib/content.functions";
-import { TreatmentPicker } from "@/components/treatment-picker";
 import { Prose, SectionHeading } from "@/components/editorial";
 import { CoverageRequestForm } from "@/components/demand-forms";
 import { SiteSearch } from "@/components/site-search";
+import { TreatmentVisual } from "@/components/treatment-visual";
+import { GOAL_FILTERS } from "@/lib/taxonomy";
 import { buildSearchIndex } from "@/lib/search-index";
 import { absoluteUrl } from "@/lib/site";
-import type { PopularComparison } from "@/lib/content-types";
+import type { PopularComparison, TreatmentPickerRecord } from "@/lib/content-types";
 
 export const Route = createFileRoute("/")({
   loader: () => fetchCompareIndex(),
@@ -36,6 +37,10 @@ export const Route = createFileRoute("/")({
 function Home() {
   const { treatments, comparisons, popularComparisons } = Route.useLoaderData();
   const searchIndex = buildSearchIndex(treatments, comparisons, popularComparisons);
+  const featured = [...(treatments as TreatmentPickerRecord[])]
+    .filter((entry) => entry.entity_type === "product" || entry.entity_type === "device")
+    .sort((a, b) => a.sort_rank - b.sort_rank || a.name.localeCompare(b.name))
+    .slice(0, 8);
 
   return (
     <>
@@ -44,7 +49,7 @@ function Home() {
           Find the treatment that fits
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
-          Search cosmetic treatments, brands, devices, and completed comparisons.
+          Explore what's actually inside any cosmetic treatment.
         </p>
         <div className="mx-auto mt-8 max-w-xl">
           <SiteSearch index={searchIndex} variant="hero" />
@@ -55,14 +60,47 @@ function Home() {
       </section>
 
       <section className="mt-4">
-        <SectionHeading>Compare treatments</SectionHeading>
-        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Start with one item. We will show only completed comparisons in the same comparison group.
-        </p>
-        <div className="mt-5 card-soft p-4 sm:p-5">
-          <TreatmentPicker treatments={treatments} comparisons={comparisons} />
-        </div>
+        <SectionHeading>Browse by goal</SectionHeading>
+        <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {GOAL_FILTERS.map((goal) => (
+            <li key={goal.slug}>
+              <Link
+                to="/explore"
+                search={{ goal: goal.slug }}
+                className="block h-full card-soft card-hover p-4"
+              >
+                <span className="font-display text-base font-semibold">{goal.label}</span>
+                <span className="mt-1 block text-sm text-muted-foreground">{goal.detail}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </section>
+
+      {featured.length ? (
+        <section className="mt-14">
+          <SectionHeading>Popular products &amp; devices</SectionHeading>
+          <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {featured.map((entry) => (
+              <li key={entry.id}>
+                <Link
+                  to="/treatments/$slug"
+                  params={{ slug: entry.slug }}
+                  className="flex h-full items-center gap-3 card-soft card-hover p-4"
+                >
+                  <TreatmentVisual name={entry.name} media={entry.media} />
+                  <span className="min-w-0">
+                    <span className="block truncate font-medium">{entry.name}</span>
+                    <span className="block truncate text-xs text-muted-foreground">
+                      {entry.category}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {popularComparisons.length ? (
         <section className="mt-14">
@@ -107,6 +145,13 @@ function Home() {
         <Link to="/explore" className="mt-4 inline-block text-sm underline underline-offset-4">
           Browse brands, products, devices, and treatment types
         </Link>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Ready to weigh two options?{" "}
+          <Link to="/compare" className="underline underline-offset-4 hover:text-primary">
+            Build a comparison
+          </Link>
+          .
+        </p>
       </section>
 
       <section className="mt-14">
