@@ -128,8 +128,8 @@ const SECTIONS: Array<{ heading: string; body: React.ReactNode }> = [
       <p>
         Links to clinic, manufacturer, government, publication, booking, or other third-party
         websites are provided for convenience and source transparency. Aesthetic Index does not
-        control or guarantee the accuracy, availability, security, privacy practices, or services
-        of third-party websites.
+        control or guarantee the accuracy, availability, security, privacy practices, or services of
+        third-party websites.
       </p>
     ),
   },

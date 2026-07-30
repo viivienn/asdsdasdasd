@@ -118,6 +118,57 @@ export type Database = {
         };
         Relationships: [];
       };
+      comparison_family_rules: {
+        Row: {
+          comparison_mode: Database["public"]["Enums"]["comparison_mode"];
+          created_at: string;
+          id: string;
+          is_active: boolean;
+          left_group_slug: string;
+          public_label: string;
+          right_group_slug: string;
+          template_key: string;
+          updated_at: string;
+        };
+        Insert: {
+          comparison_mode?: Database["public"]["Enums"]["comparison_mode"];
+          created_at?: string;
+          id?: string;
+          is_active?: boolean;
+          left_group_slug: string;
+          public_label: string;
+          right_group_slug: string;
+          template_key: string;
+          updated_at?: string;
+        };
+        Update: {
+          comparison_mode?: Database["public"]["Enums"]["comparison_mode"];
+          created_at?: string;
+          id?: string;
+          is_active?: boolean;
+          left_group_slug?: string;
+          public_label?: string;
+          right_group_slug?: string;
+          template_key?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "comparison_family_rules_left_group_slug_fkey";
+            columns: ["left_group_slug"];
+            isOneToOne: false;
+            referencedRelation: "comparison_groups";
+            referencedColumns: ["slug"];
+          },
+          {
+            foreignKeyName: "comparison_family_rules_right_group_slug_fkey";
+            columns: ["right_group_slug"];
+            isOneToOne: false;
+            referencedRelation: "comparison_groups";
+            referencedColumns: ["slug"];
+          },
+        ];
+      };
       comparison_groups: {
         Row: {
           created_at: string;
@@ -587,6 +638,126 @@ export type Database = {
           },
         ];
       };
+      postal_region_map: {
+        Row: {
+          city_name: string | null;
+          country_code: string;
+          created_at: string;
+          id: string;
+          postal_prefix: string;
+          region_slug: string;
+          updated_at: string;
+        };
+        Insert: {
+          city_name?: string | null;
+          country_code: string;
+          created_at?: string;
+          id?: string;
+          postal_prefix: string;
+          region_slug: string;
+          updated_at?: string;
+        };
+        Update: {
+          city_name?: string | null;
+          country_code?: string;
+          created_at?: string;
+          id?: string;
+          postal_prefix?: string;
+          region_slug?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      regional_price_estimates: {
+        Row: {
+          comparison_group_slug: string | null;
+          country_code: string;
+          created_at: string;
+          currency: string;
+          estimated_average: number | null;
+          estimated_high: number;
+          estimated_low: number;
+          estimated_median: number | null;
+          id: string;
+          is_sample: boolean;
+          limitations: string | null;
+          methodology_note: string;
+          pricing_unit: string;
+          publication_status: Database["public"]["Enums"]["publication_status"];
+          region_name: string;
+          region_slug: string;
+          researched_at: string;
+          source_count: number;
+          source_urls: Json;
+          treatment_area: string | null;
+          treatment_id: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          comparison_group_slug?: string | null;
+          country_code: string;
+          created_at?: string;
+          currency: string;
+          estimated_average?: number | null;
+          estimated_high: number;
+          estimated_low: number;
+          estimated_median?: number | null;
+          id?: string;
+          is_sample?: boolean;
+          limitations?: string | null;
+          methodology_note: string;
+          pricing_unit: string;
+          publication_status?: Database["public"]["Enums"]["publication_status"];
+          region_name: string;
+          region_slug: string;
+          researched_at: string;
+          source_count: number;
+          source_urls?: Json;
+          treatment_area?: string | null;
+          treatment_id?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          comparison_group_slug?: string | null;
+          country_code?: string;
+          created_at?: string;
+          currency?: string;
+          estimated_average?: number | null;
+          estimated_high?: number;
+          estimated_low?: number;
+          estimated_median?: number | null;
+          id?: string;
+          is_sample?: boolean;
+          limitations?: string | null;
+          methodology_note?: string;
+          pricing_unit?: string;
+          publication_status?: Database["public"]["Enums"]["publication_status"];
+          region_name?: string;
+          region_slug?: string;
+          researched_at?: string;
+          source_count?: number;
+          source_urls?: Json;
+          treatment_area?: string | null;
+          treatment_id?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "regional_price_estimates_comparison_group_slug_fkey";
+            columns: ["comparison_group_slug"];
+            isOneToOne: false;
+            referencedRelation: "comparison_groups";
+            referencedColumns: ["slug"];
+          },
+          {
+            foreignKeyName: "regional_price_estimates_treatment_id_fkey";
+            columns: ["treatment_id"];
+            isOneToOne: false;
+            referencedRelation: "treatments";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       submission_audit: {
         Row: {
           created_at: string;
@@ -797,6 +968,7 @@ export type Database = {
           canada_status: string | null;
           generic_name: string | null;
           id: string;
+          intended_areas: string[];
           is_sample: boolean;
           last_reviewed_at: string | null;
           longevity_text: string | null;
@@ -845,6 +1017,7 @@ export type Database = {
           canada_status?: string | null;
           generic_name?: string | null;
           id?: string;
+          intended_areas?: string[];
           is_sample?: boolean;
           last_reviewed_at?: string | null;
           longevity_text?: string | null;
@@ -893,6 +1066,7 @@ export type Database = {
           canada_status?: string | null;
           generic_name?: string | null;
           id?: string;
+          intended_areas?: string[];
           is_sample?: boolean;
           last_reviewed_at?: string | null;
           longevity_text?: string | null;

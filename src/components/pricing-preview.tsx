@@ -15,10 +15,7 @@ export function VerificationBadge({ status }: { status: string }) {
 }
 
 export function FreshnessBadge({ observedAt }: { observedAt: string }) {
-  const days = Math.max(
-    0,
-    Math.round((Date.now() - new Date(observedAt).getTime()) / 86_400_000),
-  );
+  const days = Math.max(0, Math.round((Date.now() - new Date(observedAt).getTime()) / 86_400_000));
   const label =
     days === 0 ? "Observed today" : days === 1 ? "Observed yesterday" : `Observed ${days} days ago`;
   return (
@@ -40,9 +37,7 @@ export function ClinicCard({
   return (
     <article className="border border-rule bg-card p-4">
       <h3 className="text-lg">{name}</h3>
-      {addressLine ? (
-        <p className="mt-1 text-sm text-muted-foreground">{addressLine}</p>
-      ) : null}
+      {addressLine ? <p className="mt-1 text-sm text-muted-foreground">{addressLine}</p> : null}
       {website ? (
         <a
           href={website}
@@ -74,16 +69,12 @@ export function OfferCard({
   );
 }
 
-export function EmptyCoverage({
-  city,
-  treatment,
-}: {
-  city: string;
-  treatment: string;
-}) {
+export function EmptyCoverage({ city, treatment }: { city: string; treatment: string }) {
   return (
     <div className="border border-rule bg-card p-6">
-      <h2 className="text-xl">No published {treatment} prices for {city} yet</h2>
+      <h2 className="text-xl">
+        No published {treatment} prices for {city} yet
+      </h2>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
         We only publish prices that a clinic has listed publicly, with a link to the page where we
         found the amount and the date we observed it. Nothing meets that bar for this page yet, so
@@ -93,11 +84,7 @@ export function EmptyCoverage({
   );
 }
 
-export function LocalPriceSummary({
-  observations,
-}: {
-  observations: PriceObservation[];
-}) {
+export function LocalPriceSummary({ observations }: { observations: PriceObservation[] }) {
   if (observations.length === 0) return null;
   return (
     <div className="border border-rule bg-card p-4 text-sm">
@@ -223,8 +210,8 @@ export function PriceDatasetSummary({
         <div>
           <h3 className="font-medium">Inclusion criteria</h3>
           <p className="mt-1 text-muted-foreground">
-            A price is included when a clinic publishes it on a public page, the amount and unit
-            are stated, and we can link to the page where we observed it.
+            A price is included when a clinic publishes it on a public page, the amount and unit are
+            stated, and we can link to the page where we observed it.
           </p>
         </div>
         <div>
@@ -252,11 +239,7 @@ export function PriceDatasetSummary({
   );
 }
 
-export function PriceObservationTable({
-  observations,
-}: {
-  observations: PriceObservation[];
-}) {
+export function PriceObservationTable({ observations }: { observations: PriceObservation[] }) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full border-collapse text-sm">
@@ -265,11 +248,21 @@ export function PriceObservationTable({
         </caption>
         <thead>
           <tr className="border-b border-rule text-left">
-            <th scope="col" className="py-2 pr-4 font-medium">Clinic</th>
-            <th scope="col" className="py-2 pr-4 font-medium">Advertised</th>
-            <th scope="col" className="py-2 pr-4 font-medium">Unit</th>
-            <th scope="col" className="py-2 pr-4 font-medium">Conditions</th>
-            <th scope="col" className="py-2 pr-4 font-medium">Source</th>
+            <th scope="col" className="py-2 pr-4 font-medium">
+              Clinic
+            </th>
+            <th scope="col" className="py-2 pr-4 font-medium">
+              Advertised
+            </th>
+            <th scope="col" className="py-2 pr-4 font-medium">
+              Unit
+            </th>
+            <th scope="col" className="py-2 pr-4 font-medium">
+              Conditions
+            </th>
+            <th scope="col" className="py-2 pr-4 font-medium">
+              Source
+            </th>
           </tr>
         </thead>
         <tbody>

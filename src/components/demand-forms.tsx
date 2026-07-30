@@ -55,8 +55,7 @@ export function CoverageRequestForm({ treatmentSlug }: { treatmentSlug?: string 
                   city: String(fd.get("city") ?? ""),
                   treatment_slug: treatmentSlug ?? "",
                   consent: fd.get("consent") === "on" ? true : (false as never),
-                  source_path:
-                    typeof window === "undefined" ? undefined : window.location.pathname,
+                  source_path: typeof window === "undefined" ? undefined : window.location.pathname,
                   company: String(fd.get("company") ?? ""),
                 },
               });

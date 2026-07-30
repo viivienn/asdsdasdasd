@@ -8,8 +8,18 @@ export default defineTool({
   description:
     "List the cosmetic treatment profiles on Aesthetic Index with their slug, category, review status and whether they are published.",
   inputSchema: {
-    search: z.string().trim().optional().describe("Optional text to match against treatment name or slug."),
-    limit: z.number().int().min(1).max(100).default(50).describe("Maximum number of rows to return."),
+    search: z
+      .string()
+      .trim()
+      .optional()
+      .describe("Optional text to match against treatment name or slug."),
+    limit: z
+      .number()
+      .int()
+      .min(1)
+      .max(100)
+      .default(50)
+      .describe("Maximum number of rows to return."),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ search, limit }, ctx: ToolContext) => {

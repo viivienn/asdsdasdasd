@@ -8,7 +8,11 @@ export default defineTool({
   description:
     "Read the publicly listed clinic price observations collected for a treatment, newest first.",
   inputSchema: {
-    treatmentSlug: z.string().trim().optional().describe("Optional treatment slug filter, e.g. 'botox'."),
+    treatmentSlug: z
+      .string()
+      .trim()
+      .optional()
+      .describe("Optional treatment slug filter, e.g. 'botox'."),
     limit: z.number().int().min(1).max(200).default(50),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
@@ -17,7 +21,11 @@ export default defineTool({
     const supabase = supabaseForUser(ctx);
     let treatmentId: string | undefined;
     if (treatmentSlug) {
-      const { data: t } = await supabase.from("treatments").select("id").eq("slug", treatmentSlug).maybeSingle();
+      const { data: t } = await supabase
+        .from("treatments")
+        .select("id")
+        .eq("slug", treatmentSlug)
+        .maybeSingle();
       if (!t) return fail(`No treatment found with slug "${treatmentSlug}".`);
       treatmentId = t.id;
     }

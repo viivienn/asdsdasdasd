@@ -357,10 +357,7 @@
       "estimated_low": 15,
       "estimated_high": 19,
       "source_count": 2,
-      "source_urls": [
-        "https://eliteaestheticsnyc.com/pricing/",
-        "https://www.ratio.nyc/pricing"
-      ],
+      "source_urls": ["https://eliteaestheticsnyc.com/pricing/", "https://www.ratio.nyc/pricing"],
       "methodology_note": "Retained each clinic's raw regular Dysport-unit pricing without conversion.",
       "limitations": "Only two sources and both use combined toxin menus; Dysport units remain non-interchangeable.",
       "publication_status": "published",
@@ -380,10 +377,7 @@
       "estimated_low": 850,
       "estimated_high": 1250,
       "source_count": 2,
-      "source_urls": [
-        "https://eliteaestheticsnyc.com/pricing/",
-        "https://www.ratio.nyc/pricing"
-      ],
+      "source_urls": ["https://eliteaestheticsnyc.com/pricing/", "https://www.ratio.nyc/pricing"],
       "methodology_note": "Compared Elite's regular area range with Ratio's full-syringe regular price; no average was calculated because billing units are not perfectly identical.",
       "limitations": "One source bills by area and the other by syringe; use the range for orientation only.",
       "publication_status": "published",
@@ -1115,10 +1109,7 @@
       "estimated_low": 595,
       "estimated_high": 800,
       "source_count": 2,
-      "source_urls": [
-        "https://mrcbc.com/price-list/",
-        "https://www.azinyazdani.com/book-online"
-      ],
+      "source_urls": ["https://mrcbc.com/price-list/", "https://www.azinyazdani.com/book-online"],
       "methodology_note": "Compared Medical Rejuvenation Centre's regular 1 mL portfolio price with Azin Yazdani's public starting syringe price.",
       "limitations": "One value is a starting price; specific product and area materially affect cost.",
       "publication_status": "published",
@@ -1138,10 +1129,7 @@
       "estimated_low": 850,
       "estimated_high": 1000,
       "source_count": 2,
-      "source_urls": [
-        "https://mrcbc.com/price-list/",
-        "https://www.marjandavinci.com/pricing"
-      ],
+      "source_urls": ["https://mrcbc.com/price-list/", "https://www.marjandavinci.com/pricing"],
       "methodology_note": "Compared two public starting/one-bottle values.",
       "limitations": "Both may be starting prices; multi-vial course cost is not estimated.",
       "publication_status": "published",
@@ -1161,10 +1149,7 @@
       "estimated_low": 900,
       "estimated_high": 1100,
       "source_count": 2,
-      "source_urls": [
-        "https://mrcbc.com/price-list/",
-        "https://www.azinyazdani.com/book-online"
-      ],
+      "source_urls": ["https://mrcbc.com/price-list/", "https://www.azinyazdani.com/book-online"],
       "methodology_note": "Compared one starting price and one fixed public price.",
       "limitations": "Only two sources; product version and treatment area vary.",
       "publication_status": "published",

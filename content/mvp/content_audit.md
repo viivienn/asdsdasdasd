@@ -125,23 +125,23 @@ Representative current regional sources include:
 
 `P` means the JSON contains a published estimate with at least two usable sources. `—` means the treatment/region cell was researched but withheld because there were too few sources, incompatible areas/units, promotion-only pricing, or quote-only pages.
 
-| Treatment | SF Bay | LA | NYC | Miami | Austin | Chicago | Toronto | Vancouver | Montreal |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Botox | P | P | P | P | P | P | P | P | P |
-| Dysport | P | P | P | P | P | P | P | — | — |
-| HA filler class | P | P | P | P | P | — | P | P | P |
-| Juvéderm family | — | — | — | — | — | P | — | — | — |
-| Restylane family | — | — | — | — | — | P | — | — | — |
-| Juvéderm Voluma | — | P | — | — | P | — | — | — | — |
-| Restylane Kysse | P | P | — | — | P | — | — | — | — |
-| Sculptra | P | P | P | P | P | P | P | P | P |
-| Radiesse | — | P | — | — | P | P | P | P | — |
-| Thermage FLX | — | — | — | — | — | — | P | P | — |
-| Ultherapy | — | — | — | — | — | — | P | P | — |
-| Morpheus8 | — | P | — | P | — | — | P | — | P |
-| Potenza | — | — | — | — | — | — | — | — | — |
-| HydraFacial | — | — | — | — | P | P | — | — | P |
-| DiamondGlow | — | — | — | — | — | — | — | — | — |
+| Treatment        | SF Bay |  LA | NYC | Miami | Austin | Chicago | Toronto | Vancouver | Montreal |
+| ---------------- | -----: | --: | --: | ----: | -----: | ------: | ------: | --------: | -------: |
+| Botox            |      P |   P |   P |     P |      P |       P |       P |         P |        P |
+| Dysport          |      P |   P |   P |     P |      P |       P |       P |         — |        — |
+| HA filler class  |      P |   P |   P |     P |      P |       — |       P |         P |        P |
+| Juvéderm family  |      — |   — |   — |     — |      — |       P |       — |         — |        — |
+| Restylane family |      — |   — |   — |     — |      — |       P |       — |         — |        — |
+| Juvéderm Voluma  |      — |   P |   — |     — |      P |       — |       — |         — |        — |
+| Restylane Kysse  |      P |   P |   — |     — |      P |       — |       — |         — |        — |
+| Sculptra         |      P |   P |   P |     P |      P |       P |       P |         P |        P |
+| Radiesse         |      — |   P |   — |     — |      P |       P |       P |         P |        — |
+| Thermage FLX     |      — |   — |   — |     — |      — |       — |       P |         P |        — |
+| Ultherapy        |      — |   — |   — |     — |      — |       — |       P |         P |        — |
+| Morpheus8        |      — |   P |   — |     P |      — |       — |       P |         — |        P |
+| Potenza          |      — |   — |   — |     — |      — |       — |       — |         — |        — |
+| HydraFacial      |      — |   — |   — |     — |      P |       P |       — |         — |        P |
+| DiamondGlow      |      — |   — |   — |     — |      — |       — |       — |         — |        — |
 
 The Chicago HA class is represented by separate Juvéderm and Restylane family estimates rather than a pooled class estimate. Potenza and DiamondGlow were often quote-only or had only one regular public price in a city; they remain absent rather than borrowing category prices. Every published estimate includes its own URLs, method, limitations, and research date.
 
@@ -149,7 +149,7 @@ The Chicago HA class is represented by separate Juvéderm and Restylane family e
 
 No manufacturer image, before/after photograph, product shot, or clinic media is included. Availability on an official site does not establish reuse rights. `treatment_media.json` recommends original neutral diagrams and states what each illustration must not imply.
 
-The SQL migration deliberately inserts no `treatment_media` rows. Existing media is not deleted or republished. The repository’s public-media gate continues to require a permitted licence plus `rights_verified_at`.
+The source-pack migration deliberately inserts no `treatment_media` asset rows because the manifest contains briefs rather than reusable files. Existing media is not deleted or republished. The follow-up validation guard moves any published launch media without `rights_verified_at` to review, and the repository’s public-media gate continues to require a permitted licence plus verified rights.
 
 ## Migration safety audit
 
@@ -166,7 +166,7 @@ The migration:
 - publishes only rows marked published in this pack;
 - does not delete treatments, clinics, locations, offers, submissions, price observations, or existing media;
 - removes only obsolete launch-group mappings when the replacement mapping for that same launch entity exists;
-- performs no media insert and cannot publish unlicensed media.
+- performs no media insert from illustration briefs, moves unverified launch media to review, and cannot publish unlicensed media.
 
 ## Known limitations and next review
 

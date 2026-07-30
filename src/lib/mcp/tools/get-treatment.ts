@@ -12,7 +12,11 @@ export default defineTool({
   handler: async ({ slug }, ctx: ToolContext) => {
     if (!ctx.isAuthenticated()) return unauthenticated();
     const supabase = supabaseForUser(ctx);
-    const { data, error } = await supabase.from("treatments").select("*").eq("slug", slug).maybeSingle();
+    const { data, error } = await supabase
+      .from("treatments")
+      .select("*")
+      .eq("slug", slug)
+      .maybeSingle();
     if (error) return fail(error.message);
     if (!data) return fail(`No treatment found with slug "${slug}".`);
     const { data: sources } = await supabase
