@@ -67,6 +67,7 @@ const baseTreatment: Treatment = {
   when_not_appropriate: null,
   pricing_basis: "Per treatment",
   fda_status: null,
+  canada_status: null,
   evidence_grade: null,
   last_reviewed_at: "2026-07-01",
   publication_status: "published",
@@ -256,6 +257,7 @@ test("regional estimate selects an exact treatment before its broad family", () 
     source_count: 2,
     source_urls: [],
     methodology_note: "Stored research",
+    limitations: "Small public sample.",
     researched_at: "2026-07-01",
   };
   const family = {

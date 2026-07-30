@@ -49,9 +49,10 @@ async function prototypeClient() {
 }
 
 const TREATMENT_COLUMNS =
-  "id,name,slug,category,treatment_class,brand_name,generic_name,manufacturer,intended_areas,entity_type,parent_id,sort_rank,at_a_glance,summary,primary_purpose,mechanism,adds_volume,tightening_level,result_timing,sessions_text,downtime_text,longevity_text,pain_level,reversibility,major_risks,most_likely_disappointment,marketing_misconception,provider_variables,skin_tone_notes,appointment_time,swelling_text,bruising_text,exercise_restrictions,what_it_changes,what_it_does_not_change,expected_result_magnitude,true_substitute_notes,when_not_appropriate,pricing_basis,fda_status,evidence_grade,last_reviewed_at,publication_status,is_sample";
+  "id,name,slug,category,treatment_class,brand_name,generic_name,manufacturer,intended_areas,entity_type,parent_id,sort_rank,at_a_glance,summary,primary_purpose,mechanism,adds_volume,tightening_level,result_timing,sessions_text,downtime_text,longevity_text,pain_level,reversibility,major_risks,most_likely_disappointment,marketing_misconception,provider_variables,skin_tone_notes,appointment_time,swelling_text,bruising_text,exercise_restrictions,what_it_changes,what_it_does_not_change,expected_result_magnitude,true_substitute_notes,when_not_appropriate,pricing_basis,fda_status,canada_status,evidence_grade,last_reviewed_at,publication_status,is_sample";
 
-const PRE_AREAS_TREATMENT_COLUMNS = TREATMENT_COLUMNS.replace(",intended_areas", "");
+const PRE_CANADA_TREATMENT_COLUMNS = TREATMENT_COLUMNS.replace(",canada_status", "");
+const PRE_AREAS_TREATMENT_COLUMNS = PRE_CANADA_TREATMENT_COLUMNS.replace(",intended_areas", "");
 const LEGACY_TREATMENT_COLUMNS = PRE_AREAS_TREATMENT_COLUMNS.replace(",pricing_basis", "");
 
 async function loadTreatmentRows(
@@ -69,12 +70,14 @@ async function loadTreatmentRows(
     return query;
   };
   let result = await run(TREATMENT_COLUMNS);
+  if (result.error) result = await run(PRE_CANADA_TREATMENT_COLUMNS);
   if (result.error) result = await run(PRE_AREAS_TREATMENT_COLUMNS);
   if (result.error) result = await run(LEGACY_TREATMENT_COLUMNS);
   return scrubTreatments(result.data ?? []).map((treatment) => ({
     ...treatment,
     intended_areas: treatment.intended_areas ?? [],
     pricing_basis: treatment.pricing_basis ?? null,
+    canada_status: treatment.canada_status ?? null,
   }));
 }
 
@@ -620,7 +623,7 @@ export async function getRegionalPriceEstimate(
   const estimatesResult = await schema
     .from("regional_price_estimates")
     .select(
-      "id,treatment_id,comparison_group_slug,country_code,region_slug,region_name,currency,pricing_unit,treatment_area,estimated_average,estimated_median,estimated_low,estimated_high,source_count,source_urls,methodology_note,researched_at",
+      "id,treatment_id,comparison_group_slug,country_code,region_slug,region_name,currency,pricing_unit,treatment_area,estimated_average,estimated_median,estimated_low,estimated_high,source_count,source_urls,methodology_note,limitations,researched_at",
     )
     .eq("country_code", postalCode.countryCode)
     .eq("region_slug", region.region_slug);

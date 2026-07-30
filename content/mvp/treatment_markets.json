@@ -1,0 +1,21 @@
+{
+  "schema_version": "2026-07-29",
+  "experience": "One universal public experience; market rows are availability metadata and must not create country tabs.",
+  "mappings": [
+    { "treatment_slug": "botox", "markets": ["US", "CA"] },
+    { "treatment_slug": "dysport", "markets": ["US", "CA"] },
+    { "treatment_slug": "ha-filler", "markets": ["US", "CA"] },
+    { "treatment_slug": "juvederm", "markets": ["US", "CA"] },
+    { "treatment_slug": "restylane", "markets": ["US", "CA"] },
+    { "treatment_slug": "juvederm-voluma", "markets": ["US", "CA"] },
+    { "treatment_slug": "restylane-kysse", "markets": ["US", "CA"] },
+    { "treatment_slug": "sculptra", "markets": ["US", "CA"] },
+    { "treatment_slug": "radiesse", "markets": ["US", "CA"] },
+    { "treatment_slug": "thermage", "markets": ["US", "CA"] },
+    { "treatment_slug": "ultherapy", "markets": ["US", "CA"] },
+    { "treatment_slug": "morpheus8", "markets": ["US", "CA"] },
+    { "treatment_slug": "potenza", "markets": ["US", "CA"] },
+    { "treatment_slug": "hydrafacial", "markets": ["US", "CA"] },
+    { "treatment_slug": "diamondglow", "markets": ["US", "CA"] }
+  ]
+}

@@ -44,7 +44,7 @@ const RISK_SECTION: DetailSection = {
 const EVIDENCE_SECTION: DetailSection = {
   id: "evidence",
   title: "Evidence and regulatory status",
-  keys: ["fda_status", "evidence_grade"],
+  keys: ["fda_status", "canada_status", "evidence_grade"],
 };
 
 export const TEMPLATES: Record<TemplateId, RowTemplate> = {

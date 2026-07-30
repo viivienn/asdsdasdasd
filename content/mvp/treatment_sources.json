@@ -1,0 +1,967 @@
+{
+  "schema_version": "2026-07-29",
+  "retrieved_at": "2026-07-29T00:00:00Z",
+  "source_policy": "One row supports one profile field. Repeated URLs are intentional because treatment_sources.claim_field is singular in the current schema.",
+  "sources": [
+    {
+      "treatment_slug": "botox",
+      "claim_field": "primary_purpose",
+      "source_title": "BOTOX Cosmetic US Prescribing Information",
+      "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/103000s5316s5319s5323s5326s5331lbl.pdf",
+      "source_type": "FDA prescribing information",
+      "publication_date": "2024-10-18",
+      "evidence_level": "regulatory-primary",
+      "notes": "Current US cosmetic indications and labelled treatment areas."
+    },
+    {
+      "treatment_slug": "botox",
+      "claim_field": "mechanism",
+      "source_title": "BOTOX Cosmetic US Prescribing Information",
+      "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/103000s5316s5319s5323s5326s5331lbl.pdf",
+      "source_type": "FDA prescribing information",
+      "publication_date": "2024-10-18",
+      "evidence_level": "regulatory-primary",
+      "notes": "Neuromuscular-junction mechanism and SNAP-25 cleavage."
+    },
+    {
+      "treatment_slug": "botox",
+      "claim_field": "result_timing",
+      "source_title": "BOTOX Cosmetic US Prescribing Information",
+      "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/103000s5316s5319s5323s5326s5331lbl.pdf",
+      "source_type": "FDA prescribing information",
+      "publication_date": "2024-10-18",
+      "evidence_level": "regulatory-primary",
+      "notes": "Initial denervation effect and development over the first week."
+    },
+    {
+      "treatment_slug": "botox",
+      "claim_field": "longevity_text",
+      "source_title": "BOTOX Cosmetic US Prescribing Information",
+      "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/103000s5316s5319s5323s5326s5331lbl.pdf",
+      "source_type": "FDA prescribing information",
+      "publication_date": "2024-10-18",
+      "evidence_level": "regulatory-primary",
+      "notes": "Approximately three to four months for glabellar-line effect."
+    },
+    {
+      "treatment_slug": "botox",
+      "claim_field": "major_risks",
+      "source_title": "BOTOX Cosmetic US Prescribing Information",
+      "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/103000s5316s5319s5323s5326s5331lbl.pdf",
+      "source_type": "FDA prescribing information",
+      "publication_date": "2024-10-18",
+      "evidence_level": "regulatory-primary",
+      "notes": "Boxed warning, contraindications, and cosmetic adverse reactions."
+    },
+    {
+      "treatment_slug": "botox",
+      "claim_field": "fda_status",
+      "source_title": "FDA approval letter for BOTOX Cosmetic",
+      "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2002/botuall041202L.htm",
+      "source_type": "FDA approval record",
+      "publication_date": "2002-04-12",
+      "evidence_level": "regulatory-primary",
+      "notes": "Original US aesthetic approval; current indication wording comes from the current label."
+    },
+    {
+      "treatment_slug": "botox",
+      "claim_field": "canada_status",
+      "source_title": "Health Canada Drug Product Database: Botox Cosmetic DIN 02531445",
+      "source_url": "https://health-products.canada.ca/dpd-bdpp/info?code=102058&lang=eng",
+      "source_type": "Health Canada DPD",
+      "publication_date": "2025-04-09",
+      "evidence_level": "regulatory-primary",
+      "notes": "Approved Canadian drug-product record and product-monograph link."
+    },
+    {
+      "treatment_slug": "dysport",
+      "claim_field": "primary_purpose",
+      "source_title": "DYSPORT US Prescribing Information",
+      "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/125274s123lbl.pdf",
+      "source_type": "FDA prescribing information",
+      "publication_date": "2023-07-11",
+      "evidence_level": "regulatory-primary",
+      "notes": "US glabellar indication and age limitation."
+    },
+    {
+      "treatment_slug": "dysport",
+      "claim_field": "mechanism",
+      "source_title": "DYSPORT US Prescribing Information",
+      "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/125274s123lbl.pdf",
+      "source_type": "FDA prescribing information",
+      "publication_date": "2023-07-11",
+      "evidence_level": "regulatory-primary",
+      "notes": "Inhibition of acetylcholine release at the neuromuscular junction."
+    },
+    {
+      "treatment_slug": "dysport",
+      "claim_field": "sessions_text",
+      "source_title": "DYSPORT US Prescribing Information",
+      "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/125274s123lbl.pdf",
+      "source_type": "FDA prescribing information",
+      "publication_date": "2023-07-11",
+      "evidence_level": "regulatory-primary",
+      "notes": "Retreatment no more frequently than every three months."
+    },
+    {
+      "treatment_slug": "dysport",
+      "claim_field": "pricing_basis",
+      "source_title": "DYSPORT US Prescribing Information",
+      "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/125274s123lbl.pdf",
+      "source_type": "FDA prescribing information",
+      "publication_date": "2023-07-11",
+      "evidence_level": "regulatory-primary",
+      "notes": "Potency units are product specific and not interchangeable with other botulinum toxin products."
+    },
+    {
+      "treatment_slug": "dysport",
+      "claim_field": "major_risks",
+      "source_title": "DYSPORT US Prescribing Information",
+      "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/125274s123lbl.pdf",
+      "source_type": "FDA prescribing information",
+      "publication_date": "2023-07-11",
+      "evidence_level": "regulatory-primary",
+      "notes": "Boxed warning, cow's-milk-protein contraindication, infection-site contraindication, and adverse reactions."
+    },
+    {
+      "treatment_slug": "dysport",
+      "claim_field": "fda_status",
+      "source_title": "DYSPORT US Prescribing Information",
+      "source_url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/125274s123lbl.pdf",
+      "source_type": "FDA prescribing information",
+      "publication_date": "2023-07-11",
+      "evidence_level": "regulatory-primary",
+      "notes": "Current US cosmetic indication."
+    },
+    {
+      "treatment_slug": "dysport",
+      "claim_field": "canada_status",
+      "source_title": "Health Canada Drug Product Database: Dysport Aesthetic DIN 02387735",
+      "source_url": "https://health-products.canada.ca/dpd-bdpp/info?code=87332&lang=eng",
+      "source_type": "Health Canada DPD",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Marketed Canadian drug-product record."
+    },
+    {
+      "treatment_slug": "ha-filler",
+      "claim_field": "primary_purpose",
+      "source_title": "FDA: Dermal Fillers (Soft Tissue Fillers)",
+      "source_url": "https://www.fda.gov/medical-devices/aesthetic-cosmetic-devices/dermal-fillers-soft-tissue-fillers",
+      "source_type": "FDA device guidance",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Class definition and product-specific intended uses."
+    },
+    {
+      "treatment_slug": "ha-filler",
+      "claim_field": "mechanism",
+      "source_title": "FDA: Dermal Fillers (Soft Tissue Fillers)",
+      "source_url": "https://www.fda.gov/medical-devices/aesthetic-cosmetic-devices/dermal-fillers-soft-tissue-fillers",
+      "source_type": "FDA device guidance",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Gel-like implanted materials used to create a fuller or smoother appearance."
+    },
+    {
+      "treatment_slug": "ha-filler",
+      "claim_field": "longevity_text",
+      "source_title": "FDA-Approved Dermal Fillers",
+      "source_url": "https://www.fda.gov/medical-devices/aesthetic-cosmetic-devices/fda-approved-dermal-fillers",
+      "source_type": "FDA device guidance",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Approximate class-level absorbable-filler durations and product-specific approval list."
+    },
+    {
+      "treatment_slug": "ha-filler",
+      "claim_field": "major_risks",
+      "source_title": "FDA: Dermal Filler Do's and Don'ts",
+      "source_url": "https://www.fda.gov/consumers/consumer-updates/dermal-filler-dos-and-donts-wrinkles-lips-and-more",
+      "source_type": "FDA consumer safety guidance",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Common injection reactions and rare vascular events including blindness and stroke."
+    },
+    {
+      "treatment_slug": "ha-filler",
+      "claim_field": "reversibility",
+      "source_title": "The use of hyaluronidase in aesthetic practice",
+      "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5242216/",
+      "source_type": "peer-reviewed review",
+      "publication_date": "2018-01-01",
+      "evidence_level": "peer-reviewed-secondary",
+      "notes": "Clinical use of hyaluronidase for HA filler complications; US use is off-label."
+    },
+    {
+      "treatment_slug": "ha-filler",
+      "claim_field": "fda_status",
+      "source_title": "FDA-Approved Dermal Fillers",
+      "source_url": "https://www.fda.gov/medical-devices/aesthetic-cosmetic-devices/fda-approved-dermal-fillers",
+      "source_type": "FDA device guidance",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "FDA approval is product and indication specific."
+    },
+    {
+      "treatment_slug": "ha-filler",
+      "claim_field": "canada_status",
+      "source_title": "Health Canada Medical Devices Active Licence Listing",
+      "source_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/medical-devices/licences/medical-devices-active-licence-listing.html",
+      "source_type": "Health Canada regulatory guidance",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Class II, III, and IV devices are searched by product-specific active licence."
+    },
+    {
+      "treatment_slug": "juvederm",
+      "claim_field": "primary_purpose",
+      "source_title": "Juvéderm Collection: Treatment Areas",
+      "source_url": "https://www.juvederm.com/treatment-areas",
+      "source_type": "official manufacturer safety information",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "Portfolio products and their US intended treatment areas."
+    },
+    {
+      "treatment_slug": "juvederm",
+      "claim_field": "mechanism",
+      "source_title": "About the Juvéderm Collection",
+      "source_url": "https://www.juvederm.com/about-juvederm",
+      "source_type": "official manufacturer information",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "Family composition as modified HA gels and product-specific formulation framing."
+    },
+    {
+      "treatment_slug": "juvederm",
+      "claim_field": "major_risks",
+      "source_title": "Juvéderm Collection: Treatment Areas and Important Safety Information",
+      "source_url": "https://www.juvederm.com/treatment-areas",
+      "source_type": "official manufacturer safety information",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "Product-family safety information and vascular risk warning."
+    },
+    {
+      "treatment_slug": "juvederm",
+      "claim_field": "fda_status",
+      "source_title": "FDA PMA P050047/S052",
+      "source_url": "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpma/pma.cfm?id=P050047S052",
+      "source_type": "FDA PMA record",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Example of product-specific Juvéderm PMA supplement; family status is not universal."
+    },
+    {
+      "treatment_slug": "juvederm",
+      "claim_field": "canada_status",
+      "source_title": "Health Canada MDALL: Allergan Juvéderm licences",
+      "source_url": "https://health-products.canada.ca/mdall-limh/information?companyId=112685&lang=eng",
+      "source_type": "Health Canada MDALL",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Active Class III Juvéderm family and product records."
+    },
+    {
+      "treatment_slug": "restylane",
+      "claim_field": "primary_purpose",
+      "source_title": "Explore Restylane Products and Treatment Areas",
+      "source_url": "https://www.restylaneusa.com/explore-restylane",
+      "source_type": "official manufacturer safety information",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "Current US family members and product-specific intended areas."
+    },
+    {
+      "treatment_slug": "restylane",
+      "claim_field": "mechanism",
+      "source_title": "Restylane Science and Technology",
+      "source_url": "https://www.restylaneusa.com/restylane-science",
+      "source_type": "official manufacturer information",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "HA gel family and product-specific technology."
+    },
+    {
+      "treatment_slug": "restylane",
+      "claim_field": "major_risks",
+      "source_title": "Explore Restylane Products and Treatment Areas",
+      "source_url": "https://www.restylaneusa.com/explore-restylane",
+      "source_type": "official manufacturer safety information",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "Family safety information, contraindications, and area-specific indications."
+    },
+    {
+      "treatment_slug": "restylane",
+      "claim_field": "fda_status",
+      "source_title": "FDA PMA P040024: Restylane",
+      "source_url": "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpma/pma.cfm?id=P040024",
+      "source_type": "FDA PMA record",
+      "publication_date": "2003-12-12",
+      "evidence_level": "regulatory-primary",
+      "notes": "Original Restylane PMA; later products and indications use separate supplements."
+    },
+    {
+      "treatment_slug": "restylane",
+      "claim_field": "canada_status",
+      "source_title": "Health Canada MDALL: Q-Med Restylane licences",
+      "source_url": "https://health-products.canada.ca/mdall-limh/information?companyId=108608&lang=eng",
+      "source_type": "Health Canada MDALL",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Active Class III Restylane family and product records."
+    },
+    {
+      "treatment_slug": "juvederm-voluma",
+      "claim_field": "primary_purpose",
+      "source_title": "Juvéderm Voluma XC Instructions for Use, P110033/S070",
+      "source_url": "https://www.accessdata.fda.gov/cdrh_docs/pdf11/P110033S070C.pdf",
+      "source_type": "FDA-approved device labelling",
+      "publication_date": "2023-10-06",
+      "evidence_level": "regulatory-primary",
+      "notes": "Cheek, chin, and temple indications and intended planes."
+    },
+    {
+      "treatment_slug": "juvederm-voluma",
+      "claim_field": "mechanism",
+      "source_title": "Juvéderm Voluma XC Instructions for Use, P110033/S070",
+      "source_url": "https://www.accessdata.fda.gov/cdrh_docs/pdf11/P110033S070C.pdf",
+      "source_type": "FDA-approved device labelling",
+      "publication_date": "2023-10-06",
+      "evidence_level": "regulatory-primary",
+      "notes": "20 mg/mL cross-linked HA with 0.3% lidocaine and deep implantation."
+    },
+    {
+      "treatment_slug": "juvederm-voluma",
+      "claim_field": "longevity_text",
+      "source_title": "Juvéderm Voluma XC Instructions for Use, P110033/S070",
+      "source_url": "https://www.accessdata.fda.gov/cdrh_docs/pdf11/P110033S070C.pdf",
+      "source_type": "FDA-approved device labelling",
+      "publication_date": "2023-10-06",
+      "evidence_level": "regulatory-primary",
+      "notes": "Area-specific clinical study follow-up, including cheek study through 24 months."
+    },
+    {
+      "treatment_slug": "juvederm-voluma",
+      "claim_field": "major_risks",
+      "source_title": "Juvéderm Voluma XC Instructions for Use, P110033/S070",
+      "source_url": "https://www.accessdata.fda.gov/cdrh_docs/pdf11/P110033S070C.pdf",
+      "source_type": "FDA-approved device labelling",
+      "publication_date": "2023-10-06",
+      "evidence_level": "regulatory-primary",
+      "notes": "Contraindications, common reactions, and vascular-compromise warning."
+    },
+    {
+      "treatment_slug": "juvederm-voluma",
+      "claim_field": "fda_status",
+      "source_title": "FDA PMA P110033/S070",
+      "source_url": "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpma/pma.cfm?id=P110033S070",
+      "source_type": "FDA PMA record",
+      "publication_date": "2023-10-06",
+      "evidence_level": "regulatory-primary",
+      "notes": "Temple-hollowing supplement; label consolidates current areas."
+    },
+    {
+      "treatment_slug": "juvederm-voluma",
+      "claim_field": "canada_status",
+      "source_title": "Health Canada MDALL: Allergan Juvéderm licences",
+      "source_url": "https://health-products.canada.ca/mdall-limh/information?companyId=112685&lang=eng",
+      "source_type": "Health Canada MDALL",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Active Class III licence 77899 for Juvéderm Voluma with lidocaine."
+    },
+    {
+      "treatment_slug": "restylane-kysse",
+      "claim_field": "primary_purpose",
+      "source_title": "Restylane Kysse Instructions for Use",
+      "source_url": "https://www.restylaneusa.com/docs/Restylane-Kysse-IFU",
+      "source_type": "official manufacturer IFU",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "Lip augmentation and upper-perioral-rhytid indication."
+    },
+    {
+      "treatment_slug": "restylane-kysse",
+      "claim_field": "mechanism",
+      "source_title": "Restylane Kysse Instructions for Use",
+      "source_url": "https://www.restylaneusa.com/docs/Restylane-Kysse-IFU",
+      "source_type": "official manufacturer IFU",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "Cross-linked HA gel with lidocaine and intended injection sites."
+    },
+    {
+      "treatment_slug": "restylane-kysse",
+      "claim_field": "longevity_text",
+      "source_title": "FDA Summary of Safety and Effectiveness Data P140029/S021",
+      "source_url": "https://www.accessdata.fda.gov/cdrh_docs/pdf14/P140029S021B.pdf",
+      "source_type": "FDA SSED",
+      "publication_date": "2020-03-25",
+      "evidence_level": "regulatory-primary",
+      "notes": "Pivotal-study week-48 responder analysis."
+    },
+    {
+      "treatment_slug": "restylane-kysse",
+      "claim_field": "major_risks",
+      "source_title": "Restylane Kysse Patient Safety Information",
+      "source_url": "https://www.restylaneusa.com/docs/Restylane-Kysse-PSI",
+      "source_type": "official manufacturer patient labelling",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "Contraindications, common local reactions, and vascular risks."
+    },
+    {
+      "treatment_slug": "restylane-kysse",
+      "claim_field": "fda_status",
+      "source_title": "FDA PMA P140029/S021",
+      "source_url": "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpma/pma.cfm?id=P140029S021",
+      "source_type": "FDA PMA record",
+      "publication_date": "2020-03-25",
+      "evidence_level": "regulatory-primary",
+      "notes": "US approval for lips and upper perioral rhytids."
+    },
+    {
+      "treatment_slug": "restylane-kysse",
+      "claim_field": "canada_status",
+      "source_title": "Health Canada MDALL: Q-Med Restylane licences",
+      "source_url": "https://health-products.canada.ca/mdall-limh/information?companyId=108608&lang=eng",
+      "source_type": "Health Canada MDALL",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Active Class III licence 95283 for Restylane Kysse."
+    },
+    {
+      "treatment_slug": "sculptra",
+      "claim_field": "primary_purpose",
+      "source_title": "Sculptra Aesthetic Instructions for Use",
+      "source_url": "https://www.sculptrausa.com/docs/Sculptra-e-IFU",
+      "source_type": "official manufacturer IFU",
+      "publication_date": "2023-04-01",
+      "evidence_level": "manufacturer-primary",
+      "notes": "Current US aesthetic indications and excluded lip/periorbital areas."
+    },
+    {
+      "treatment_slug": "sculptra",
+      "claim_field": "mechanism",
+      "source_title": "Sculptra Science",
+      "source_url": "https://www.sculptrausa.com/sculptra-science",
+      "source_type": "official manufacturer information",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "PLLA microparticle and collagen-response description with peer-reviewed references."
+    },
+    {
+      "treatment_slug": "sculptra",
+      "claim_field": "sessions_text",
+      "source_title": "Sculptra Frequently Asked Questions",
+      "source_url": "https://www.sculptrausa.com/faqs",
+      "source_type": "official manufacturer information",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "Average two to three sessions and typical spacing."
+    },
+    {
+      "treatment_slug": "sculptra",
+      "claim_field": "longevity_text",
+      "source_title": "FDA Summary of Safety and Effectiveness Data P030050/S039",
+      "source_url": "https://www.accessdata.fda.gov/cdrh_docs/pdf3/P030050S039B.pdf",
+      "source_type": "FDA SSED",
+      "publication_date": "2023-04-04",
+      "evidence_level": "regulatory-primary",
+      "notes": "Cheek clinical program and extension follow-up."
+    },
+    {
+      "treatment_slug": "sculptra",
+      "claim_field": "major_risks",
+      "source_title": "Sculptra Aesthetic Instructions for Use",
+      "source_url": "https://www.sculptrausa.com/docs/Sculptra-e-IFU",
+      "source_type": "official manufacturer IFU",
+      "publication_date": "2023-04-01",
+      "evidence_level": "manufacturer-primary",
+      "notes": "Papules, nodules, granuloma, vascular risk, and contraindications."
+    },
+    {
+      "treatment_slug": "sculptra",
+      "claim_field": "fda_status",
+      "source_title": "FDA PMA P030050/S039",
+      "source_url": "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfPMA/pma.cfm?id=P030050S039",
+      "source_type": "FDA PMA record",
+      "publication_date": "2023-04-04",
+      "evidence_level": "regulatory-primary",
+      "notes": "Fine lines and wrinkles in the cheek region."
+    },
+    {
+      "treatment_slug": "sculptra",
+      "claim_field": "canada_status",
+      "source_title": "Health Canada MDALL: Q-Med licences",
+      "source_url": "https://health-products.canada.ca/mdall-limh/information?companyId=108608&lang=eng",
+      "source_type": "Health Canada MDALL",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Active Class III Sculptra licence 71658."
+    },
+    {
+      "treatment_slug": "radiesse",
+      "claim_field": "primary_purpose",
+      "source_title": "Radiesse (+) Instructions for Use",
+      "source_url": "https://radiesse.com/app/uploads/2024/04/instructions-for-use-radiesse-plus-lidocaine.pdf",
+      "source_type": "official manufacturer IFU",
+      "publication_date": "2024-04-01",
+      "evidence_level": "manufacturer-primary",
+      "notes": "Product-specific facial and hand uses."
+    },
+    {
+      "treatment_slug": "radiesse",
+      "claim_field": "mechanism",
+      "source_title": "Radiesse (+) Instructions for Use",
+      "source_url": "https://radiesse.com/app/uploads/2024/04/instructions-for-use-radiesse-plus-lidocaine.pdf",
+      "source_type": "official manufacturer IFU",
+      "publication_date": "2024-04-01",
+      "evidence_level": "manufacturer-primary",
+      "notes": "Calcium hydroxylapatite microspheres in gel carrier and lidocaine formulation."
+    },
+    {
+      "treatment_slug": "radiesse",
+      "claim_field": "longevity_text",
+      "source_title": "FDA-Approved Dermal Fillers",
+      "source_url": "https://www.fda.gov/medical-devices/aesthetic-cosmetic-devices/fda-approved-dermal-fillers",
+      "source_type": "FDA device guidance",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Approximate calcium-hydroxylapatite class duration."
+    },
+    {
+      "treatment_slug": "radiesse",
+      "claim_field": "major_risks",
+      "source_title": "Radiesse (+) Instructions for Use",
+      "source_url": "https://radiesse.com/app/uploads/2024/04/instructions-for-use-radiesse-plus-lidocaine.pdf",
+      "source_type": "official manufacturer IFU",
+      "publication_date": "2024-04-01",
+      "evidence_level": "manufacturer-primary",
+      "notes": "Adverse events, radiopacity, contraindications, and vascular warning."
+    },
+    {
+      "treatment_slug": "radiesse",
+      "claim_field": "fda_status",
+      "source_title": "FDA PMA database: Radiesse P050052",
+      "source_url": "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpma/pma.cfm?id=P050052S148",
+      "source_type": "FDA PMA record",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Current PMA-family record; exact labelled area depends on supplement and product version."
+    },
+    {
+      "treatment_slug": "radiesse",
+      "claim_field": "canada_status",
+      "source_title": "Health Canada MDALL: Merz Radiesse licences",
+      "source_url": "https://health-products.canada.ca/mdall-limh/information?companyId=116080&lang=eng",
+      "source_type": "Health Canada MDALL",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Active Class III licences 78893 and 95140."
+    },
+    {
+      "treatment_slug": "thermage",
+      "claim_field": "primary_purpose",
+      "source_title": "FDA 510(k) Summary K170758: Thermage FLX",
+      "source_url": "https://www.accessdata.fda.gov/cdrh_docs/pdf17/K170758.pdf",
+      "source_type": "FDA 510(k) summary",
+      "publication_date": "2017-09-29",
+      "evidence_level": "regulatory-primary",
+      "notes": "Device indications and substantial-equivalence decision."
+    },
+    {
+      "treatment_slug": "thermage",
+      "claim_field": "mechanism",
+      "source_title": "FDA 510(k) Summary K170758: Thermage FLX",
+      "source_url": "https://www.accessdata.fda.gov/cdrh_docs/pdf17/K170758.pdf",
+      "source_type": "FDA 510(k) summary",
+      "publication_date": "2017-09-29",
+      "evidence_level": "regulatory-primary",
+      "notes": "6.78 MHz monopolar RF, cooling, and selective tissue coagulation."
+    },
+    {
+      "treatment_slug": "thermage",
+      "claim_field": "result_timing",
+      "source_title": "Thermage official patient information",
+      "source_url": "https://www.thermage.com/",
+      "source_type": "official manufacturer information",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "Manufacturer timing and one-session framing, labelled as manufacturer estimate."
+    },
+    {
+      "treatment_slug": "thermage",
+      "claim_field": "major_risks",
+      "source_title": "Thermage CPT Technical User's Manual",
+      "source_url": "https://ca.thermage.com/siteassets/hcp/pdf/thermage-cpt-technical-users-manual-model-tg-2b-p-np009240-06-2021.pdf",
+      "source_type": "official manufacturer user manual",
+      "publication_date": "2021-06-01",
+      "evidence_level": "manufacturer-primary",
+      "notes": "Contraindications, warnings, cooling, burns, scarring, and operator variables."
+    },
+    {
+      "treatment_slug": "thermage",
+      "claim_field": "evidence_grade",
+      "source_title": "Systematic review of monopolar radiofrequency for facial rejuvenation",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/35877937/",
+      "source_type": "peer-reviewed systematic review",
+      "publication_date": "2022-07-21",
+      "evidence_level": "peer-reviewed-secondary",
+      "notes": "Heterogeneous studies and modest noninvasive outcomes."
+    },
+    {
+      "treatment_slug": "thermage",
+      "claim_field": "fda_status",
+      "source_title": "FDA 510(k) database K170758",
+      "source_url": "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpmn/pmn.cfm?ID=K170758",
+      "source_type": "FDA 510(k) record",
+      "publication_date": "2017-09-29",
+      "evidence_level": "regulatory-primary",
+      "notes": "Substantial-equivalence clearance record."
+    },
+    {
+      "treatment_slug": "thermage",
+      "claim_field": "canada_status",
+      "source_title": "Health Canada MDALL: Solta Thermage licences",
+      "source_url": "https://health-products.canada.ca/mdall-limh/information?companyId=126264&lang=eng",
+      "source_type": "Health Canada MDALL",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Active Class III Thermage FLX licence 112966."
+    },
+    {
+      "treatment_slug": "ultherapy",
+      "claim_field": "primary_purpose",
+      "source_title": "FDA 510(k) Summary K121700: Ulthera System",
+      "source_url": "https://www.accessdata.fda.gov/cdrh_docs/pdf12/K121700.pdf",
+      "source_type": "FDA 510(k) summary",
+      "publication_date": "2012-10-19",
+      "evidence_level": "regulatory-primary",
+      "notes": "Brow, submental, and neck lifting indications."
+    },
+    {
+      "treatment_slug": "ultherapy",
+      "claim_field": "mechanism",
+      "source_title": "Ultherapy Instructions for Use",
+      "source_url": "https://ultherapy.com/app/uploads/2023/02/1015107_Ultherapy_IFU_2023.pdf",
+      "source_type": "official manufacturer IFU",
+      "publication_date": "2023-02-01",
+      "evidence_level": "manufacturer-primary",
+      "notes": "Ultrasound imaging, treatment depths, and thermal-coagulation points."
+    },
+    {
+      "treatment_slug": "ultherapy",
+      "claim_field": "result_timing",
+      "source_title": "Ultherapy official patient information",
+      "source_url": "https://ultherapy.com/",
+      "source_type": "official manufacturer information",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "Manufacturer timing and no-planned-downtime framing."
+    },
+    {
+      "treatment_slug": "ultherapy",
+      "claim_field": "pain_level",
+      "source_title": "Systematic review and meta-analysis of microfocused ultrasound",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/39540440/",
+      "source_type": "peer-reviewed systematic review",
+      "publication_date": "2024-11-01",
+      "evidence_level": "peer-reviewed-secondary",
+      "notes": "Aggregated discomfort and adverse-event findings across 42 studies."
+    },
+    {
+      "treatment_slug": "ultherapy",
+      "claim_field": "longevity_text",
+      "source_title": "Systematic review of microfocused ultrasound for facial rejuvenation",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/36674277/",
+      "source_type": "peer-reviewed systematic review",
+      "publication_date": "2023-01-24",
+      "evidence_level": "peer-reviewed-secondary",
+      "notes": "Modest improvement and follow-up commonly through one year."
+    },
+    {
+      "treatment_slug": "ultherapy",
+      "claim_field": "major_risks",
+      "source_title": "Ultherapy Instructions for Use",
+      "source_url": "https://ultherapy.com/app/uploads/2023/02/1015107_Ultherapy_IFU_2023.pdf",
+      "source_type": "official manufacturer IFU",
+      "publication_date": "2023-02-01",
+      "evidence_level": "manufacturer-primary",
+      "notes": "Warnings, contraindications, and adverse events."
+    },
+    {
+      "treatment_slug": "ultherapy",
+      "claim_field": "fda_status",
+      "source_title": "FDA 510(k) Summary K134032: Ulthera System",
+      "source_url": "https://www.accessdata.fda.gov/cdrh_docs/pdf13/k134032.pdf",
+      "source_type": "FDA 510(k) summary",
+      "publication_date": "2014-07-18",
+      "evidence_level": "regulatory-primary",
+      "notes": "Décolletage-line indication supplement."
+    },
+    {
+      "treatment_slug": "ultherapy",
+      "claim_field": "canada_status",
+      "source_title": "Health Canada MDALL: Ulthera System",
+      "source_url": "https://health-products.canada.ca/mdall-limh/information?companyId=128516&lang=eng",
+      "source_type": "Health Canada MDALL",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Active Class III licence 79689."
+    },
+    {
+      "treatment_slug": "morpheus8",
+      "claim_field": "primary_purpose",
+      "source_title": "FDA 510(k) Summary K231790: Morpheus8",
+      "source_url": "https://www.accessdata.fda.gov/cdrh_docs/pdf23/K231790.pdf",
+      "source_type": "FDA 510(k) summary",
+      "publication_date": "2023-11-03",
+      "evidence_level": "regulatory-primary",
+      "notes": "Cleared electrocoagulation, hemostasis, and soft-tissue contraction/coagulation language."
+    },
+    {
+      "treatment_slug": "morpheus8",
+      "claim_field": "mechanism",
+      "source_title": "FDA 510(k) Summary K231790: Morpheus8",
+      "source_url": "https://www.accessdata.fda.gov/cdrh_docs/pdf23/K231790.pdf",
+      "source_type": "FDA 510(k) summary",
+      "publication_date": "2023-11-03",
+      "evidence_level": "regulatory-primary",
+      "notes": "Fractional RF electrode array, tips, energy, and depth."
+    },
+    {
+      "treatment_slug": "morpheus8",
+      "claim_field": "skin_tone_notes",
+      "source_title": "FDA 510(k) Summary K231790: Morpheus8",
+      "source_url": "https://www.accessdata.fda.gov/cdrh_docs/pdf23/K231790.pdf",
+      "source_type": "FDA 510(k) summary",
+      "publication_date": "2023-11-03",
+      "evidence_level": "regulatory-primary",
+      "notes": "Energy above 62 mJ per pin limited to Fitzpatrick I–IV."
+    },
+    {
+      "treatment_slug": "morpheus8",
+      "claim_field": "major_risks",
+      "source_title": "FDA Safety Communication: Potential Risks with Certain Uses of RF Microneedling",
+      "source_url": "https://www.fda.gov/medical-devices/safety-communications/potential-risks-certain-uses-radiofrequency-rf-microneedling-fda-safety-communication",
+      "source_type": "FDA safety communication",
+      "publication_date": "2025-10-15",
+      "evidence_level": "regulatory-primary",
+      "notes": "Reports of burns, scarring, fat loss, disfigurement, and nerve damage."
+    },
+    {
+      "treatment_slug": "morpheus8",
+      "claim_field": "fda_status",
+      "source_title": "FDA 510(k) database K231790",
+      "source_url": "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfPMN/pmn.cfm?ID=K231790",
+      "source_type": "FDA 510(k) record",
+      "publication_date": "2023-11-03",
+      "evidence_level": "regulatory-primary",
+      "notes": "Substantial-equivalence clearance record."
+    },
+    {
+      "treatment_slug": "morpheus8",
+      "claim_field": "canada_status",
+      "source_title": "Health Canada MDALL: InMode licences",
+      "source_url": "https://health-products.canada.ca/mdall-limh/information?companyId=129694&lang=eng",
+      "source_type": "Health Canada MDALL",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Active Class III device-family licences include Morpheus8 configurations; exact model requires verification."
+    },
+    {
+      "treatment_slug": "potenza",
+      "claim_field": "primary_purpose",
+      "source_title": "FDA 510(k) Summary K192545: Potenza",
+      "source_url": "https://www.accessdata.fda.gov/cdrh_docs/pdf19/K192545.pdf",
+      "source_type": "FDA 510(k) summary",
+      "publication_date": "2020-05-12",
+      "evidence_level": "regulatory-primary",
+      "notes": "Narrow cleared indication for electrocoagulation and hemostasis."
+    },
+    {
+      "treatment_slug": "potenza",
+      "claim_field": "mechanism",
+      "source_title": "FDA 510(k) Summary K192545: Potenza",
+      "source_url": "https://www.accessdata.fda.gov/cdrh_docs/pdf19/K192545.pdf",
+      "source_type": "FDA 510(k) summary",
+      "publication_date": "2020-05-12",
+      "evidence_level": "regulatory-primary",
+      "notes": "Monopolar/bipolar RF and insulated/non-insulated microneedle configurations."
+    },
+    {
+      "treatment_slug": "potenza",
+      "claim_field": "provider_variables",
+      "source_title": "Potenza Physician Brochure",
+      "source_url": "https://www.cynosure.com/wp-content/uploads/2021/04/PRD_4362_Potenza-Physician-Brochure-Fusion-Tip-web.pdf",
+      "source_type": "official manufacturer technical information",
+      "publication_date": "2021-04-01",
+      "evidence_level": "manufacturer-primary",
+      "notes": "Tip and mode configurations; not used as proof of superiority."
+    },
+    {
+      "treatment_slug": "potenza",
+      "claim_field": "major_risks",
+      "source_title": "FDA Safety Communication: Potential Risks with Certain Uses of RF Microneedling",
+      "source_url": "https://www.fda.gov/medical-devices/safety-communications/potential-risks-certain-uses-radiofrequency-rf-microneedling-fda-safety-communication",
+      "source_type": "FDA safety communication",
+      "publication_date": "2025-10-15",
+      "evidence_level": "regulatory-primary",
+      "notes": "Procedure-category safety warning."
+    },
+    {
+      "treatment_slug": "potenza",
+      "claim_field": "fda_status",
+      "source_title": "FDA 510(k) Summary K192545: Potenza",
+      "source_url": "https://www.accessdata.fda.gov/cdrh_docs/pdf19/K192545.pdf",
+      "source_type": "FDA 510(k) summary",
+      "publication_date": "2020-05-12",
+      "evidence_level": "regulatory-primary",
+      "notes": "Does not establish a wrinkle, scar, or tightening indication."
+    },
+    {
+      "treatment_slug": "potenza",
+      "claim_field": "canada_status",
+      "source_title": "Health Canada MDALL: Jeisys Potenza licence",
+      "source_url": "https://health-products.canada.ca/mdall-limh/information?companyId=132079&lang=eng",
+      "source_type": "Health Canada MDALL",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Active Class III licence 106699."
+    },
+    {
+      "treatment_slug": "hydrafacial",
+      "claim_field": "primary_purpose",
+      "source_title": "HydraFacial Treatment",
+      "source_url": "https://hydrafacial.com/treatment/",
+      "source_type": "official manufacturer information",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "Branded cleanse, extract, and hydrate protocol."
+    },
+    {
+      "treatment_slug": "hydrafacial",
+      "claim_field": "mechanism",
+      "source_title": "HydraFacial Electronic Instructions for Use",
+      "source_url": "https://www.hydrafacial.com/pages/electronic-instructions-for-use-eifu",
+      "source_type": "official manufacturer IFU hub",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "Device manuals, suction/fluid path, solutions, contraindications, and cleaning."
+    },
+    {
+      "treatment_slug": "hydrafacial",
+      "claim_field": "appointment_time",
+      "source_title": "HydraFacial Treatment",
+      "source_url": "https://hydrafacial.com/treatment/",
+      "source_type": "official manufacturer information",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "Common 30-minute branded treatment framing."
+    },
+    {
+      "treatment_slug": "hydrafacial",
+      "claim_field": "major_risks",
+      "source_title": "HydraFacial Electronic Instructions for Use",
+      "source_url": "https://www.hydrafacial.com/pages/electronic-instructions-for-use-eifu",
+      "source_type": "official manufacturer IFU hub",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "Model-specific warnings, contraindications, hygiene, and solution precautions."
+    },
+    {
+      "treatment_slug": "hydrafacial",
+      "claim_field": "fda_status",
+      "source_title": "FDA 510(k) Premarket Notification Database",
+      "source_url": "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpmn/pmn.cfm",
+      "source_type": "FDA device database",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Database searched by brand, manufacturer, and model; no HydraFacial-branded PMA, De Novo, or 510(k) indication identified in this review."
+    },
+    {
+      "treatment_slug": "hydrafacial",
+      "claim_field": "canada_status",
+      "source_title": "Health Canada MDALL: HydraFacial licences",
+      "source_url": "https://health-products.canada.ca/mdall-limh/information?companyId=120660&lang=eng",
+      "source_type": "Health Canada MDALL",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Active Class II microdermabrasion-system licence 79154 and handpiece licence 79395."
+    },
+    {
+      "treatment_slug": "diamondglow",
+      "claim_field": "primary_purpose",
+      "source_title": "DiamondGlow: How It Works",
+      "source_url": "https://www.diamondglow.com/how-it-works/",
+      "source_type": "official manufacturer information",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "Diamond-tip exfoliation, extraction, and topical infusion process."
+    },
+    {
+      "treatment_slug": "diamondglow",
+      "claim_field": "mechanism",
+      "source_title": "DiamondGlow: How It Works",
+      "source_url": "https://www.diamondglow.com/how-it-works/",
+      "source_type": "official manufacturer information",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "Simultaneous abrasion, suction, and Pro-Infusion delivery."
+    },
+    {
+      "treatment_slug": "diamondglow",
+      "claim_field": "appointment_time",
+      "source_title": "DiamondGlow Frequently Asked Questions",
+      "source_url": "https://www.diamondglow.com/faq/",
+      "source_type": "official manufacturer information",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "Approximately 30-minute treatment and user-manual references."
+    },
+    {
+      "treatment_slug": "diamondglow",
+      "claim_field": "major_risks",
+      "source_title": "DiamondGlow Frequently Asked Questions and Safety Information",
+      "source_url": "https://www.diamondglow.com/faq/",
+      "source_type": "official manufacturer safety information",
+      "publication_date": null,
+      "evidence_level": "manufacturer-primary",
+      "notes": "Patient selection and user-manual safety framing."
+    },
+    {
+      "treatment_slug": "diamondglow",
+      "claim_field": "fda_status",
+      "source_title": "FDA Establishment Registration and Device Listing: Envy Medical powered dermabrasion devices",
+      "source_url": "https://www.accessdata.fda.gov/scrIpts/cdrh/cfdocs/cfRL/rl.cfm?lid=964029&lpcd=GFE",
+      "source_type": "FDA device listing",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "Class I product code GFE listing for DPRO, Dermalinfusion, SilkPeel, and related models."
+    },
+    {
+      "treatment_slug": "diamondglow",
+      "claim_field": "fda_status",
+      "source_title": "FDA MAUDE report identifying SilkPeel Pro Dermalinfusion as 510(k)-exempt",
+      "source_url": "https://www.accessdata.fda.gov/scripts/cdrh/cfmaude/detail.cfm?mdrfoi__id=9919070&pc=GFE",
+      "source_type": "FDA device adverse-event record",
+      "publication_date": "2020-05-05",
+      "evidence_level": "regulatory-primary",
+      "notes": "Corroborates Class I/510(k)-exempt regulatory pathway; not used to estimate event incidence."
+    },
+    {
+      "treatment_slug": "diamondglow",
+      "claim_field": "canada_status",
+      "source_title": "Health Canada Medical Devices Active Licence Listing",
+      "source_url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/medical-devices/licences/medical-devices-active-licence-listing.html",
+      "source_type": "Health Canada regulatory guidance",
+      "publication_date": null,
+      "evidence_level": "regulatory-primary",
+      "notes": "MDALL covers active Class II–IV device licences; Class I devices do not receive a device licence."
+    }
+  ]
+}

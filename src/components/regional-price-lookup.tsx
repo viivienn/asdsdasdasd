@@ -163,7 +163,9 @@ function EstimateResult({
           <dd className="inline">{estimate.researched_at}</dd>
         </div>
       </dl>
-      <p className="mt-4 text-xs text-muted-foreground">
+      <p className="mt-4 text-xs text-muted-foreground">{estimate.methodology_note}</p>
+      <p className="mt-2 text-xs text-muted-foreground">Limitations: {estimate.limitations}</p>
+      <p className="mt-2 text-xs text-muted-foreground">
         This estimate uses pricing from the surrounding market associated with your ZIP or postal
         code. It may not represent providers located inside that exact postal area.
       </p>

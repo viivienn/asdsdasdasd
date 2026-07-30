@@ -794,6 +794,7 @@ export type Database = {
           exercise_restrictions: string | null;
           expected_result_magnitude: string | null;
           fda_status: string | null;
+          canada_status: string | null;
           generic_name: string | null;
           id: string;
           is_sample: boolean;
@@ -841,6 +842,7 @@ export type Database = {
           exercise_restrictions?: string | null;
           expected_result_magnitude?: string | null;
           fda_status?: string | null;
+          canada_status?: string | null;
           generic_name?: string | null;
           id?: string;
           is_sample?: boolean;
@@ -888,6 +890,7 @@ export type Database = {
           exercise_restrictions?: string | null;
           expected_result_magnitude?: string | null;
           fda_status?: string | null;
+          canada_status?: string | null;
           generic_name?: string | null;
           id?: string;
           is_sample?: boolean;

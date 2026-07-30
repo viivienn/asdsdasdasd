@@ -108,6 +108,7 @@ export interface Treatment {
   when_not_appropriate: string | null;
   pricing_basis: string | null;
   fda_status: string | null;
+  canada_status: string | null;
   evidence_grade: string | null;
   last_reviewed_at: string | null;
   publication_status: PublicationStatus;
@@ -195,7 +196,8 @@ export const COMPARISON_ROWS = [
   { key: "skin_tone_notes", label: "Skin-tone considerations" },
   { key: "true_substitute_notes", label: "Whether they are true substitutes" },
   { key: "when_not_appropriate", label: "When this treatment may not be appropriate" },
-  { key: "fda_status", label: "Regulatory status" },
+  { key: "fda_status", label: "United States regulatory status" },
+  { key: "canada_status", label: "Canadian regulatory status" },
   { key: "evidence_grade", label: "Evidence status" },
 ] as const satisfies ReadonlyArray<{ key: keyof Treatment; label: string }>;
 
@@ -214,7 +216,8 @@ export const TREATMENT_PROFILE_ROWS = [
   { key: "provider_variables", label: "What varies by provider" },
   { key: "skin_tone_notes", label: "Skin-tone considerations" },
   { key: "when_not_appropriate", label: "When this treatment may not be appropriate" },
-  { key: "fda_status", label: "Regulatory status" },
+  { key: "fda_status", label: "United States regulatory status" },
+  { key: "canada_status", label: "Canadian regulatory status" },
   { key: "evidence_grade", label: "Evidence status" },
 ] as const satisfies ReadonlyArray<{ key: keyof Treatment; label: string }>;
 
@@ -284,7 +287,7 @@ export const COMPARISON_SECTIONS = [
   {
     id: "evidence",
     title: "Evidence and regulatory status",
-    keys: ["fda_status", "evidence_grade"],
+    keys: ["fda_status", "canada_status", "evidence_grade"],
   },
 ] as const satisfies ReadonlyArray<{
   id: string;
@@ -465,6 +468,7 @@ export interface RegionalPriceEstimate {
   source_count: number;
   source_urls: string[];
   methodology_note: string;
+  limitations: string;
   researched_at: string;
 }
 
