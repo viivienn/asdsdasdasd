@@ -53,10 +53,17 @@ export const TEMPLATES: Record<TemplateId, RowTemplate> = {
     label: "Neuromodulator brands",
     likeForLike: true,
     glance: [
-      { key: "generic_name", label: "Active ingredient" },
       { key: "manufacturer", label: "Manufacturer" },
-      { key: "result_timing", label: "Onset" },
-      { key: "longevity_text", label: "Duration" },
+      { key: "generic_name", label: "Active ingredient" },
+      { key: "intended_areas", label: "Commonly treated areas" },
+      { key: "mechanism", label: "How it works" },
+      { key: "result_timing", label: "Results timing" },
+      { key: "longevity_text", label: "Typical duration" },
+      { key: "downtime_text", label: "Downtime" },
+      { key: "reversibility", label: "Reversibility" },
+      { key: "pricing_basis", label: "Pricing basis" },
+      { key: "fda_status", label: "Regulatory status" },
+      { key: "most_likely_disappointment", label: "Major limitations" },
     ],
     sections: [
       {
@@ -78,10 +85,18 @@ export const TEMPLATES: Record<TemplateId, RowTemplate> = {
     label: "Filler brand families",
     likeForLike: true,
     glance: [
-      { key: "generic_name", label: "Base material" },
       { key: "manufacturer", label: "Manufacturer" },
+      { key: "generic_name", label: "Base material" },
+      { key: "intended_areas", label: "Intended areas" },
+      { key: "primary_purpose", label: "Primary purpose" },
+      { key: "mechanism", label: "Product behavior" },
+      { key: "result_timing", label: "Results timing" },
       { key: "longevity_text", label: "Typical longevity" },
+      { key: "swelling_text", label: "Downtime and swelling" },
       { key: "reversibility", label: "Reversibility" },
+      { key: "pricing_basis", label: "Pricing basis" },
+      { key: "fda_status", label: "Regulatory status" },
+      { key: "most_likely_disappointment", label: "Major limitations" },
     ],
     sections: [
       {
@@ -103,10 +118,18 @@ export const TEMPLATES: Record<TemplateId, RowTemplate> = {
     label: "Specific filler products",
     likeForLike: true,
     glance: [
-      { key: "generic_name", label: "Gel and anaesthetic" },
-      { key: "treatment_class", label: "Firmness class" },
+      { key: "manufacturer", label: "Manufacturer" },
+      { key: "generic_name", label: "Base material" },
+      { key: "intended_areas", label: "Intended areas" },
+      { key: "primary_purpose", label: "Primary purpose" },
+      { key: "mechanism", label: "Product behavior" },
+      { key: "result_timing", label: "Results timing" },
       { key: "longevity_text", label: "Typical longevity" },
+      { key: "swelling_text", label: "Downtime and swelling" },
       { key: "reversibility", label: "Reversibility" },
+      { key: "pricing_basis", label: "Pricing basis" },
+      { key: "fda_status", label: "Regulatory status" },
+      { key: "most_likely_disappointment", label: "Major limitations" },
     ],
     sections: [
       {
@@ -128,10 +151,17 @@ export const TEMPLATES: Record<TemplateId, RowTemplate> = {
     label: "Lifting and tightening devices",
     likeForLike: true,
     glance: [
+      { key: "manufacturer", label: "Manufacturer" },
       { key: "treatment_class", label: "Energy type" },
-      { key: "sessions_text", label: "Typical sessions" },
-      { key: "result_timing", label: "Results appear" },
-      { key: "longevity_text", label: "Durability" },
+      { key: "intended_areas", label: "Intended areas" },
+      { key: "mechanism", label: "Delivery approach" },
+      { key: "sessions_text", label: "Typical course" },
+      { key: "result_timing", label: "Results timing" },
+      { key: "downtime_text", label: "Downtime" },
+      { key: "longevity_text", label: "Longevity" },
+      { key: "pricing_basis", label: "Pricing basis" },
+      { key: "fda_status", label: "Regulatory status" },
+      { key: "most_likely_disappointment", label: "Major limitations" },
     ],
     sections: [
       {
@@ -162,7 +192,12 @@ export const TEMPLATES: Record<TemplateId, RowTemplate> = {
       {
         id: "mechanism",
         title: "How the skin is treated",
-        keys: ["mechanism", "what_it_changes", "what_it_does_not_change", "expected_result_magnitude"],
+        keys: [
+          "mechanism",
+          "what_it_changes",
+          "what_it_does_not_change",
+          "expected_result_magnitude",
+        ],
       },
       {
         id: "experience",
@@ -178,10 +213,18 @@ export const TEMPLATES: Record<TemplateId, RowTemplate> = {
     label: "Different categories",
     likeForLike: false,
     glance: [
-      { key: "category", label: "Category" },
-      { key: "primary_purpose", label: "Generally used for" },
-      { key: "result_timing", label: "Results appear" },
-      { key: "longevity_text", label: "Typically lasts" },
+      { key: "category", label: "Treatment category" },
+      { key: "what_it_changes", label: "What it targets" },
+      { key: "mechanism", label: "How it works" },
+      { key: "intended_areas", label: "Common treatment areas" },
+      { key: "adds_volume", label: "Whether it adds volume" },
+      { key: "result_timing", label: "Results timing" },
+      { key: "longevity_text", label: "Typical longevity" },
+      { key: "reversibility", label: "Reversibility" },
+      { key: "downtime_text", label: "Downtime" },
+      { key: "pricing_basis", label: "Pricing basis" },
+      { key: "major_risks", label: "Major risks" },
+      { key: "most_likely_disappointment", label: "Primary limitations" },
     ],
     sections: [
       {
@@ -201,7 +244,11 @@ export const TEMPLATES: Record<TemplateId, RowTemplate> = {
         title: "Sessions, downtime and recovery",
         keys: ["sessions_text", "appointment_time", "pain_level", "downtime_text", "swelling_text"],
       },
-      { id: "longevity", title: "Longevity and reversibility", keys: ["longevity_text", "reversibility"] },
+      {
+        id: "longevity",
+        title: "Longevity and reversibility",
+        keys: ["longevity_text", "reversibility"],
+      },
       RISK_SECTION,
       EVIDENCE_SECTION,
     ],
@@ -247,8 +294,7 @@ export function resolveTemplate(
 
   if (isFiller(a) && isFiller(b)) {
     const productish: EntityType[] = ["product"];
-    const bothProducts =
-      productish.includes(a.entity_type) && productish.includes(b.entity_type);
+    const bothProducts = productish.includes(a.entity_type) && productish.includes(b.entity_type);
     return bothProducts ? TEMPLATES.filler_products : TEMPLATES.filler_families;
   }
 

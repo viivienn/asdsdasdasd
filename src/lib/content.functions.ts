@@ -71,6 +71,25 @@ export const fetchCityPrices = createServerFn({ method: "GET" })
     return listCityPrices(data.city, data.treatment);
   });
 
+export const fetchRegionalPriceEstimate = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        postalCode: z.string().trim().min(3).max(12),
+        treatmentSlug: z
+          .string()
+          .trim()
+          .min(1)
+          .max(80)
+          .regex(/^[a-z0-9-]+$/),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { getRegionalPriceEstimate } = await import("./content.server");
+    return getRegionalPriceEstimate(data.postalCode, data.treatmentSlug);
+  });
+
 export const fetchComparisonPair = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) =>
     z

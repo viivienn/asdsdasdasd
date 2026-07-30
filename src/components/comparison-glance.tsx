@@ -1,6 +1,7 @@
 import { AlertCircle, CheckCircle2 } from "lucide-react";
-import { QUICK_COMPARISON_ROWS, type Treatment, type TreatmentMedia } from "@/lib/content-types";
+import type { Treatment, TreatmentMedia } from "@/lib/content-types";
 import { displayValue, nonEmptyComparisonRows } from "@/lib/comparison-model";
+import type { RowTemplate } from "@/lib/comparison-templates";
 import { TreatmentVisual } from "@/components/treatment-visual";
 
 export function ComparisonGlance({
@@ -8,17 +9,17 @@ export function ComparisonGlance({
   b,
   nameA,
   nameB,
-  oneLine,
   media,
+  template,
 }: {
   a: Treatment;
   b: Treatment;
   nameA: string;
   nameB: string;
-  oneLine: string;
   media: Record<string, TreatmentMedia>;
+  template: RowTemplate;
 }) {
-  const rows = nonEmptyComparisonRows(a, b, QUICK_COMPARISON_ROWS);
+  const rows = nonEmptyComparisonRows(a, b, template.glance);
 
   return (
     <>
@@ -27,16 +28,6 @@ export function ComparisonGlance({
           <TreatmentHeader treatment={a} name={nameA} media={media[a.id] ?? null} />
           <TreatmentHeader treatment={b} name={nameB} media={media[b.id] ?? null} />
         </div>
-      </section>
-
-      <section id="bottom-line" aria-labelledby="bottom-line-heading" className="mt-6 scroll-mt-24">
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
-          Bottom line
-        </p>
-        <h2 id="bottom-line-heading" className="sr-only">
-          Main difference
-        </h2>
-        <p className="mt-2 max-w-4xl text-base leading-7 sm:text-lg">{oneLine}</p>
       </section>
 
       {rows.length ? (
@@ -76,6 +67,11 @@ function TreatmentHeader({
         <p className="mt-1 truncate text-xs uppercase tracking-[0.1em] text-muted-foreground">
           {treatment.manufacturer || treatment.brand_name || treatment.category}
         </p>
+        {treatment.intended_areas.length ? (
+          <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
+            {displayValue(treatment, "intended_areas")}
+          </p>
+        ) : null}
       </div>
     </article>
   );
@@ -92,7 +88,7 @@ function QuickComparisonTable({
   b: Treatment;
   nameA: string;
   nameB: string;
-  rows: Array<(typeof QUICK_COMPARISON_ROWS)[number]>;
+  rows: Array<{ key: keyof Treatment; label: string }>;
 }) {
   return (
     <div className="mt-4 overflow-hidden rounded-2xl border border-rule bg-card">

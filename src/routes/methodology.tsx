@@ -5,17 +5,13 @@ import { absoluteUrl } from "@/lib/site";
 export const Route = createFileRoute("/methodology")({
   head: () => ({
     meta: [
-      { title: "Methodology — how Aesthetic Index sources and verifies" },
+      { title: "Methodology — how Aesthetic Index sources and compares" },
       {
         name: "description",
         content:
-          "How treatment information is sourced, how evidence grades work, how prices are collected and normalized, and how stale records are handled.",
+          "How treatment profiles support comparisons, how sources are shown, and how stored regional price estimates are researched and presented.",
       },
       { property: "og:title", content: "Methodology — Aesthetic Index" },
-      {
-        property: "og:description",
-        content: "How we source treatment information, collect prices, and handle stale records.",
-      },
       { property: "og:url", content: absoluteUrl("/methodology") },
       { property: "og:type", content: "article" },
     ],
@@ -31,65 +27,55 @@ function Methodology() {
       <Prose>
         <h2 className="mt-10 text-2xl">How treatment information is sourced</h2>
         <p>
-          Every factual row on a treatment or comparison page is meant to trace back to a recorded
-          source: manufacturer instructions for use, regulatory clearance documents, peer-reviewed
-          literature, or professional society guidance. Missing fields are omitted from the public
-          comparison rather than filled with plausible text.
+          Factual treatment fields are intended to trace back to recorded sources such as
+          manufacturer instructions for use, regulatory documents, peer-reviewed literature, or
+          professional society guidance. Missing fields are omitted rather than filled with
+          generated medical prose.
+        </p>
+
+        <h2 className="mt-10 text-2xl">How comparisons are assembled</h2>
+        <p>
+          Comparison pages read matching structured fields from two individual treatment profiles. A
+          separate editorial article is not required. Direct comparisons require compatible entity
+          types and a shared broad treatment family. Selected different-approach comparisons use an
+          explicit family rule and are labeled as treatments that are not direct substitutes.
         </p>
         <p>
-          Incomplete comparisons are excluded from normal navigation, search engines, and the
-          sitemap until the relevant records, distinction, sources, and review date are complete.
+          A page is only eligible for search indexing when both profiles are published, non-sample,
+          source-supported, and complete enough for the relevant comparison template. Other valid
+          long-tail comparisons may remain noindex while still being usable.
         </p>
 
         <h2 className="mt-10 text-2xl">How evidence grades work</h2>
         <p>
-          Evidence grades describe how strong the published evidence is for a claim, not how good a
-          treatment is. A grade is only shown once the underlying sources are attached to the claim.
-          We do not assign grades editorially in the absence of sources.
+          Evidence grades describe the recorded strength of evidence for a claim, not whether a
+          treatment is good or appropriate for an individual. A grade is shown only when stored in
+          the treatment profile.
         </p>
 
-        <h2 className="mt-10 text-2xl">How price data is collected</h2>
+        <h2 className="mt-10 text-2xl">How regional price estimates work</h2>
         <p>
-          Prices are collected by hand from pages a clinic publishes itself. Each observation stores
-          the amount, the unit, the URL, and the date it was seen. Observations are immutable: when
-          a price changes we add a new record rather than editing the old one, so the history stays
-          auditable.
+          A ZIP or postal code is normalized and matched to a stored surrounding market. The site
+          then reads a researched regional estimate from the database. No search engine, language
+          model, crawler, or external pricing service is called when a visitor submits a code.
         </p>
-
-        <h2 className="mt-10 text-2xl">How prices are normalized</h2>
         <p>
-          Clinics advertise differently — per unit, per area, per session, per package. Where an
-          advertised amount can be converted to a per-unit figure without assumption, we show the
-          effective per-unit price alongside the original. Where it cannot, we show only what was
-          advertised. Conditions such as “new clients only”, membership requirements, and minimum
-          purchases are recorded as separate fields, not buried in footnotes.
+          Each estimate keeps its currency, pricing unit, treatment area when applicable, estimated
+          average or median when available, estimated range, source count, methodology note, source
+          URLs, and research date. Incompatible units, currencies, treatment areas, and promotion
+          types are not combined.
         </p>
-
-        <h2 className="mt-10 text-2xl">What “publicly listed” means</h2>
         <p>
-          The clinic itself published the amount on a page anyone can visit. It is not a quote, not
-          a phone estimate, and not a number a third party reported to us.
-        </p>
-
-        <h2 className="mt-10 text-2xl">What “verified” means</h2>
-        <p>
-          A person re-opened the source URL, confirmed the amount still appears there, and recorded
-          the date. Anything short of that is shown as unverified.
-        </p>
-
-        <h2 className="mt-10 text-2xl">How stale records are handled</h2>
-        <p>
-          Every price carries the date it was observed, displayed on the row. Records whose source
-          page no longer shows the price are marked expired and excluded from any summary figure. We
-          would rather show fewer prices than confident, stale ones.
+          A regional estimate is not a quote and may not represent a provider located inside the
+          exact postal area. Actual pricing varies by provider, quantity, treatment area, product,
+          promotions, membership, and individual treatment needs.
         </p>
 
         <h2 className="mt-10 text-2xl">Why we do not diagnose or rank providers</h2>
         <p>
-          Whether a treatment suits you depends on your anatomy, history, and goals — none of which
-          a website can assess. We also do not rank clinics: ranking requires outcome data that is
-          not publicly available, and inventing a ranking would mislead. We compare treatments and
-          report prices. Your clinician decides the rest.
+          Whether a treatment suits someone depends on anatomy, history, and goals that a public
+          comparison cannot assess. Aesthetic Index presents factual differences and researched
+          pricing context; it does not select a treatment or provider for the reader.
         </p>
       </Prose>
     </>

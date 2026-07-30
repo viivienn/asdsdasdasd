@@ -175,15 +175,21 @@ export type Database = {
           consider_a_when: string | null;
           consider_b_when: string | null;
           created_at: string;
+          description_override: string | null;
           id: string;
+          is_featured: boolean;
+          is_indexable: boolean;
           is_sample: boolean;
           last_reviewed_at: string | null;
+          last_verified_at: string | null;
           neither_when: string | null;
           one_sentence_difference: string | null;
           pair_key: string | null;
           publication_status: Database["public"]["Enums"]["publication_status"];
           row_template: string | null;
           slug: string;
+          sort_rank: number;
+          title_override: string | null;
           treatment_a_id: string;
           treatment_b_id: string;
           updated_at: string;
@@ -194,15 +200,21 @@ export type Database = {
           consider_a_when?: string | null;
           consider_b_when?: string | null;
           created_at?: string;
+          description_override?: string | null;
           id?: string;
+          is_featured?: boolean;
+          is_indexable?: boolean;
           is_sample?: boolean;
           last_reviewed_at?: string | null;
+          last_verified_at?: string | null;
           neither_when?: string | null;
           one_sentence_difference?: string | null;
           pair_key?: string | null;
           publication_status?: Database["public"]["Enums"]["publication_status"];
           row_template?: string | null;
           slug: string;
+          sort_rank?: number;
+          title_override?: string | null;
           treatment_a_id: string;
           treatment_b_id: string;
           updated_at?: string;
@@ -213,15 +225,21 @@ export type Database = {
           consider_a_when?: string | null;
           consider_b_when?: string | null;
           created_at?: string;
+          description_override?: string | null;
           id?: string;
+          is_featured?: boolean;
+          is_indexable?: boolean;
           is_sample?: boolean;
           last_reviewed_at?: string | null;
+          last_verified_at?: string | null;
           neither_when?: string | null;
           one_sentence_difference?: string | null;
           pair_key?: string | null;
           publication_status?: Database["public"]["Enums"]["publication_status"];
           row_template?: string | null;
           slug?: string;
+          sort_rank?: number;
+          title_override?: string | null;
           treatment_a_id?: string;
           treatment_b_id?: string;
           updated_at?: string;
@@ -333,6 +351,7 @@ export type Database = {
           effective_unit_price: number | null;
           ends_at: string | null;
           id: string;
+          intended_areas: string[];
           is_sample: boolean;
           location_id: string;
           membership_required: boolean;
@@ -360,6 +379,7 @@ export type Database = {
           effective_unit_price?: number | null;
           ends_at?: string | null;
           id?: string;
+          intended_areas?: string[];
           is_sample?: boolean;
           location_id: string;
           membership_required?: boolean;
@@ -387,6 +407,7 @@ export type Database = {
           effective_unit_price?: number | null;
           ends_at?: string | null;
           id?: string;
+          intended_areas?: string[];
           is_sample?: boolean;
           location_id?: string;
           membership_required?: boolean;
@@ -940,7 +961,7 @@ export type Database = {
     };
     Enums: {
       app_role: "admin" | "editor";
-      comparison_mode: "direct" | "curated_cross_category";
+      comparison_mode: "direct" | "different_approach";
       publication_status: "draft" | "review" | "published";
       suggestion_status: "new" | "accepted" | "rejected";
       treatment_entity_type: "class" | "brand_family" | "product" | "device" | "procedure";
@@ -1068,7 +1089,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "editor"],
-      comparison_mode: ["direct", "curated_cross_category"],
+      comparison_mode: ["direct", "different_approach"],
       publication_status: ["draft", "review", "published"],
       suggestion_status: ["new", "accepted", "rejected"],
       treatment_entity_type: ["class", "brand_family", "product", "device", "procedure"],

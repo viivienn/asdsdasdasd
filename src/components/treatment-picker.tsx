@@ -1,13 +1,20 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Check, Plus, Search, X } from "lucide-react";
 import {
-  directCompatibleComparisons,
   ENTITY_LABEL,
-  type AvailableComparison,
+  type ComparisonFamilyRule,
   type TreatmentPickerRecord,
 } from "@/lib/content-types";
-import { addPickerSelection, nextPickerIndex } from "@/lib/comparison-model";
+import {
+  addPickerSelection,
+  comparisonSlugForPair,
+  displayValue,
+  hasMinimumComparisonProfile,
+  listCompatibleTreatmentOptions,
+  nextPickerIndex,
+  resolvePairCompatibility,
+} from "@/lib/comparison-model";
 import {
   Dialog,
   DialogContent,
@@ -20,10 +27,10 @@ import { TreatmentVisual } from "@/components/treatment-visual";
 
 export function TreatmentPicker({
   treatments,
-  comparisons,
+  familyRules,
 }: {
   treatments: TreatmentPickerRecord[];
-  comparisons: AvailableComparison[];
+  familyRules: ComparisonFamilyRule[];
 }) {
   const [selected, setSelected] = useState<TreatmentPickerRecord[]>([]);
   const [query, setQuery] = useState("");
@@ -32,40 +39,39 @@ export function TreatmentPicker({
   const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const navigate = useNavigate();
 
-  const eligibleFirstSlugs = useMemo(() => {
-    const slugs = new Set<string>();
-    for (const comparison of comparisons) {
-      if (comparison.comparison_mode !== "direct") continue;
-      slugs.add(comparison.treatment_a_slug);
-      slugs.add(comparison.treatment_b_slug);
-    }
-    return slugs;
-  }, [comparisons]);
-
-  const compatiblePairs = useMemo(
+  const compatibleOptions = useMemo(
     () =>
       selected.length === 1
-        ? directCompatibleComparisons(selected[0].slug, treatments, comparisons)
+        ? listCompatibleTreatmentOptions(selected[0], treatments, familyRules)
         : [],
-    [comparisons, selected, treatments],
-  );
-  const comparisonSlugByTreatment = useMemo(
-    () => new Map(compatiblePairs.map((pair) => [pair.treatmentSlug, pair.comparisonSlug])),
-    [compatiblePairs],
+    [familyRules, selected, treatments],
   );
 
   const options = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-    const compatibleSlugs =
+    const candidates =
       selected.length === 1
-        ? new Set(compatiblePairs.map((pair) => pair.treatmentSlug))
-        : eligibleFirstSlugs;
+        ? compatibleOptions
+        : treatments
+            .filter(
+              (treatment) =>
+                hasMinimumComparisonProfile(treatment) &&
+                listCompatibleTreatmentOptions(treatment, treatments, familyRules).length > 0,
+            )
+            .map((treatment) => ({
+              treatment,
+              section: "closest" as const,
+              compatibility: {
+                mode: "direct" as const,
+                templateKey: "",
+                publicLabel: "",
+              },
+            }));
 
-    return treatments
-      .filter((treatment) => !selected.some((item) => item.id === treatment.id))
-      .filter((treatment) => compatibleSlugs.has(treatment.slug))
+    return candidates
+      .filter(({ treatment }) => !selected.some((item) => item.id === treatment.id))
       .filter(
-        (treatment) =>
+        ({ treatment }) =>
           !normalizedQuery ||
           [
             treatment.name,
@@ -76,12 +82,15 @@ export function TreatmentPicker({
           ]
             .filter(Boolean)
             .some((value) => value!.toLowerCase().includes(normalizedQuery)),
-      )
-      .sort((a, b) => a.sort_rank - b.sort_rank || a.name.localeCompare(b.name));
-  }, [compatiblePairs, eligibleFirstSlugs, query, selected, treatments]);
+      );
+  }, [compatibleOptions, familyRules, query, selected, treatments]);
 
+  const selectedCompatibility =
+    selected.length === 2 ? resolvePairCompatibility(selected[0], selected[1], familyRules) : null;
   const comparisonSlug =
-    selected.length === 2 ? comparisonSlugByTreatment.get(selected[1].slug) : undefined;
+    selected.length === 2 && selectedCompatibility
+      ? comparisonSlugForPair(selected[0], selected[1], selectedCompatibility)
+      : undefined;
 
   useEffect(() => {
     setActiveIndex(options.length ? 0 : -1);
@@ -146,7 +155,7 @@ export function TreatmentPicker({
             {selected.length === 0
               ? "Choose a treatment"
               : selected.length === 1
-                ? "Add a similar treatment"
+                ? "Add a treatment to compare"
                 : "Change comparison"}
           </button>
         </DialogTrigger>
@@ -157,9 +166,9 @@ export function TreatmentPicker({
             </DialogTitle>
             <DialogDescription aria-live="polite">
               {selected.length === 0
-                ? "Start with any treatment that has a completed direct comparison."
+                ? "Start with a published treatment profile."
                 : selected.length === 1
-                  ? `Only completed, like-for-like comparisons with ${selected[0].name} are shown.`
+                  ? `Closest matches, other family options, and supported beginner comparisons with ${selected[0].name}.`
                   : "Two treatments selected."}
             </DialogDescription>
           </DialogHeader>
@@ -200,38 +209,55 @@ export function TreatmentPicker({
             onKeyDown={onOptionsKeyDown}
           >
             {selected.length < 2
-              ? options.map((treatment, index) => (
-                  <li
-                    key={treatment.id}
-                    className="flex items-center gap-3 border-b border-rule py-3 last:border-0"
-                  >
-                    <TreatmentVisual name={treatment.name} media={treatment.media} />
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium">{treatment.name}</p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {treatment.manufacturer || treatment.brand_name || treatment.category}
-                      </p>
-                      <p className="mt-0.5 text-xs">{ENTITY_LABEL[treatment.entity_type]}</p>
-                    </div>
-                    <button
-                      ref={(node) => {
-                        optionRefs.current[index] = node;
-                      }}
-                      type="button"
-                      role="option"
-                      aria-selected={activeIndex === index}
-                      onFocus={() => setActiveIndex(index)}
-                      onClick={() => add(treatment)}
-                      className="min-h-11 rounded-full border border-primary px-4 text-xs font-medium text-primary hover:bg-primary hover:text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                    >
-                      Add
-                    </button>
-                  </li>
+              ? options.map(({ treatment, section }, index) => (
+                  <Fragment key={treatment.id}>
+                    {selected.length === 1 &&
+                    (index === 0 || options[index - 1]?.section !== section) ? (
+                      <li
+                        role="presentation"
+                        className="sticky top-0 z-10 -mx-1 bg-background/95 px-1 pb-1 pt-4 text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground backdrop-blur"
+                      >
+                        {section === "closest"
+                          ? "Closest matches"
+                          : section === "family"
+                            ? "Other options in this family"
+                            : "Beginner comparisons"}
+                      </li>
+                    ) : null}
+                    <li className="flex items-center gap-3 border-b border-rule py-3 last:border-0">
+                      <TreatmentVisual name={treatment.name} media={treatment.media} />
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium">{treatment.name}</p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {treatment.manufacturer || treatment.brand_name || treatment.category}
+                        </p>
+                        <p className="mt-0.5 text-xs">{ENTITY_LABEL[treatment.entity_type]}</p>
+                        {treatment.intended_areas.length ? (
+                          <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
+                            {displayValue(treatment, "intended_areas")}
+                          </p>
+                        ) : null}
+                      </div>
+                      <button
+                        ref={(node) => {
+                          optionRefs.current[index] = node;
+                        }}
+                        type="button"
+                        role="option"
+                        aria-selected={activeIndex === index}
+                        onFocus={() => setActiveIndex(index)}
+                        onClick={() => add(treatment)}
+                        className="min-h-11 rounded-full border border-primary px-4 text-xs font-medium text-primary hover:bg-primary hover:text-primary-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                      >
+                        Add
+                      </button>
+                    </li>
+                  </Fragment>
                 ))
               : null}
             {selected.length < 2 && options.length === 0 ? (
               <li className="py-10 text-center text-sm text-muted-foreground">
-                No completed direct comparisons match this search.
+                No compatible published treatments match this search.
               </li>
             ) : null}
           </ul>

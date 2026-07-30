@@ -1,10 +1,10 @@
-import type { Comparison, Treatment, TreatmentSource } from "@/lib/content-types";
+import type { Treatment, TreatmentSource } from "@/lib/content-types";
 import { comparisonRowLabel, sourcePublisher } from "@/lib/content-types";
 import type { RowTemplate } from "@/lib/comparison-templates";
+import { displayValue } from "@/lib/comparison-model";
 
 function value(t: Treatment | null | undefined, key: keyof Treatment) {
-  const result = t?.[key];
-  return typeof result === "string" && result.trim() ? result.trim() : null;
+  return displayValue(t, key);
 }
 
 function RowSources({
@@ -50,7 +50,6 @@ export function ComparisonDetails({
   template,
   sources,
   label,
-  comparison,
 }: {
   a: Treatment | null;
   b: Treatment | null;
@@ -59,7 +58,6 @@ export function ComparisonDetails({
   template: RowTemplate;
   sources: TreatmentSource[];
   label: string;
-  comparison?: Comparison | null;
 }) {
   const sections = template.sections
     .map((section) => ({
@@ -67,14 +65,7 @@ export function ComparisonDetails({
       keys: section.keys.filter((key) => value(a, key) || value(b, key)),
     }))
     .filter((section) => section.keys.length > 0);
-  const hasChoiceContext = Boolean(
-    comparison?.consider_a_when ||
-    comparison?.consider_b_when ||
-    comparison?.neither_when ||
-    comparison?.common_misconception,
-  );
-
-  if (sections.length === 0 && !hasChoiceContext) return null;
+  if (sections.length === 0) return null;
 
   return (
     <section className="mt-10">
@@ -84,51 +75,6 @@ export function ComparisonDetails({
       </p>
 
       <div className="mt-4 divide-y divide-rule border-y border-rule">
-        {hasChoiceContext ? (
-          <details className="group">
-            <summary className="cursor-pointer list-none py-3 text-base font-medium marker:hidden">
-              <span className="inline-flex w-full items-center justify-between gap-3">
-                How to think about the choice
-                <DisclosureLabel />
-              </span>
-            </summary>
-            <dl className="grid gap-4 pb-5 text-sm sm:grid-cols-2">
-              {comparison?.consider_a_when ? (
-                <div>
-                  <dt className="font-medium">{nameA} may be considered when</dt>
-                  <dd className="mt-1 leading-6 text-muted-foreground">
-                    {comparison.consider_a_when}
-                  </dd>
-                </div>
-              ) : null}
-              {comparison?.consider_b_when ? (
-                <div>
-                  <dt className="font-medium">{nameB} may be considered when</dt>
-                  <dd className="mt-1 leading-6 text-muted-foreground">
-                    {comparison.consider_b_when}
-                  </dd>
-                </div>
-              ) : null}
-              {comparison?.neither_when ? (
-                <div>
-                  <dt className="font-medium">Neither may be a direct fit when</dt>
-                  <dd className="mt-1 leading-6 text-muted-foreground">
-                    {comparison.neither_when}
-                  </dd>
-                </div>
-              ) : null}
-              {comparison?.common_misconception ? (
-                <div>
-                  <dt className="font-medium">Common misconception</dt>
-                  <dd className="mt-1 leading-6 text-muted-foreground">
-                    {comparison.common_misconception}
-                  </dd>
-                </div>
-              ) : null}
-            </dl>
-          </details>
-        ) : null}
-
         {sections.map((section) => (
           <details key={section.id} id={section.id} className="group scroll-mt-24">
             <summary className="cursor-pointer list-none py-3 text-base font-medium marker:hidden">

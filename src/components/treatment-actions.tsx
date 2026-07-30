@@ -1,11 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { ChevronRight, Lock, X } from "lucide-react";
-import {
-  directCompatibleComparisons,
-  type AvailableComparison,
-  type TreatmentPickerRecord,
-} from "@/lib/content-types";
+import { type ComparisonFamilyRule, type TreatmentPickerRecord } from "@/lib/content-types";
+import { comparisonSlugForPair, listCompatibleTreatmentOptions } from "@/lib/comparison-model";
 import { trackEvent } from "@/lib/analytics";
 
 /** Pick a second treatment and jump to the canonical comparison URL. */
@@ -13,20 +10,23 @@ export function CompareWith({
   slug,
   name,
   treatments,
-  comparisons,
+  familyRules,
 }: {
   slug: string;
   name: string;
   treatments: TreatmentPickerRecord[];
-  comparisons: AvailableComparison[];
+  familyRules: ComparisonFamilyRule[];
 }) {
   const [other, setOther] = useState("");
   const navigate = useNavigate();
-  const treatmentBySlug = new Map(treatments.map((treatment) => [treatment.slug, treatment]));
-  const options = directCompatibleComparisons(slug, treatments, comparisons).flatMap((pair) => {
-    const treatment = treatmentBySlug.get(pair.treatmentSlug);
-    return treatment ? [{ ...pair, name: treatment.name }] : [];
-  });
+  const selected = treatments.find((treatment) => treatment.slug === slug);
+  const options = selected
+    ? listCompatibleTreatmentOptions(selected, treatments, familyRules).map((option) => ({
+        treatmentSlug: option.treatment.slug,
+        name: option.treatment.name,
+        comparisonSlug: comparisonSlugForPair(selected, option.treatment, option.compatibility),
+      }))
+    : [];
   const comparisonSlug = options.find((option) => option.treatmentSlug === other)?.comparisonSlug;
 
   if (!options.length) return null;

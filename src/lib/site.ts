@@ -9,9 +9,9 @@ export const SITE = {
   url: SITE_URL,
   logo: `${SITE_URL}/favicon.ico`,
   description:
-    "Independent consumer platform for comparing cosmetic treatments and publicly listed local prices.",
+    "Source-backed cosmetic treatment comparisons with researched regional price estimates.",
   foundingPurpose:
-    "To make cosmetic treatment differences and publicly advertised prices comparable without sponsorship.",
+    "To make cosmetic treatment differences and typical regional pricing easier to compare.",
   editorialPolicy: `${SITE_URL}/about`,
   pricingMethodology: `${SITE_URL}/methodology`,
   medicalDisclaimer: `${SITE_URL}/medical-disclaimer`,

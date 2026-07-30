@@ -12,8 +12,8 @@ import { resolveTemplate } from "@/lib/comparison-templates";
 import { SITE_URL, absoluteUrl, breadcrumbJsonLd, organizationJsonLd } from "@/lib/site";
 import { ComparisonGlance } from "@/components/comparison-glance";
 import { ComparisonDetails } from "@/components/comparison-details";
-import { CoverageRequestForm } from "@/components/demand-forms";
 import { ComparisonDisclaimer } from "@/components/disclaimers";
+import { RegionalPriceLookup } from "@/components/regional-price-lookup";
 
 export const Route = createFileRoute("/compare/$slug")({
   loader: async ({ params }) => {
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/compare/$slug")({
     if (!pair || pair[0] === pair[1]) throw notFound();
 
     const result = await fetchComparisonPair({ data: { a: pair[0], b: pair[1] } });
-    if (!result.a || !result.b || !result.comparison || !result.reviewed) throw notFound();
+    if (!result.a || !result.b || !result.compatibility || !result.valid) throw notFound();
     if (result.canonicalSlug !== params.slug) {
       throw redirect({
         to: "/compare/$slug",
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/compare/$slug")({
     return result;
   },
   head: ({ params, loaderData }) => {
-    if (!loaderData?.a || !loaderData?.b || !loaderData.comparison) {
+    if (!loaderData?.a || !loaderData?.b || !loaderData.compatibility) {
       return {
         meta: [
           { title: "Comparison unavailable | Aesthetic Index" },
@@ -43,16 +43,28 @@ export const Route = createFileRoute("/compare/$slug")({
 
     const nameA = loaderData.a.name;
     const nameB = loaderData.b.name;
-    const title = `${nameA} vs. ${nameB}: Results, Risks, Downtime & Cost | Aesthetic Index`;
-    const description = `Compare ${nameA} and ${nameB} by purpose, results, downtime, risks, reversibility, longevity, and pricing basis.`;
+    const title =
+      loaderData.comparison?.title_override ??
+      `${nameA} vs. ${nameB}: Differences, Results, Risks & Cost | Aesthetic Index`;
+    const description =
+      loaderData.comparison?.description_override ??
+      `Compare ${nameA} and ${nameB} side by side, including intended uses, results, longevity, downtime, reversibility, risks, regulatory information, and typical pricing.`;
     const url = absoluteUrl(`/compare/${params.slug}`);
-    const reviewedAt = loaderData.comparison.last_reviewed_at ?? undefined;
+    const reviewedAt =
+      loaderData.comparison?.last_verified_at ??
+      loaderData.comparison?.last_reviewed_at ??
+      undefined;
 
     return {
       meta: [
         { title },
         { name: "description", content: description },
-        { name: "robots", content: "index, follow, max-image-preview:large" },
+        {
+          name: "robots",
+          content: loaderData.indexable
+            ? "index, follow, max-image-preview:large"
+            : "noindex, follow",
+        },
         { property: "og:title", content: `${nameA} vs. ${nameB}` },
         { property: "og:description", content: description },
         { property: "og:url", content: url },
@@ -109,7 +121,7 @@ function NotFoundComparison() {
     <div>
       <h1 className="font-display text-3xl">This comparison is not currently available.</h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">
-        Only completed, source-supported comparisons appear publicly.
+        Choose another pair from the compatible treatments in the comparison picker.
       </p>
       <ul className="mt-4 flex flex-wrap gap-4 text-sm">
         <li>
@@ -137,9 +149,13 @@ function ComparisonPage() {
   const { slug } = Route.useParams();
   const a = data.a as Treatment;
   const b = data.b as Treatment;
-  const comparison = data.comparison!;
+  const comparison = data.comparison;
   const label = `${a.name} vs. ${b.name}`;
-  const template = resolveTemplate(a, b, comparison.row_template);
+  const template = resolveTemplate(
+    a,
+    b,
+    comparison?.row_template ?? data.compatibility?.templateKey,
+  );
   const sources = data.sources as TreatmentSource[];
 
   return (
@@ -149,12 +165,14 @@ function ComparisonPage() {
       <header className="mt-4 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-display text-4xl">{label}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Last reviewed{" "}
-            {comparison.last_reviewed_at
-              ? new Date(comparison.last_reviewed_at).toLocaleDateString()
-              : ""}
-          </p>
+          {comparison?.last_verified_at || comparison?.last_reviewed_at ? (
+            <p className="mt-2 text-sm text-muted-foreground">
+              Last verified{" "}
+              {new Date(
+                comparison.last_verified_at ?? comparison.last_reviewed_at!,
+              ).toLocaleDateString()}
+            </p>
+          ) : null}
         </div>
         <Link
           to="/compare"
@@ -164,13 +182,19 @@ function ComparisonPage() {
         </Link>
       </header>
 
+      {data.compatibility?.mode === "different_approach" ? (
+        <p className="mt-6 rounded-xl border border-rule bg-secondary px-4 py-3 text-sm">
+          These treatments work differently and are not direct substitutes.
+        </p>
+      ) : null}
+
       <ComparisonGlance
         a={a}
         b={b}
         nameA={a.name}
         nameB={b.name}
-        oneLine={comparison.one_sentence_difference ?? ""}
         media={data.media ?? {}}
+        template={template}
       />
 
       <ComparisonDetails
@@ -181,23 +205,35 @@ function ComparisonPage() {
         template={template}
         sources={sources}
         label={label}
-        comparison={comparison}
       />
 
-      <section id="sources" className="mt-12 scroll-mt-24">
-        <h2 className="text-2xl">Sources</h2>
-        <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
+      <details id="sources" className="group mt-12 scroll-mt-24 border-y border-rule">
+        <summary className="cursor-pointer list-none py-4 text-xl font-medium marker:hidden">
+          <span className="flex items-center justify-between gap-3">
+            Sources
+            <span className="text-sm text-muted-foreground">
+              <span className="group-open:hidden">Show</span>
+              <span className="hidden group-open:inline">Hide</span>
+            </span>
+          </span>
+        </summary>
+        <p className="max-w-3xl text-sm text-muted-foreground">
           Sources are grouped by treatment so the support for each record stays visible.
         </p>
         <SourcesByTreatment sources={sources} a={a} b={b} />
+      </details>
+
+      <section id="local-prices" className="mt-12 scroll-mt-24">
+        <RegionalPriceLookup
+          treatments={[
+            { id: a.id, slug: a.slug, name: a.name },
+            { id: b.id, slug: b.slug, name: b.name },
+          ]}
+        />
       </section>
 
       <section id="medical-disclaimer" className="scroll-mt-24">
         <ComparisonDisclaimer />
-      </section>
-
-      <section id="local-prices" className="mt-12 scroll-mt-24">
-        <CoverageRequestForm treatmentSlug={a.slug} />
       </section>
 
       <RelatedComparisons currentSlug={slug} reviewedSlugs={data.reviewedSlugs ?? []} />

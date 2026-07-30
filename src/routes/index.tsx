@@ -2,26 +2,24 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { fetchCompareIndex } from "@/lib/content.functions";
 import { TreatmentPicker } from "@/components/treatment-picker";
 import { Prose, SectionHeading } from "@/components/editorial";
-import { CoverageRequestForm } from "@/components/demand-forms";
-import { SiteSearch } from "@/components/site-search";
-import { buildSearchIndex } from "@/lib/search-index";
+import { RegionalPriceLookup } from "@/components/regional-price-lookup";
 import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/")({
   loader: () => fetchCompareIndex(),
   head: () => ({
     meta: [
-      { title: "Aesthetic Index — Compare cosmetic treatments before you book" },
+      { title: "Aesthetic Index — Compare treatments and typical local costs" },
       {
         name: "description",
         content:
-          "Compare cosmetic treatments on results, downtime, risks, reversibility, and publicly listed local prices in one clear place.",
+          "Compare cosmetic treatments side by side and see researched regional price estimates by ZIP or postal code.",
       },
-      { property: "og:title", content: "Compare cosmetic treatments before you book" },
+      { property: "og:title", content: "Compare treatments and typical local costs" },
       {
         property: "og:description",
         content:
-          "Results, downtime, risks, reversibility, and publicly listed local prices—in one clear place.",
+          "Results, downtime, risks, sources, and researched regional price estimates in one clear place.",
       },
       { property: "og:url", content: absoluteUrl("/") },
       { property: "og:type", content: "website" },
@@ -33,33 +31,30 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { treatments, comparisons, popularComparisons } = Route.useLoaderData();
-  const searchIndex = buildSearchIndex(treatments, comparisons, popularComparisons);
+  const { treatments, popularComparisons, familyRules } = Route.useLoaderData();
 
   return (
     <>
-      <section className="-mt-4 px-2 py-14 text-center sm:py-24">
-        <h1 className="mx-auto max-w-3xl font-display text-4xl leading-[1.05] tracking-tight sm:text-6xl">
-          Find the treatment that fits
+      <section className="-mt-10 px-2 py-4 text-center sm:-mt-14 sm:py-6">
+        <h1 className="mx-auto max-w-3xl font-display text-3xl leading-[1.05] tracking-tight sm:text-4xl lg:text-5xl">
+          Compare treatments and see what they typically cost near you.
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
-          Search cosmetic treatments, brands, devices, and completed comparisons.
+          Understand differences in results, downtime, risks, and typical regional pricing.
         </p>
-        <div className="mx-auto mt-8 max-w-xl">
-          <SiteSearch index={searchIndex} variant="hero" />
-        </div>
         <p className="mt-4 text-xs uppercase tracking-[0.14em] text-muted-foreground">
-          Independent · no sponsorships · publicly listed prices
+          Source-backed comparisons · Sources shown
         </p>
       </section>
 
       <section className="mt-4">
         <SectionHeading>Compare treatments</SectionHeading>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Start with one item. We will show only completed comparisons in the same comparison group.
+          Start with one item. We will show close matches, options in the same family, and selected
+          beginner comparisons.
         </p>
         <div className="mt-5 card-soft p-4 sm:p-5">
-          <TreatmentPicker treatments={treatments} comparisons={comparisons} />
+          <TreatmentPicker treatments={treatments} familyRules={familyRules} />
         </div>
       </section>
 
@@ -116,8 +111,8 @@ function Home() {
             first, with deeper details available only when you want them.
           </p>
           <p>
-            For pricing, we publish only amounts tied to a public clinic source and the date
-            observed. We do not estimate prices we cannot show you.
+            Regional estimates use stored, researched market data with the pricing basis, source
+            count, and research date shown.
           </p>
           <p>
             We do not diagnose, recommend treatments, or rank providers.{" "}
@@ -130,21 +125,13 @@ function Home() {
       </section>
 
       <section className="mt-14">
-        <SectionHeading>Local pricing coverage</SectionHeading>
-        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-          Coverage starts in San Francisco and expands by demand.{" "}
-          <Link
-            to="/prices/us/ca/$city/$treatment"
-            params={{ city: "san-francisco", treatment: "botox" }}
-            className="underline underline-offset-4 hover:text-primary"
-          >
-            See San Francisco Botox prices
-          </Link>
-          .
-        </p>
-        <div className="mt-5">
-          <CoverageRequestForm />
-        </div>
+        <RegionalPriceLookup
+          treatments={treatments.map((treatment) => ({
+            id: treatment.id,
+            slug: treatment.slug,
+            name: treatment.name,
+          }))}
+        />
       </section>
     </>
   );

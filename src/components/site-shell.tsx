@@ -6,6 +6,7 @@ import { SiteSearch } from "@/components/site-search";
 import { trackAnswerEngineReferral } from "@/lib/analytics";
 import type { PopularComparison } from "@/lib/content-types";
 import type { SearchIndex } from "@/lib/search-index";
+import { FEATURES } from "@/lib/features";
 
 type NavLink = {
   to: string;
@@ -24,7 +25,7 @@ const EXPLORE: NavLink[] = [
     label: "Local prices",
     detail: "Publicly listed clinic prices",
   },
-];
+].filter((item) => FEATURES.clinicPriceDirectory || item.to !== "/prices/us/ca/$city/$treatment");
 
 const TOOLS: NavLink[] = [
   { to: "/compare", label: "Compare any two", detail: "Build a comparison yourself" },
@@ -229,6 +230,11 @@ export function SiteShell({
             <li>
               <Link to="/about" className="hover:text-foreground">
                 About
+              </Link>
+            </li>
+            <li>
+              <Link to="/advertising-disclosure" className="hover:text-foreground">
+                Advertising disclosure
               </Link>
             </li>
             <li>

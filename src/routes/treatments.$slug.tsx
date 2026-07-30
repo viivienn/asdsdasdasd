@@ -7,7 +7,7 @@ import {
   type TreatmentSource,
 } from "@/lib/content-types";
 import { EvidenceState } from "@/components/editorial";
-import { CoverageRequestForm } from "@/components/demand-forms";
+import { RegionalPriceLookup } from "@/components/regional-price-lookup";
 import { TreatmentDisclaimer } from "@/components/disclaimers";
 import { CompareWith, MatchGate } from "@/components/treatment-actions";
 import { TreatmentVisual } from "@/components/treatment-visual";
@@ -119,7 +119,7 @@ function TreatmentPage() {
             slug={slug}
             name={treatment.name}
             treatments={experience.treatments}
-            comparisons={experience.comparisons}
+            familyRules={experience.familyRules}
           />
         </div>
       ) : null}
@@ -200,7 +200,9 @@ function TreatmentPage() {
       ) : null}
 
       <section className="mt-12">
-        <CoverageRequestForm treatmentSlug={slug} />
+        <RegionalPriceLookup
+          treatments={[{ id: treatment.id, slug: treatment.slug, name: treatment.name }]}
+        />
       </section>
 
       <TreatmentDisclaimer />

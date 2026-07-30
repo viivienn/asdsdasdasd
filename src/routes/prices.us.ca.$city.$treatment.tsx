@@ -10,20 +10,28 @@ import { FeaturePreview } from "@/components/editorial";
 import { PricingDisclaimer } from "@/components/disclaimers";
 import type { PriceObservation } from "@/lib/content-types";
 import { SITE, SITE_URL, absoluteUrl, breadcrumbJsonLd, organizationJsonLd } from "@/lib/site";
+import { FEATURES } from "@/lib/features";
 
 const CITY_LABELS: Record<string, string> = { "san-francisco": "San Francisco" };
 const TREATMENT_LABELS: Record<string, string> = { botox: "Botox" };
 
 export const Route = createFileRoute("/prices/us/ca/$city/$treatment")({
   loader: ({ params }) =>
-    fetchCityPrices({ data: { city: params.city, treatment: params.treatment } }),
+    FEATURES.clinicPriceDirectory
+      ? fetchCityPrices({ data: { city: params.city, treatment: params.treatment } })
+      : Promise.resolve({
+          observations: [],
+          cityKnown: false,
+          clinicsChecked: 0,
+          clinicsWithPublicPrices: 0,
+        }),
   head: ({ params, loaderData }) => {
     const city = CITY_LABELS[params.city] ?? params.city;
     const treatment = TREATMENT_LABELS[params.treatment] ?? params.treatment;
     const title = `${city} ${treatment} prices — publicly listed | Aesthetic Index`;
     const description = `Publicly advertised ${treatment} prices in ${city}, each with a source link and the date observed. No estimates.`;
     // Pricing pages stay noindex until manually verified records exist.
-    const verified = (loaderData?.observations.length ?? 0) > 0;
+    const verified = FEATURES.clinicPriceDirectory && (loaderData?.observations.length ?? 0) > 0;
     const url = absoluteUrl(`/prices/us/ca/${params.city}/${params.treatment}`);
     const dates = (loaderData?.observations ?? []).map((o) => o.observed_at).sort();
     return {
@@ -83,6 +91,23 @@ function PricingPage() {
   const { city, treatment } = Route.useParams();
   const { observations, cityKnown, clinicsChecked, clinicsWithPublicPrices } =
     Route.useLoaderData();
+
+  if (!FEATURES.clinicPriceDirectory) {
+    return (
+      <>
+        <h1 className="font-display text-4xl">Clinic price directory unavailable</h1>
+        <p className="mt-3 max-w-2xl text-muted-foreground">
+          Aesthetic Index currently publishes researched regional estimates rather than
+          clinic-specific price listings.
+        </p>
+        <p className="mt-6">
+          <Link to="/" className="underline underline-offset-4">
+            Check a regional estimate
+          </Link>
+        </p>
+      </>
+    );
+  }
   const cityLabel = CITY_LABELS[city] ?? city;
   const treatmentLabel = TREATMENT_LABELS[treatment] ?? treatment;
   const rows = observations as PriceObservation[];

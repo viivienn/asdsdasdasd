@@ -17,9 +17,24 @@ import type {
   MarketCode,
   AvailableComparison,
   ComparisonExperience,
+  ComparisonFamilyRule,
+  RegionalPriceEstimate,
+  RegionalPriceResult,
 } from "./content-types";
 import { canonicalPairSlug } from "./content-types";
-import { isReviewedComparison } from "./comparison-model";
+import {
+  comparisonSlugForPair,
+  hasMinimumComparisonProfile,
+  isIndexableComparison,
+  resolveComparisonRouteSlug,
+  resolvePairCompatibility,
+} from "./comparison-model";
+import {
+  normalizePostalCode,
+  resolvePostalRegion,
+  selectRegionalEstimate,
+  type PostalRegionRow,
+} from "./regional-pricing";
 
 function publicClient() {
   const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
@@ -34,9 +49,10 @@ async function prototypeClient() {
 }
 
 const TREATMENT_COLUMNS =
-  "id,name,slug,category,treatment_class,brand_name,generic_name,manufacturer,entity_type,parent_id,sort_rank,at_a_glance,summary,primary_purpose,mechanism,adds_volume,tightening_level,result_timing,sessions_text,downtime_text,longevity_text,pain_level,reversibility,major_risks,most_likely_disappointment,marketing_misconception,provider_variables,skin_tone_notes,appointment_time,swelling_text,bruising_text,exercise_restrictions,what_it_changes,what_it_does_not_change,expected_result_magnitude,true_substitute_notes,when_not_appropriate,pricing_basis,fda_status,evidence_grade,last_reviewed_at,publication_status,is_sample";
+  "id,name,slug,category,treatment_class,brand_name,generic_name,manufacturer,intended_areas,entity_type,parent_id,sort_rank,at_a_glance,summary,primary_purpose,mechanism,adds_volume,tightening_level,result_timing,sessions_text,downtime_text,longevity_text,pain_level,reversibility,major_risks,most_likely_disappointment,marketing_misconception,provider_variables,skin_tone_notes,appointment_time,swelling_text,bruising_text,exercise_restrictions,what_it_changes,what_it_does_not_change,expected_result_magnitude,true_substitute_notes,when_not_appropriate,pricing_basis,fda_status,evidence_grade,last_reviewed_at,publication_status,is_sample";
 
-const LEGACY_TREATMENT_COLUMNS = TREATMENT_COLUMNS.replace(",pricing_basis", "");
+const PRE_AREAS_TREATMENT_COLUMNS = TREATMENT_COLUMNS.replace(",intended_areas", "");
+const LEGACY_TREATMENT_COLUMNS = PRE_AREAS_TREATMENT_COLUMNS.replace(",pricing_basis", "");
 
 async function loadTreatmentRows(
   client: ReturnType<typeof publicClient>,
@@ -53,9 +69,11 @@ async function loadTreatmentRows(
     return query;
   };
   let result = await run(TREATMENT_COLUMNS);
+  if (result.error) result = await run(PRE_AREAS_TREATMENT_COLUMNS);
   if (result.error) result = await run(LEGACY_TREATMENT_COLUMNS);
   return scrubTreatments(result.data ?? []).map((treatment) => ({
     ...treatment,
+    intended_areas: treatment.intended_areas ?? [],
     pricing_basis: treatment.pricing_basis ?? null,
   }));
 }
@@ -165,9 +183,12 @@ export async function getTreatmentBySlug(
 }
 
 const COMPARISON_COLUMNS =
-  "id,slug,treatment_a_id,treatment_b_id,one_sentence_difference,consider_a_when,consider_b_when,neither_when,common_misconception,row_template,comparison_mode,publication_status,is_sample,last_reviewed_at";
+  "id,slug,treatment_a_id,treatment_b_id,one_sentence_difference,consider_a_when,consider_b_when,neither_when,common_misconception,row_template,comparison_mode,title_override,description_override,is_featured,is_indexable,sort_rank,last_verified_at,publication_status,is_sample,last_reviewed_at";
 
 const LEGACY_COMPARISON_COLUMNS =
+  "id,slug,treatment_a_id,treatment_b_id,one_sentence_difference,consider_a_when,consider_b_when,neither_when,common_misconception,row_template,comparison_mode,publication_status,is_sample,last_reviewed_at";
+
+const PRE_MODE_COMPARISON_COLUMNS =
   "id,slug,treatment_a_id,treatment_b_id,one_sentence_difference,consider_a_when,consider_b_when,neither_when,common_misconception,row_template,publication_status,is_sample,last_reviewed_at";
 
 async function loadComparisonRows(client: ReturnType<typeof publicClient>): Promise<Comparison[]> {
@@ -179,11 +200,38 @@ async function loadComparisonRows(client: ReturnType<typeof publicClient>): Prom
 
   // Allows the app to stay readable while Lovable applies this branch's
   // migration. Market-aware compatibility remains disabled until then.
-  const legacy = await schema.from("comparisons").select(LEGACY_COMPARISON_COLUMNS);
-  return ((legacy.data ?? []) as Array<Omit<Comparison, "comparison_mode">>).map((row) => ({
+  let legacy = await schema.from("comparisons").select(LEGACY_COMPARISON_COLUMNS);
+  if (legacy.error) legacy = await schema.from("comparisons").select(PRE_MODE_COMPARISON_COLUMNS);
+  return (legacy.data ?? []).map((row: Partial<Comparison>) => ({
     ...row,
-    comparison_mode: "direct",
-  }));
+    comparison_mode:
+      String(row.comparison_mode) === "different_approach" ||
+      String(row.comparison_mode) === "curated_cross_category"
+        ? "different_approach"
+        : "direct",
+    title_override: null,
+    description_override: null,
+    is_featured: false,
+    is_indexable: false,
+    sort_rank: 0,
+    last_verified_at: null,
+  })) as Comparison[];
+}
+
+async function loadFamilyRules(
+  client: ReturnType<typeof publicClient>,
+): Promise<ComparisonFamilyRule[]> {
+  // The fallback is intentionally empty while the additive migration is pending.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const schema = client as any;
+  const result = await schema
+    .from("comparison_family_rules")
+    .select(
+      "id,left_group_slug,right_group_slug,comparison_mode,template_key,public_label,is_active",
+    )
+    .eq("is_active", true);
+  if (result.error) return [];
+  return (result.data ?? []) as ComparisonFamilyRule[];
 }
 
 function reviewedComparisonsFromRows(
@@ -195,14 +243,16 @@ function reviewedComparisonsFromRows(
   return comparisons.flatMap((comparison) => {
     const a = treatmentsById.get(comparison.treatment_a_id) ?? null;
     const b = treatmentsById.get(comparison.treatment_b_id) ?? null;
-    if (!isReviewedComparison(a, b, comparison, sources) || !a || !b) return [];
+    if (!isIndexableComparison(a, b, comparison, sources) || !a || !b) return [];
     return [
       {
         slug: comparison.slug,
         treatment_a_slug: a.slug,
         treatment_b_slug: b.slug,
         comparison_mode: comparison.comparison_mode,
-        last_reviewed_at: comparison.last_reviewed_at as string,
+        last_reviewed_at: comparison.last_verified_at ?? comparison.last_reviewed_at,
+        is_featured: comparison.is_featured,
+        is_indexable: comparison.is_indexable,
       },
     ];
   });
@@ -222,6 +272,7 @@ export async function listComparisonExperience(): Promise<ComparisonExperience> 
     comparisonRows,
     comparisonMarketsResult,
     sourcesResult,
+    familyRules,
   ] = await Promise.all([
     loadTreatmentRows(client, { ordered: true }),
     client.from("treatment_media").select(MEDIA_COLUMNS),
@@ -234,6 +285,7 @@ export async function listComparisonExperience(): Promise<ComparisonExperience> 
       .select(
         "id,treatment_id,claim_field,source_title,source_url,source_type,publication_date,evidence_level",
       ),
+    loadFamilyRules(client),
   ]);
 
   const base = treatmentsResult;
@@ -263,21 +315,26 @@ export async function listComparisonExperience(): Promise<ComparisonExperience> 
   }
 
   const popularMap = new Map<string, PopularComparison>();
+  for (const comparison of comparisons.filter((row) => row.is_featured)) {
+    const stored = comparisonRows.find((row) => row.slug === comparison.slug);
+    const a = treatmentBySlug.get(comparison.treatment_a_slug);
+    const b = treatmentBySlug.get(comparison.treatment_b_slug);
+    popularMap.set(comparison.slug, {
+      slug: comparison.slug,
+      label: `${a?.name ?? comparison.treatment_a_slug} vs. ${
+        b?.name ?? comparison.treatment_b_slug
+      }`,
+      markets: [],
+      sort_rank: stored?.sort_rank ?? 0,
+    });
+  }
   for (const row of comparisonMarketsResult.data ?? []) {
     const stored = comparisonById.get(row.comparison_id);
     if (!stored) continue;
     const comparison = availableBySlug.get(stored.slug);
     if (!comparison) continue;
-    const a = treatmentBySlug.get(comparison.treatment_a_slug);
-    const b = treatmentBySlug.get(comparison.treatment_b_slug);
-    const existing = popularMap.get(comparison.slug) ?? {
-      slug: comparison.slug,
-      label: `${a?.name ?? comparison.treatment_a_slug} vs. ${
-        b?.name ?? comparison.treatment_b_slug
-      }`,
-      markets: [] as MarketCode[],
-      sort_rank: row.sort_rank ?? 0,
-    };
+    const existing = popularMap.get(comparison.slug);
+    if (!existing) continue;
     existing.markets.push(row.country_code as MarketCode);
     popularMap.set(existing.slug, existing);
   }
@@ -293,6 +350,7 @@ export async function listComparisonExperience(): Promise<ComparisonExperience> 
     popularComparisons: [...popularMap.values()].sort(
       (a, b) => a.sort_rank - b.sort_rank || a.label.localeCompare(b.label),
     ),
+    familyRules,
   };
 }
 
@@ -320,24 +378,29 @@ export interface ComparisonContext {
   comparison: Comparison | null;
   sources: TreatmentSource[];
   reviewed: boolean;
+  indexable: boolean;
+  valid: boolean;
+  compatibility: ReturnType<typeof resolvePairCompatibility>;
   media: Record<string, TreatmentMedia>;
   canonicalSlug: string;
 }
 
 /**
- * Resolves a treatment pair into a comparison context. Treatment existence is
- * checked against the public catalogue, then the stored pair determines the
- * permanent URL. Unreviewed pairs never become normal picker destinations.
+ * Resolves a treatment pair into a comparison context. Treatment existence and
+ * compatibility come from the public profiles and broad-family rules. Optional
+ * pair metadata controls featured placement and search indexing.
  */
 export async function getComparisonContext(
   slugA: string,
   slugB: string,
 ): Promise<ComparisonContext> {
   const client = publicClient();
-
-  const list = await loadTreatmentRows(client, { slugs: [slugA, slugB] });
-  const a = list.find((t) => t.slug === slugA) ?? null;
-  const b = list.find((t) => t.slug === slugB) ?? null;
+  const resolvedA = resolveComparisonRouteSlug(slugA);
+  const resolvedB = resolveComparisonRouteSlug(slugB);
+  const experience = await listComparisonExperience();
+  const a = experience.treatments.find((t) => t.slug === resolvedA) ?? null;
+  const b = experience.treatments.find((t) => t.slug === resolvedB) ?? null;
+  const compatibility = a && b ? resolvePairCompatibility(a, b, experience.familyRules) : null;
 
   const comparisonRows = await loadComparisonRows(client);
   const comparison =
@@ -362,15 +425,29 @@ export async function getComparisonContext(
     media = await listMediaFor([a.id, b.id]);
   }
 
-  const reviewed = isReviewedComparison(a, b, comparison, sources);
+  const indexable = isIndexableComparison(a, b, comparison, sources);
+  const reviewed = indexable;
+  const valid = Boolean(
+    a && b && compatibility && hasMinimumComparisonProfile(a) && hasMinimumComparisonProfile(b),
+  );
+  const generatedCanonical =
+    a && b && compatibility
+      ? comparisonSlugForPair(a, b, compatibility)
+      : canonicalPairSlug(slugA, slugB);
   return {
     a,
     b,
     comparison,
     sources,
     reviewed,
+    indexable,
+    valid,
+    compatibility,
     media,
-    canonicalSlug: comparison?.slug ?? canonicalPairSlug(slugA, slugB),
+    canonicalSlug:
+      compatibility?.mode === "different_approach"
+        ? generatedCanonical
+        : (comparison?.slug ?? generatedCanonical),
   };
 }
 
@@ -501,6 +578,81 @@ export async function listCityPrices(
     cityKnown: true,
     clinicsChecked: Math.max(checked.count ?? 0, clinicNames.size),
     clinicsWithPublicPrices: clinicNames.size,
+  };
+}
+
+export async function getRegionalPriceEstimate(
+  postalCodeInput: string,
+  treatmentSlug: string,
+): Promise<{ ok: true; result: RegionalPriceResult } | { ok: false; error: string }> {
+  const postalCode = normalizePostalCode(postalCodeInput);
+  if (!postalCode) {
+    return { ok: false, error: "Enter a valid US ZIP code or Canadian postal code." };
+  }
+
+  const client = publicClient();
+  const treatmentRows = await loadTreatmentRows(client, { slug: treatmentSlug });
+  const treatment = treatmentRows[0];
+  if (!treatment) return { ok: false, error: "That treatment is not available." };
+
+  // These additive tables may not exist until Lovable applies the migration.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const schema = client as any;
+  const [regionRows, groupRows] = await Promise.all([
+    schema
+      .from("postal_region_map")
+      .select("country_code,postal_prefix,region_slug,city_name")
+      .eq("country_code", postalCode.countryCode),
+    schema
+      .from("treatment_comparison_groups")
+      .select("comparison_groups!inner(slug)")
+      .eq("treatment_id", treatment.id),
+  ]);
+
+  if (regionRows.error) {
+    return { ok: false, error: "Local estimates are not available yet." };
+  }
+  const region = resolvePostalRegion(postalCode, (regionRows.data ?? []) as PostalRegionRow[]);
+  if (!region) {
+    return { ok: false, error: "We do not map that ZIP or postal code yet." };
+  }
+
+  const estimatesResult = await schema
+    .from("regional_price_estimates")
+    .select(
+      "id,treatment_id,comparison_group_slug,country_code,region_slug,region_name,currency,pricing_unit,treatment_area,estimated_average,estimated_median,estimated_low,estimated_high,source_count,source_urls,methodology_note,researched_at",
+    )
+    .eq("country_code", postalCode.countryCode)
+    .eq("region_slug", region.region_slug);
+
+  if (estimatesResult.error) {
+    return { ok: false, error: "Local estimates are not available yet." };
+  }
+  const groups = (groupRows.data ?? []).flatMap((row: Record<string, unknown>) => {
+    const relation = row.comparison_groups as { slug: string } | Array<{ slug: string }> | null;
+    return Array.isArray(relation) ? relation.map((value) => value.slug) : (relation?.slug ?? []);
+  });
+  const estimates = (estimatesResult.data ?? []).map((row: Record<string, unknown>) => ({
+    ...row,
+    estimated_average: row.estimated_average == null ? null : String(row.estimated_average),
+    estimated_median: row.estimated_median == null ? null : String(row.estimated_median),
+    estimated_low: String(row.estimated_low),
+    estimated_high: String(row.estimated_high),
+    source_urls: Array.isArray(row.source_urls)
+      ? row.source_urls.filter((value): value is string => typeof value === "string")
+      : [],
+  })) as RegionalPriceEstimate[];
+  const estimate = selectRegionalEstimate(estimates, treatment.id, groups);
+
+  return {
+    ok: true,
+    result: {
+      postalCode: postalCodeInput.trim().toUpperCase(),
+      countryCode: postalCode.countryCode,
+      regionName:
+        estimate?.region_name ?? region.city_name ?? region.region_slug.replace(/-/g, " "),
+      estimate,
+    },
   };
 }
 
