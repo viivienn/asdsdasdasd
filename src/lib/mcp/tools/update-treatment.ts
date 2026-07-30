@@ -26,6 +26,7 @@ const EDITABLE = [
   "true_substitute_notes",
   "when_not_appropriate",
   "fda_status",
+  "canada_status",
 ] as const;
 
 export default defineTool({

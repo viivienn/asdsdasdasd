@@ -4,9 +4,9 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { FOOTER_DISCLAIMER } from "@/components/disclaimers";
 import { SiteSearch } from "@/components/site-search";
 import { trackAnswerEngineReferral } from "@/lib/analytics";
-import { GOAL_FILTERS, slugifyType } from "@/lib/taxonomy";
-import type { PopularComparison, TreatmentPickerRecord } from "@/lib/content-types";
+import type { PopularComparison } from "@/lib/content-types";
 import type { SearchIndex } from "@/lib/search-index";
+import { FEATURES } from "@/lib/features";
 
 type NavLink = {
   to: string;
@@ -15,104 +15,56 @@ type NavLink = {
   detail: string;
 };
 
+const EXPLORE: NavLink[] = [
+  { to: "/explore", label: "Catalog", detail: "Classes, brands, products, devices" },
+  { to: "/treatments", label: "Treatments", detail: "Every profile, same questions" },
+  { to: "/compare", label: "Comparisons", detail: "Popular side-by-side pages" },
+  {
+    to: "/prices/us/ca/$city/$treatment",
+    params: { city: "san-francisco", treatment: "botox" },
+    label: "Local prices",
+    detail: "Publicly listed clinic prices",
+  },
+].filter((item) => FEATURES.clinicPriceDirectory || item.to !== "/prices/us/ca/$city/$treatment");
+
 const TOOLS: NavLink[] = [
   { to: "/compare", label: "Compare any two", detail: "Build a comparison yourself" },
   { to: "/methodology", label: "Methodology", detail: "How we source and check" },
   { to: "/medical-disclaimer", label: "Medical disclaimer", detail: "What this site is not" },
 ];
 
-const MOBILE_NAV: NavLink[] = [
-  { to: "/explore", label: "Explore", detail: "" },
-  { to: "/compare", label: "Compare", detail: "" },
-  { to: "/treatments", label: "Treatments", detail: "" },
-  { to: "/methodology", label: "Methodology", detail: "" },
-  { to: "/about", label: "About", detail: "" },
-];
+const FLAT_NAV: NavLink[] = [...EXPLORE, { to: "/about", label: "About", detail: "" }];
 
-function MenuColumn({
-  title,
-  accent,
-  children,
-}: {
-  title: string;
-  accent: string;
-  children: ReactNode;
-}) {
-  return (
-    <div>
-      <p
-        className={`inline-block rounded-md px-2 py-1 text-xs font-semibold uppercase tracking-[0.08em] ${accent}`}
-      >
-        {title}
-      </p>
-      <ul className="mt-2 space-y-1">{children}</ul>
-    </div>
-  );
-}
-
-function MenuItem({
-  to,
-  params,
-  search,
+function NavMenu({
   label,
-  onNavigate,
+  items,
+  align = "left",
 }: {
-  to: string;
-  params?: Record<string, string>;
-  search?: Record<string, string>;
   label: string;
-  onNavigate: () => void;
+  items: NavLink[];
+  align?: "left" | "right";
 }) {
-  return (
-    <li>
-      <Link
-        to={to}
-        params={params}
-        search={search}
-        onClick={onNavigate}
-        className="block truncate rounded-md px-2 py-1 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-      >
-        {label}
-      </Link>
-    </li>
-  );
-}
-
-function ExploreMenu({ treatments }: { treatments: TreatmentPickerRecord[] }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLLIElement>(null);
-  const close = () => setOpen(false);
 
   useEffect(() => {
     if (!open) return;
+    function onDown(e: MouseEvent) {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    }
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") setOpen(false);
     }
+    document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
   }, [open]);
 
-  const byType = (type: string) =>
-    treatments
-      .filter((entry) => entry.entity_type === type)
-      .sort((a, b) => a.sort_rank - b.sort_rank || a.name.localeCompare(b.name))
-      .slice(0, 8);
-
-  const products = byType("product");
-  const devices = byType("device");
-  const procedures = byType("procedure");
-  const classes = byType("class");
-  const types = [...new Set(treatments.map((entry) => entry.category).filter(Boolean))]
-    .sort()
-    .slice(0, 8);
-
   return (
-    <li
-      ref={ref}
-      className="relative"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-    >
+    <li ref={ref} className="relative">
       <button
         type="button"
         aria-expanded={open}
@@ -120,140 +72,33 @@ function ExploreMenu({ treatments }: { treatments: TreatmentPickerRecord[] }) {
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-1 rounded-full px-2.5 py-1 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
       >
-        Explore
+        {label}
         <ChevronDown
           aria-hidden="true"
           className={`size-3.5 transition-transform ${open ? "rotate-180" : ""}`}
         />
       </button>
       {open ? (
-        <div className="absolute left-1/2 top-full z-50 w-[min(64rem,92vw)] -translate-x-1/2 pt-2">
-          <div className="rounded-2xl border border-rule bg-popover p-5 shadow-lift">
-            <div className="grid gap-6 sm:grid-cols-3 lg:grid-cols-5">
-              <MenuColumn title="Products" accent="bg-secondary text-secondary-foreground">
-                {products.map((entry) => (
-                  <MenuItem
-                    key={entry.id}
-                    to="/treatments/$slug"
-                    params={{ slug: entry.slug }}
-                    label={entry.name}
-                    onNavigate={close}
-                  />
-                ))}
-              </MenuColumn>
-              <MenuColumn title="Treatment goals" accent="bg-sage text-sage-foreground">
-                {GOAL_FILTERS.map((goal) => (
-                  <MenuItem
-                    key={goal.slug}
-                    to="/explore"
-                    search={{ goal: goal.slug }}
-                    label={goal.label}
-                    onNavigate={close}
-                  />
-                ))}
-              </MenuColumn>
-              <MenuColumn title="Treatment types" accent="bg-rose text-rose-foreground">
-                {types.map((type) => (
-                  <MenuItem
-                    key={type}
-                    to="/explore"
-                    search={{ type: slugifyType(type) }}
-                    label={type}
-                    onNavigate={close}
-                  />
-                ))}
-              </MenuColumn>
-              <MenuColumn title="Devices" accent="bg-muted text-muted-foreground">
-                {devices.map((entry) => (
-                  <MenuItem
-                    key={entry.id}
-                    to="/treatments/$slug"
-                    params={{ slug: entry.slug }}
-                    label={entry.name}
-                    onNavigate={close}
-                  />
-                ))}
-                {procedures.length ? (
-                  <li className="pt-2">
-                    <p className="px-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-                      Procedures
-                    </p>
-                  </li>
-                ) : null}
-                {procedures.map((entry) => (
-                  <MenuItem
-                    key={entry.id}
-                    to="/treatments/$slug"
-                    params={{ slug: entry.slug }}
-                    label={entry.name}
-                    onNavigate={close}
-                  />
-                ))}
-              </MenuColumn>
-              <MenuColumn title="Treatment classes" accent="bg-accent text-accent-foreground">
-                {classes.map((entry) => (
-                  <MenuItem
-                    key={entry.id}
-                    to="/treatments/$slug"
-                    params={{ slug: entry.slug }}
-                    label={entry.name}
-                    onNavigate={close}
-                  />
-                ))}
-              </MenuColumn>
-            </div>
-            <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 border-t border-rule pt-4 text-sm">
-              <Link to="/explore" onClick={close} className="font-medium hover:text-primary">
-                Explore everything
-              </Link>
-              <Link to="/treatments" onClick={close} className="hover:text-primary">
-                All treatment profiles
-              </Link>
-              <Link to="/compare" onClick={close} className="hover:text-primary">
-                Popular comparisons
-              </Link>
-            </div>
-          </div>
-        </div>
-      ) : null}
-    </li>
-  );
-}
-
-function ToolsMenu() {
-  const [open, setOpen] = useState(false);
-  return (
-    <li
-      className="relative"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-    >
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-haspopup="menu"
-        onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1 rounded-full px-2.5 py-1 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-      >
-        Tools
-        <ChevronDown
-          aria-hidden="true"
-          className={`size-3.5 transition-transform ${open ? "rotate-180" : ""}`}
-        />
-      </button>
-      {open ? (
-        <div className="absolute right-0 top-full z-50 w-60 pt-2">
-          <ul className="rounded-xl border border-rule bg-popover p-1 shadow-lift">
-            {TOOLS.map((item) => (
-              <li key={item.label}>
+        <div
+          className={`absolute top-[calc(100%+0.5rem)] z-50 w-60 rounded-xl border border-rule bg-popover p-1 shadow-lift ${align === "right" ? "right-0" : "left-0"}`}
+        >
+          <ul className="space-y-0.5">
+            {items.map((item, index) => (
+              <li key={`${item.to}-${item.label}`}>
                 <Link
                   to={item.to}
+                  params={item.params}
                   onClick={() => setOpen(false)}
                   className="block rounded-lg px-2.5 py-2 transition-colors hover:bg-secondary"
                 >
                   <span className="block text-sm font-medium text-foreground">{item.label}</span>
-                  <span className="block text-xs text-muted-foreground">{item.detail}</span>
+                  {item.detail ? (
+                    <span className="block text-xs text-muted-foreground">{item.detail}</span>
+                  ) : null}
                 </Link>
+                {index < items.length - 1 ? (
+                  <div className="mx-2.5 my-1 border-b border-rule" />
+                ) : null}
               </li>
             ))}
           </ul>
@@ -267,12 +112,10 @@ export function SiteShell({
   children,
   searchIndex,
   popularComparisons,
-  treatments,
 }: {
   children: ReactNode;
   searchIndex: SearchIndex;
   popularComparisons: PopularComparison[];
-  treatments: TreatmentPickerRecord[];
 }) {
   useEffect(() => {
     trackAnswerEngineReferral();
@@ -304,26 +147,8 @@ export function SiteShell({
           </div>
           <nav aria-label="Primary" className="hidden lg:block">
             <ul className="flex items-center gap-0.5">
-              <ExploreMenu treatments={treatments} />
-              <li>
-                <Link
-                  to="/compare"
-                  className="rounded-full px-2.5 py-1 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                  activeProps={{ className: "bg-secondary text-secondary-foreground font-medium" }}
-                >
-                  Compare
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/prices/us/ca/$city/$treatment"
-                  params={{ city: "san-francisco", treatment: "botox" }}
-                  className="rounded-full px-2.5 py-1 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                >
-                  Local prices
-                </Link>
-              </li>
-              <ToolsMenu />
+              <NavMenu label="Explore" items={EXPLORE} align="left" />
+              <NavMenu label="Tools" items={TOOLS} align="right" />
               <li>
                 <Link
                   to="/about"
@@ -336,11 +161,10 @@ export function SiteShell({
             </ul>
           </nav>
           <Link
-            to="/prices/us/ca/$city/$treatment"
-            params={{ city: "san-francisco", treatment: "botox" }}
+            to="/compare"
             className="hidden shrink-0 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 sm:inline-flex"
           >
-            See local prices
+            Compare treatments
           </Link>
         </div>
         <div className="px-4 pb-3 lg:hidden">
@@ -348,7 +172,7 @@ export function SiteShell({
         </div>
         <nav aria-label="Primary mobile" className="lg:hidden">
           <ul className="flex gap-1 overflow-x-auto px-4 pb-3 text-sm">
-            {MOBILE_NAV.map((item) => (
+            {[...FLAT_NAV, ...TOOLS.slice(1)].map((item) => (
               <li key={`${item.to}-${item.label}`} className="shrink-0">
                 <Link
                   to={item.to}
@@ -406,6 +230,11 @@ export function SiteShell({
             <li>
               <Link to="/about" className="hover:text-foreground">
                 About
+              </Link>
+            </li>
+            <li>
+              <Link to="/advertising-disclosure" className="hover:text-foreground">
+                Advertising disclosure
               </Link>
             </li>
             <li>

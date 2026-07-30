@@ -1,0 +1,141 @@
+{
+  "schema_version": "2026-07-29",
+  "policy": "No media is publishable in this pack. Manufacturer galleries and product photographs were not copied because reuse rights were not explicit. The migration inserts no treatment_media rows.",
+  "media": [
+    {
+      "treatment_slug": "botox",
+      "recommended_asset": "Original neutral line illustration of a facial muscle meeting a motor nerve terminal, with no syringe dose or branded vial.",
+      "media_role": "diagram",
+      "publish": false,
+      "publication_status": "review",
+      "rights_status": "new own-work asset required",
+      "prohibited_inference": "Do not imply exact injection sites or dosing."
+    },
+    {
+      "treatment_slug": "dysport",
+      "recommended_asset": "Original neutral neuromuscular-junction illustration using a distinct layout from the Botox asset.",
+      "media_role": "diagram",
+      "publish": false,
+      "publication_status": "review",
+      "rights_status": "new own-work asset required",
+      "prohibited_inference": "Do not present potency-unit conversion."
+    },
+    {
+      "treatment_slug": "ha-filler",
+      "recommended_asset": "Original cross-section showing gel occupying soft-tissue space without a branded syringe.",
+      "media_role": "diagram",
+      "publish": false,
+      "publication_status": "review",
+      "rights_status": "new own-work asset required",
+      "prohibited_inference": "Do not show a universal injection plane for the whole class."
+    },
+    {
+      "treatment_slug": "juvederm",
+      "recommended_asset": "Original neutral portfolio diagram showing several product cards leading to different facial areas.",
+      "media_role": "diagram",
+      "publish": false,
+      "publication_status": "review",
+      "rights_status": "new own-work asset required",
+      "prohibited_inference": "Do not reproduce manufacturer packaging or logos."
+    },
+    {
+      "treatment_slug": "restylane",
+      "recommended_asset": "Original neutral portfolio diagram showing distinct formulations and intended-area branches.",
+      "media_role": "diagram",
+      "publish": false,
+      "publication_status": "review",
+      "rights_status": "new own-work asset required",
+      "prohibited_inference": "Do not reproduce manufacturer packaging or logos."
+    },
+    {
+      "treatment_slug": "juvederm-voluma",
+      "recommended_asset": "Original face-map illustration highlighting cheeks, chin, and temples only.",
+      "media_role": "diagram",
+      "publish": false,
+      "publication_status": "review",
+      "rights_status": "new own-work asset required",
+      "prohibited_inference": "Do not highlight lips."
+    },
+    {
+      "treatment_slug": "restylane-kysse",
+      "recommended_asset": "Original face-map illustration highlighting lips and upper perioral lines only.",
+      "media_role": "diagram",
+      "publish": false,
+      "publication_status": "review",
+      "rights_status": "new own-work asset required",
+      "prohibited_inference": "Do not imply cheek, chin, or temple use."
+    },
+    {
+      "treatment_slug": "sculptra",
+      "recommended_asset": "Original time-sequence diagram showing injected PLLA particles followed by gradual tissue response.",
+      "media_role": "diagram",
+      "publish": false,
+      "publication_status": "review",
+      "rights_status": "new own-work asset required",
+      "prohibited_inference": "Do not depict a guaranteed amount of collagen."
+    },
+    {
+      "treatment_slug": "radiesse",
+      "recommended_asset": "Original cross-section showing calcium-hydroxylapatite microspheres suspended in a gel carrier.",
+      "media_role": "diagram",
+      "publish": false,
+      "publication_status": "review",
+      "rights_status": "new own-work asset required",
+      "prohibited_inference": "Do not imply hyaluronidase reversibility."
+    },
+    {
+      "treatment_slug": "thermage",
+      "recommended_asset": "Original device-agnostic cross-section showing surface cooling and broad monopolar RF heating.",
+      "media_role": "diagram",
+      "publish": false,
+      "publication_status": "review",
+      "rights_status": "new own-work asset required",
+      "prohibited_inference": "Do not depict surgical tissue repositioning."
+    },
+    {
+      "treatment_slug": "ultherapy",
+      "recommended_asset": "Original cross-section showing real-time imaging and discrete ultrasound thermal-coagulation points at selected depths.",
+      "media_role": "diagram",
+      "publish": false,
+      "publication_status": "review",
+      "rights_status": "new own-work asset required",
+      "prohibited_inference": "Do not label the image as a facelift."
+    },
+    {
+      "treatment_slug": "morpheus8",
+      "recommended_asset": "Original RF-microneedling cross-section showing an electrode array and fractional coagulation zones.",
+      "media_role": "diagram",
+      "publish": false,
+      "publication_status": "review",
+      "rights_status": "new own-work asset required",
+      "prohibited_inference": "Do not prescribe depths, energy, passes, or treatment areas."
+    },
+    {
+      "treatment_slug": "potenza",
+      "recommended_asset": "Original four-panel diagram distinguishing monopolar/bipolar and insulated/non-insulated electrode concepts.",
+      "media_role": "diagram",
+      "publish": false,
+      "publication_status": "review",
+      "rights_status": "new own-work asset required",
+      "prohibited_inference": "Do not imply that more modes produce superior results."
+    },
+    {
+      "treatment_slug": "hydrafacial",
+      "recommended_asset": "Original handpiece-flow diagram showing superficial exfoliation, suction, and topical-fluid delivery.",
+      "media_role": "diagram",
+      "publish": false,
+      "publication_status": "review",
+      "rights_status": "new own-work asset required",
+      "prohibited_inference": "Do not depict penetration into deep dermis or filler-like volume."
+    },
+    {
+      "treatment_slug": "diamondglow",
+      "recommended_asset": "Original handpiece-flow diagram showing a diamond tip, superficial abrasion, suction, and topical delivery.",
+      "media_role": "diagram",
+      "publish": false,
+      "publication_status": "review",
+      "rights_status": "new own-work asset required",
+      "prohibited_inference": "Do not reproduce proprietary handpiece trade dress."
+    }
+  ]
+}

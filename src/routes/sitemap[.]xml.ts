@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { SITE_URL } from "@/lib/site";
+import { FEATURES } from "@/lib/features";
 
 const BASE_URL = SITE_URL;
 
@@ -24,25 +25,25 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/methodology", changefreq: "monthly", priority: "0.5" },
           { path: "/about", changefreq: "monthly", priority: "0.5" },
           { path: "/medical-disclaimer", changefreq: "yearly", priority: "0.2" },
+          { path: "/advertising-disclosure", changefreq: "yearly", priority: "0.2" },
         ];
 
-        const { listReviewedComparisons, listTreatments, listIndexablePricePages } = await import(
-          "@/lib/content.server"
-        );
+        const { listReviewedComparisons, listTreatments, listIndexablePricePages } =
+          await import("@/lib/content.server");
         const [reviewed, treatments, pricePages] = await Promise.all([
           listReviewedComparisons(),
           listTreatments(),
-          listIndexablePricePages(),
+          FEATURES.clinicPriceDirectory ? listIndexablePricePages() : Promise.resolve([]),
         ]);
 
-        // Only fully reviewed, non-sample comparison records are listed. Pair
-        // URLs that render the generated "review in progress" state never are.
+        // Only profile-complete, sourced, explicitly indexable comparisons are
+        // listed. Arbitrary compatible long-tail pairs remain noindex.
         for (const c of reviewed) {
           entries.push({
             path: `/compare/${c.slug}`,
             changefreq: "monthly",
             priority: "0.7",
-            lastmod: c.last_reviewed_at.slice(0, 10),
+            lastmod: c.last_reviewed_at?.slice(0, 10),
           });
         }
         if (!treatments.isDemo) {
@@ -56,13 +57,15 @@ export const Route = createFileRoute("/sitemap.xml")({
           }
         }
         // Price pages appear only when a real, non-sample observation exists.
-        for (const p of pricePages) {
-          entries.push({
-            path: `/prices/us/ca/${p.city}/${p.treatment}`,
-            changefreq: "weekly",
-            priority: "0.6",
-            lastmod: p.lastmod,
-          });
+        if (FEATURES.clinicPriceDirectory) {
+          for (const p of pricePages) {
+            entries.push({
+              path: `/prices/us/ca/${p.city}/${p.treatment}`,
+              changefreq: "weekly",
+              priority: "0.6",
+              lastmod: p.lastmod,
+            });
+          }
         }
 
         const xml = [

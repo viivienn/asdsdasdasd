@@ -3,15 +3,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { z } from "zod";
 import { fetchCatalog } from "@/lib/content.functions";
-import {
-  ENTITY_GROUP_LABEL,
-  type MarketCode,
-  type Treatment,
-  type TreatmentMedia,
-} from "@/lib/content-types";
+import { ENTITY_GROUP_LABEL, type Treatment, type TreatmentMedia } from "@/lib/content-types";
+import type { MarketCode } from "@/lib/content-types";
 import { TreatmentVisual } from "@/components/treatment-visual";
 import { SectionHeading } from "@/components/editorial";
-import { GOAL_FILTERS, matchesGoal, slugifyType as slugify } from "@/lib/taxonomy";
 import { absoluteUrl } from "@/lib/site";
 
 interface CatalogEntryView extends Treatment {
@@ -22,7 +17,21 @@ interface CatalogEntryView extends Treatment {
   markets: MarketCode[];
 }
 
-const searchSchema = z.object({ type: z.string().optional(), goal: z.string().optional() });
+const searchSchema = z.object({ type: z.string().optional() });
+const GOAL_FILTERS = [
+  { slug: "expression-lines", label: "Expression lines", keywords: ["neuromodulator"] },
+  {
+    slug: "volume-contour",
+    label: "Volume & contour",
+    keywords: ["filler", "biostimulator", "collagen stimulator"],
+  },
+  { slug: "lift-tighten", label: "Lift & tighten", keywords: ["energy device"] },
+  {
+    slug: "texture-pores",
+    label: "Texture & pores",
+    keywords: ["facial", "exfoliation", "microneedling"],
+  },
+] as const;
 
 export const Route = createFileRoute("/explore/")({
   validateSearch: (search) => searchSchema.parse(search),
@@ -51,16 +60,13 @@ function Explore() {
     popularComparisons: Array<{ slug: string; label: string; markets: MarketCode[] }>;
   };
   const search = Route.useSearch();
-  const navigate = Route.useNavigate();
   const [query, setQuery] = useState("");
-  const [market, setMarket] = useState<MarketCode>("US");
+  const [goal, setGoal] = useState("");
   const selectedType = search.type ?? "";
-  const goal = search.goal ?? "";
 
   const visible = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     return entries.filter((entry) => {
-      if (entry.markets.length && !entry.markets.includes(market)) return false;
       if (
         selectedType &&
         slugify(entry.category) !== selectedType &&
@@ -69,9 +75,12 @@ function Explore() {
         return false;
       }
       if (goal) {
+        const goalFilter = GOAL_FILTERS.find((item) => item.slug === goal);
         const haystack =
           `${entry.category} ${entry.treatment_class} ${entry.primary_purpose ?? ""}`.toLowerCase();
-        if (!matchesGoal(haystack, goal)) return false;
+        if (goalFilter && !goalFilter.keywords.some((keyword) => haystack.includes(keyword))) {
+          return false;
+        }
       }
       return (
         !normalized ||
@@ -87,7 +96,7 @@ function Explore() {
           .some((value) => value!.toLowerCase().includes(normalized))
       );
     });
-  }, [entries, goal, market, query, selectedType]);
+  }, [entries, goal, query, selectedType]);
 
   const types = [...new Set(entries.map((entry) => entry.category).filter(Boolean))].sort();
   const brands = visible.filter((entry) => entry.entity_type === "brand_family");
@@ -95,9 +104,6 @@ function Explore() {
   const products = visible.filter((entry) => entry.entity_type === "product");
   const procedures = visible.filter((entry) => entry.entity_type === "procedure");
   const classes = visible.filter((entry) => entry.entity_type === "class");
-  const marketPopular = popularComparisons.filter(
-    (comparison) => !comparison.markets.length || comparison.markets.includes(market),
-  );
 
   return (
     <>
@@ -108,7 +114,7 @@ function Explore() {
         </p>
       </header>
 
-      <div className="mt-7 grid gap-3 sm:grid-cols-[1fr_auto]">
+      <div className="mt-7">
         <label className="flex min-h-12 items-center gap-2 rounded-full border border-input bg-card px-4">
           <Search aria-hidden="true" className="size-4 text-muted-foreground" />
           <span className="sr-only">Search the treatment catalog</span>
@@ -120,29 +126,7 @@ function Explore() {
             className="w-full bg-transparent text-sm outline-none"
           />
         </label>
-        <div
-          className="inline-flex rounded-full border border-rule bg-card p-1"
-          aria-label="Market"
-        >
-          {(["US", "CA"] as const).map((code) => (
-            <button
-              key={code}
-              type="button"
-              aria-pressed={market === code}
-              onClick={() => setMarket(code)}
-              className={`min-h-10 rounded-full px-4 text-sm ${
-                market === code ? "bg-primary text-primary-foreground" : "text-muted-foreground"
-              }`}
-            >
-              {code === "US" ? "United States" : "Canada"}
-            </button>
-          ))}
-        </div>
       </div>
-      <p className="mt-2 text-xs text-muted-foreground">
-        Market filters use recorded availability when present; unrecorded availability remains
-        visible.
-      </p>
 
       {!query && !selectedType ? (
         <section className="mt-12">
@@ -153,23 +137,14 @@ function Explore() {
                 <button
                   type="button"
                   aria-pressed={goal === item.slug}
-                  onClick={() =>
-                    navigate({
-                      to: ".",
-                      search: {
-                        type: search.type,
-                        goal: goal === item.slug ? undefined : item.slug,
-                      },
-                    })
-                  }
+                  onClick={() => setGoal((current) => (current === item.slug ? "" : item.slug))}
                   className={`block h-full w-full rounded-xl border p-4 text-left text-sm ${
                     goal === item.slug
                       ? "border-primary bg-secondary text-secondary-foreground"
                       : "border-rule bg-card hover:border-primary"
                   }`}
                 >
-                  <span className="block font-medium">{item.label}</span>
-                  <span className="mt-1 block text-xs text-muted-foreground">{item.detail}</span>
+                  {item.label}
                 </button>
               </li>
             ))}
@@ -216,11 +191,11 @@ function Explore() {
         </p>
       ) : null}
 
-      {marketPopular.length ? (
+      {popularComparisons.length ? (
         <section className="mt-12">
           <SectionHeading>Popular comparisons</SectionHeading>
           <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-            {marketPopular.map((comparison) => (
+            {popularComparisons.map((comparison) => (
               <li key={comparison.slug}>
                 <Link
                   to="/compare/$slug"
@@ -267,3 +242,9 @@ function CatalogSection({ title, entries }: { title: string; entries: CatalogEnt
   );
 }
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}

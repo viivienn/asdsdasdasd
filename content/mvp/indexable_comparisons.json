@@ -1,0 +1,112 @@
+{
+  "schema_version": "2026-07-29",
+  "last_verified_at": "2026-07-29T00:00:00Z",
+  "publication_rule": "Index only when both profiles are published, non-sample, meet the application's minimum profile gate, and each side has at least one source row.",
+  "comparisons": [
+    {
+      "slug": "botox-vs-dysport",
+      "treatment_a_slug": "botox",
+      "treatment_b_slug": "dysport",
+      "comparison_mode": "direct",
+      "row_template": "neuromodulator_brands",
+      "title_override": "Botox vs. Dysport",
+      "description_override": "Compare two botulinum toxin type A products without converting their non-interchangeable potency units.",
+      "is_featured": true,
+      "is_indexable": true,
+      "sort_rank": 10,
+      "publication_status": "published"
+    },
+    {
+      "slug": "botox-vs-dermal-fillers",
+      "treatment_a_slug": "botox",
+      "treatment_b_slug": "ha-filler",
+      "comparison_mode": "different_approach",
+      "row_template": "cross_category",
+      "title_override": "Botox vs. dermal fillers",
+      "description_override": "A beginner comparison of muscle relaxation and structural volume, explained through profile fields.",
+      "is_featured": true,
+      "is_indexable": true,
+      "sort_rank": 20,
+      "publication_status": "published",
+      "editorial_recommendation_fields": null
+    },
+    {
+      "slug": "juvederm-vs-restylane",
+      "treatment_a_slug": "juvederm",
+      "treatment_b_slug": "restylane",
+      "comparison_mode": "direct",
+      "row_template": "filler_families",
+      "title_override": "Juvéderm vs. Restylane",
+      "description_override": "Compare two HA filler portfolios while keeping product-specific indications visible.",
+      "is_featured": true,
+      "is_indexable": true,
+      "sort_rank": 30,
+      "publication_status": "published"
+    },
+    {
+      "slug": "juvederm-voluma-vs-restylane-kysse",
+      "treatment_a_slug": "juvederm-voluma",
+      "treatment_b_slug": "restylane-kysse",
+      "comparison_mode": "direct",
+      "row_template": "filler_products",
+      "title_override": "Juvéderm Voluma vs. Restylane Kysse",
+      "description_override": "An intentionally area-mismatched product comparison: structural cheek/chin/temple filler versus lip and upper-perioral filler.",
+      "is_featured": true,
+      "is_indexable": true,
+      "sort_rank": 40,
+      "publication_status": "published"
+    },
+    {
+      "slug": "sculptra-vs-radiesse",
+      "treatment_a_slug": "sculptra",
+      "treatment_b_slug": "radiesse",
+      "comparison_mode": "direct",
+      "row_template": "cross_category",
+      "title_override": "Sculptra vs. Radiesse",
+      "description_override": "Compare gradual PLLA biostimulation with immediate calcium-hydroxylapatite filler support.",
+      "is_featured": true,
+      "is_indexable": true,
+      "sort_rank": 50,
+      "publication_status": "published"
+    },
+    {
+      "slug": "thermage-vs-ultherapy",
+      "treatment_a_slug": "thermage",
+      "treatment_b_slug": "ultherapy",
+      "comparison_mode": "direct",
+      "row_template": "lifting_devices",
+      "title_override": "Thermage FLX vs. Ultherapy",
+      "description_override": "Compare monopolar radiofrequency with microfocused ultrasound for modest noninvasive tightening goals.",
+      "is_featured": true,
+      "is_indexable": true,
+      "sort_rank": 60,
+      "publication_status": "published"
+    },
+    {
+      "slug": "morpheus8-vs-potenza",
+      "treatment_a_slug": "morpheus8",
+      "treatment_b_slug": "potenza",
+      "comparison_mode": "direct",
+      "row_template": "resurfacing_devices",
+      "title_override": "Morpheus8 vs. Potenza",
+      "description_override": "Compare RF-microneedling platforms while preserving their different US clearance wording, tips, and protocol variables.",
+      "is_featured": true,
+      "is_indexable": true,
+      "sort_rank": 70,
+      "publication_status": "published"
+    },
+    {
+      "slug": "hydrafacial-vs-diamondglow",
+      "treatment_a_slug": "hydrafacial",
+      "treatment_b_slug": "diamondglow",
+      "comparison_mode": "direct",
+      "row_template": "resurfacing_devices",
+      "title_override": "HydraFacial vs. DiamondGlow",
+      "description_override": "Compare two superficial exfoliation, suction, and topical-delivery facials without implying injectable or deep-tightening effects.",
+      "is_featured": true,
+      "is_indexable": true,
+      "sort_rank": 80,
+      "publication_status": "published"
+    }
+  ]
+}

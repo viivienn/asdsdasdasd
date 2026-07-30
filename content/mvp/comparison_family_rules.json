@@ -1,0 +1,14 @@
+{
+  "schema_version": "2026-07-29",
+  "rules": [
+    {
+      "left_group_slug": "dermal-filler",
+      "right_group_slug": "neuromodulator",
+      "comparison_mode": "different_approach",
+      "template_key": "cross_category",
+      "public_label": "Beginner comparison",
+      "is_active": true,
+      "editorial_rule": "Explain the structural difference through the two treatment profiles. Do not add a recommendation article, winner, dose conversion, or claim that either approach replaces the other."
+    }
+  ]
+}

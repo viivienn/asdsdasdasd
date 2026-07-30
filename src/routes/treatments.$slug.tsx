@@ -7,7 +7,7 @@ import {
   type TreatmentSource,
 } from "@/lib/content-types";
 import { EvidenceState } from "@/components/editorial";
-import { CoverageRequestForm } from "@/components/demand-forms";
+import { RegionalPriceLookup } from "@/components/regional-price-lookup";
 import { TreatmentDisclaimer } from "@/components/disclaimers";
 import { CompareWith, MatchGate } from "@/components/treatment-actions";
 import { TreatmentVisual } from "@/components/treatment-visual";
@@ -63,7 +63,9 @@ function TreatmentPage() {
   const { data, experience } = Route.useLoaderData();
   const treatment = data.treatment as Treatment;
   const sources = data.sources as TreatmentSource[];
-  const pickerTreatment = experience.treatments.find((entry: TreatmentPickerRecord) => entry.slug === slug);
+  const pickerTreatment = experience.treatments.find(
+    (entry: TreatmentPickerRecord) => entry.slug === slug,
+  );
   const related = experience.comparisons.filter((comparison: AvailableComparison) =>
     [comparison.treatment_a_slug, comparison.treatment_b_slug].includes(slug),
   );
@@ -120,7 +122,7 @@ function TreatmentPage() {
             slug={slug}
             name={treatment.name}
             treatments={experience.treatments}
-            comparisons={experience.comparisons}
+            familyRules={experience.familyRules}
           />
         </div>
       ) : null}
@@ -183,7 +185,9 @@ function TreatmentPage() {
           <ul className="mt-3 flex flex-wrap gap-2 text-sm">
             {related.map((comparison: AvailableComparison) => {
               const otherSlug = comparisonOtherSlug(comparison, slug);
-              const other = experience.treatments.find((entry: TreatmentPickerRecord) => entry.slug === otherSlug);
+              const other = experience.treatments.find(
+                (entry: TreatmentPickerRecord) => entry.slug === otherSlug,
+              );
               return (
                 <li key={comparison.slug}>
                   <Link
@@ -201,7 +205,9 @@ function TreatmentPage() {
       ) : null}
 
       <section className="mt-12">
-        <CoverageRequestForm treatmentSlug={slug} />
+        <RegionalPriceLookup
+          treatments={[{ id: treatment.id, slug: treatment.slug, name: treatment.name }]}
+        />
       </section>
 
       <TreatmentDisclaimer />

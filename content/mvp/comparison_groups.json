@@ -1,0 +1,78 @@
+{
+  "schema_version": "2026-07-29",
+  "comparison_groups": [
+    {
+      "slug": "neuromodulator",
+      "name": "Neuromodulators",
+      "description": "Botulinum toxin products used to reduce selected muscle activity."
+    },
+    {
+      "slug": "dermal-filler",
+      "name": "Dermal fillers",
+      "description": "Broad filler class and product records that add or restore volume."
+    },
+    {
+      "slug": "ha-filler-brand-family",
+      "name": "HA filler brand families",
+      "description": "Manufacturer portfolios of hyaluronic acid filler products."
+    },
+    {
+      "slug": "ha-filler-product",
+      "name": "HA filler products",
+      "description": "Specific hyaluronic acid filler formulations."
+    },
+    {
+      "slug": "collagen-biostimulator",
+      "name": "Collagen biostimulators",
+      "description": "Injectables with a clinically relevant tissue-stimulation component."
+    },
+    {
+      "slug": "noninvasive-lifting-device",
+      "name": "Non-invasive lifting devices",
+      "description": "Noninvasive energy devices used for modest lifting or tightening goals."
+    },
+    {
+      "slug": "rf-microneedling-device",
+      "name": "RF microneedling devices",
+      "description": "Devices combining needle penetration with radiofrequency coagulation."
+    },
+    {
+      "slug": "resurfacing-device",
+      "name": "Resurfacing devices",
+      "description": "Reserved for future direct comparisons of energy-based resurfacing devices."
+    },
+    {
+      "slug": "hydradermabrasion-procedure",
+      "name": "Hydradermabrasion procedures",
+      "description": "Branded superficial facial procedures combining exfoliation, suction, and topical delivery."
+    }
+  ],
+  "treatment_area_values": [
+    "glabella",
+    "forehead",
+    "lateral canthal lines",
+    "platysma bands",
+    "lips",
+    "upper perioral lines",
+    "perioral lines",
+    "nasolabial folds",
+    "marionette lines",
+    "cheeks",
+    "cheek wrinkles",
+    "chin",
+    "chin wrinkles",
+    "jawline",
+    "temples",
+    "infraorbital hollow",
+    "dorsal hands",
+    "brow",
+    "submental area",
+    "neck",
+    "décolletage",
+    "face",
+    "body",
+    "back",
+    "acne scars",
+    "scars"
+  ]
+}

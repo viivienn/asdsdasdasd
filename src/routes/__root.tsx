@@ -86,7 +86,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Independent comparisons of cosmetic treatments, with publicly listed local prices and clear sourcing.",
+          "Source-backed cosmetic treatment comparisons with researched regional price estimates.",
       },
       { property: "og:site_name", content: "Aesthetic Index" },
       { property: "og:type", content: "website" },
@@ -157,11 +157,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SiteShell
-        searchIndex={searchIndex}
-        popularComparisons={experience.popularComparisons}
-        treatments={experience.treatments}
-      >
+      <SiteShell searchIndex={searchIndex} popularComparisons={experience.popularComparisons}>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
       </SiteShell>

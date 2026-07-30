@@ -1,0 +1,29 @@
+{
+  "schema_version": "2026-07-29",
+  "mappings": [
+    { "treatment_slug": "neuromodulator", "group_slug": "neuromodulator" },
+    { "treatment_slug": "botox", "group_slug": "neuromodulator" },
+    { "treatment_slug": "dysport", "group_slug": "neuromodulator" },
+    { "treatment_slug": "xeomin", "group_slug": "neuromodulator" },
+    { "treatment_slug": "daxxify", "group_slug": "neuromodulator" },
+    { "treatment_slug": "ha-filler", "group_slug": "dermal-filler" },
+    { "treatment_slug": "juvederm", "group_slug": "dermal-filler" },
+    { "treatment_slug": "restylane", "group_slug": "dermal-filler" },
+    { "treatment_slug": "juvederm-voluma", "group_slug": "dermal-filler" },
+    { "treatment_slug": "restylane-kysse", "group_slug": "dermal-filler" },
+    { "treatment_slug": "restylane-lyft", "group_slug": "dermal-filler" },
+    { "treatment_slug": "juvederm", "group_slug": "ha-filler-brand-family" },
+    { "treatment_slug": "restylane", "group_slug": "ha-filler-brand-family" },
+    { "treatment_slug": "juvederm-voluma", "group_slug": "ha-filler-product" },
+    { "treatment_slug": "restylane-kysse", "group_slug": "ha-filler-product" },
+    { "treatment_slug": "restylane-lyft", "group_slug": "ha-filler-product" },
+    { "treatment_slug": "sculptra", "group_slug": "collagen-biostimulator" },
+    { "treatment_slug": "radiesse", "group_slug": "collagen-biostimulator" },
+    { "treatment_slug": "thermage", "group_slug": "noninvasive-lifting-device" },
+    { "treatment_slug": "ultherapy", "group_slug": "noninvasive-lifting-device" },
+    { "treatment_slug": "morpheus8", "group_slug": "rf-microneedling-device" },
+    { "treatment_slug": "potenza", "group_slug": "rf-microneedling-device" },
+    { "treatment_slug": "hydrafacial", "group_slug": "hydradermabrasion-procedure" },
+    { "treatment_slug": "diamondglow", "group_slug": "hydradermabrasion-procedure" }
+  ]
+}

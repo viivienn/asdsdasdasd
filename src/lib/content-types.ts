@@ -1,7 +1,7 @@
 // Client-safe shared types and helpers for editorial content.
 
 export type PublicationStatus = "draft" | "review" | "published";
-export type ComparisonMode = "direct" | "curated_cross_category";
+export type ComparisonMode = "direct" | "different_approach";
 export type MarketCode = "US" | "CA";
 
 export type EntityType = "class" | "brand_family" | "product" | "device" | "procedure";
@@ -76,6 +76,7 @@ export interface Treatment {
   brand_name: string | null;
   generic_name: string | null;
   manufacturer: string | null;
+  intended_areas: string[];
   entity_type: EntityType;
   parent_id: string | null;
   sort_rank: number;
@@ -107,6 +108,7 @@ export interface Treatment {
   when_not_appropriate: string | null;
   pricing_basis: string | null;
   fda_status: string | null;
+  canada_status: string | null;
   evidence_grade: string | null;
   last_reviewed_at: string | null;
   publication_status: PublicationStatus;
@@ -136,6 +138,12 @@ export interface Comparison {
   common_misconception: string | null;
   row_template: string | null;
   comparison_mode: ComparisonMode;
+  title_override: string | null;
+  description_override: string | null;
+  is_featured: boolean;
+  is_indexable: boolean;
+  sort_rank: number;
+  last_verified_at: string | null;
   publication_status: PublicationStatus;
   is_sample: boolean;
   last_reviewed_at: string | null;
@@ -188,7 +196,8 @@ export const COMPARISON_ROWS = [
   { key: "skin_tone_notes", label: "Skin-tone considerations" },
   { key: "true_substitute_notes", label: "Whether they are true substitutes" },
   { key: "when_not_appropriate", label: "When this treatment may not be appropriate" },
-  { key: "fda_status", label: "Regulatory status" },
+  { key: "fda_status", label: "United States regulatory status" },
+  { key: "canada_status", label: "Canadian regulatory status" },
   { key: "evidence_grade", label: "Evidence status" },
 ] as const satisfies ReadonlyArray<{ key: keyof Treatment; label: string }>;
 
@@ -207,7 +216,8 @@ export const TREATMENT_PROFILE_ROWS = [
   { key: "provider_variables", label: "What varies by provider" },
   { key: "skin_tone_notes", label: "Skin-tone considerations" },
   { key: "when_not_appropriate", label: "When this treatment may not be appropriate" },
-  { key: "fda_status", label: "Regulatory status" },
+  { key: "fda_status", label: "United States regulatory status" },
+  { key: "canada_status", label: "Canadian regulatory status" },
   { key: "evidence_grade", label: "Evidence status" },
 ] as const satisfies ReadonlyArray<{ key: keyof Treatment; label: string }>;
 
@@ -277,7 +287,7 @@ export const COMPARISON_SECTIONS = [
   {
     id: "evidence",
     title: "Evidence and regulatory status",
-    keys: ["fda_status", "evidence_grade"],
+    keys: ["fda_status", "canada_status", "evidence_grade"],
   },
 ] as const satisfies ReadonlyArray<{
   id: string;
@@ -296,6 +306,7 @@ const EXTRA_ROW_LABELS: Record<string, string> = {
   category: "Category",
   treatment_class: "Treatment class",
   pricing_basis: "Pricing basis",
+  intended_areas: "Intended areas",
   summary: "Summary",
 };
 
@@ -387,13 +398,26 @@ export interface AvailableComparison {
   treatment_a_slug: string;
   treatment_b_slug: string;
   comparison_mode: ComparisonMode;
-  last_reviewed_at: string;
+  last_reviewed_at: string | null;
+  is_featured: boolean;
+  is_indexable: boolean;
+}
+
+export interface ComparisonFamilyRule {
+  id: string;
+  left_group_slug: string;
+  right_group_slug: string;
+  comparison_mode: "different_approach";
+  template_key: string;
+  public_label: string;
+  is_active: boolean;
 }
 
 export interface ComparisonExperience {
   treatments: TreatmentPickerRecord[];
   comparisons: AvailableComparison[];
   popularComparisons: PopularComparison[];
+  familyRules: ComparisonFamilyRule[];
 }
 
 export function comparisonOtherSlug(
@@ -425,4 +449,32 @@ export function directCompatibleComparisons(
     seen.add(otherSlug);
     return [{ treatmentSlug: otherSlug, comparisonSlug: comparison.slug }];
   });
+}
+
+export interface RegionalPriceEstimate {
+  id: string;
+  treatment_id: string | null;
+  comparison_group_slug: string | null;
+  country_code: MarketCode;
+  region_slug: string;
+  region_name: string;
+  currency: string;
+  pricing_unit: string;
+  treatment_area: string | null;
+  estimated_average: string | null;
+  estimated_median: string | null;
+  estimated_low: string;
+  estimated_high: string;
+  source_count: number;
+  source_urls: string[];
+  methodology_note: string;
+  limitations: string;
+  researched_at: string;
+}
+
+export interface RegionalPriceResult {
+  postalCode: string;
+  countryCode: MarketCode;
+  regionName: string;
+  estimate: RegionalPriceEstimate | null;
 }
