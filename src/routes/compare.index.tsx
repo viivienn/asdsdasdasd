@@ -4,6 +4,7 @@ import { TreatmentPicker } from "@/components/treatment-picker";
 import { SectionHeading } from "@/components/editorial";
 import { ComparisonRequestForm } from "@/components/demand-forms";
 import { absoluteUrl } from "@/lib/site";
+import type { PopularComparison } from "@/lib/content-types";
 
 export const Route = createFileRoute("/compare/")({
   loader: () => fetchCompareIndex(),
@@ -51,7 +52,7 @@ function CompareHub() {
         <section className="mt-14">
           <SectionHeading>Popular comparisons</SectionHeading>
           <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-            {popularComparisons.map((comparison) => (
+            {popularComparisons.map((comparison: PopularComparison) => (
               <li key={comparison.slug}>
                 <Link
                   to="/compare/$slug"

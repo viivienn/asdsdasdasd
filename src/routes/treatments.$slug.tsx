@@ -12,6 +12,7 @@ import { TreatmentDisclaimer } from "@/components/disclaimers";
 import { CompareWith, MatchGate } from "@/components/treatment-actions";
 import { TreatmentVisual } from "@/components/treatment-visual";
 import { absoluteUrl } from "@/lib/site";
+import type { AvailableComparison, TreatmentPickerRecord } from "@/lib/content-types";
 
 export const Route = createFileRoute("/treatments/$slug")({
   loader: async ({ params }) => {
@@ -62,8 +63,10 @@ function TreatmentPage() {
   const { data, experience } = Route.useLoaderData();
   const treatment = data.treatment as Treatment;
   const sources = data.sources as TreatmentSource[];
-  const pickerTreatment = experience.treatments.find((entry) => entry.slug === slug);
-  const related = experience.comparisons.filter((comparison) =>
+  const pickerTreatment = experience.treatments.find(
+    (entry: TreatmentPickerRecord) => entry.slug === slug,
+  );
+  const related = experience.comparisons.filter((comparison: AvailableComparison) =>
     [comparison.treatment_a_slug, comparison.treatment_b_slug].includes(slug),
   );
   const profileRows = TREATMENT_PROFILE_ROWS.filter((row) => {
@@ -180,9 +183,11 @@ function TreatmentPage() {
         <section className="mt-12">
           <h2 className="text-2xl">Related comparisons</h2>
           <ul className="mt-3 flex flex-wrap gap-2 text-sm">
-            {related.map((comparison) => {
+            {related.map((comparison: AvailableComparison) => {
               const otherSlug = comparisonOtherSlug(comparison, slug);
-              const other = experience.treatments.find((entry) => entry.slug === otherSlug);
+              const other = experience.treatments.find(
+                (entry: TreatmentPickerRecord) => entry.slug === otherSlug,
+              );
               return (
                 <li key={comparison.slug}>
                   <Link
