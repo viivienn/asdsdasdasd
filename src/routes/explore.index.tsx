@@ -1,12 +1,19 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Search } from "lucide-react";
+import { ArrowRight, Search } from "lucide-react";
 import { z } from "zod";
 import { fetchCatalog } from "@/lib/content.functions";
-import { ENTITY_GROUP_LABEL, type Treatment, type TreatmentMedia } from "@/lib/content-types";
-import type { MarketCode } from "@/lib/content-types";
+import {
+  ENTITY_DESCRIPTION,
+  ENTITY_GROUP_LABEL,
+  type EntityType,
+  type MarketCode,
+  type Treatment,
+  type TreatmentMedia,
+} from "@/lib/content-types";
 import { TreatmentVisual } from "@/components/treatment-visual";
 import { SectionHeading } from "@/components/editorial";
+import { GOAL_FILTERS, matchesGoal, slugifyType } from "@/lib/taxonomy";
 import { absoluteUrl } from "@/lib/site";
 
 interface CatalogEntryView extends Treatment {
@@ -17,21 +24,20 @@ interface CatalogEntryView extends Treatment {
   markets: MarketCode[];
 }
 
-const searchSchema = z.object({ type: z.string().optional() });
-const GOAL_FILTERS = [
-  { slug: "expression-lines", label: "Expression lines", keywords: ["neuromodulator"] },
-  {
-    slug: "volume-contour",
-    label: "Volume & contour",
-    keywords: ["filler", "biostimulator", "collagen stimulator"],
-  },
-  { slug: "lift-tighten", label: "Lift & tighten", keywords: ["energy device"] },
-  {
-    slug: "texture-pores",
-    label: "Texture & pores",
-    keywords: ["facial", "exfoliation", "microneedling"],
-  },
-] as const;
+const entitySchema = z.enum(["class", "brand_family", "product", "device", "procedure"]);
+const searchSchema = z.object({
+  type: z.string().optional(),
+  goal: z.string().optional(),
+  entity: entitySchema.optional(),
+});
+
+const ENTITY_TABS: Array<{ entity: EntityType; label: string }> = [
+  { entity: "product", label: "Products" },
+  { entity: "brand_family", label: "Brands" },
+  { entity: "device", label: "Devices" },
+  { entity: "procedure", label: "Procedures" },
+  { entity: "class", label: "Treatment classes" },
+];
 
 export const Route = createFileRoute("/explore/")({
   validateSearch: (search) => searchSchema.parse(search),
@@ -61,32 +67,30 @@ function Explore() {
   };
   const search = Route.useSearch();
   const [query, setQuery] = useState("");
-  const [goal, setGoal] = useState("");
   const selectedType = search.type ?? "";
+  const selectedGoal = search.goal ?? "";
+  const selectedEntity = search.entity;
 
   const visible = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     return entries.filter((entry) => {
+      if (selectedEntity && entry.entity_type !== selectedEntity) return false;
       if (
         selectedType &&
-        slugify(entry.category) !== selectedType &&
-        slugify(entry.entity_type) !== selectedType
+        slugifyType(entry.category) !== selectedType &&
+        slugifyType(entry.treatment_class) !== selectedType
       ) {
         return false;
       }
-      if (goal) {
-        const goalFilter = GOAL_FILTERS.find((item) => item.slug === goal);
-        const haystack =
-          `${entry.category} ${entry.treatment_class} ${entry.primary_purpose ?? ""}`.toLowerCase();
-        if (goalFilter && !goalFilter.keywords.some((keyword) => haystack.includes(keyword))) {
-          return false;
-        }
-      }
+      const goalHaystack =
+        `${entry.category} ${entry.treatment_class} ${entry.primary_purpose ?? ""}`.toLowerCase();
+      if (selectedGoal && !matchesGoal(goalHaystack, selectedGoal)) return false;
       return (
         !normalized ||
         [
           entry.name,
           entry.category,
+          entry.treatment_class,
           entry.primary_purpose,
           entry.manufacturer,
           entry.brand_name,
@@ -96,71 +100,120 @@ function Explore() {
           .some((value) => value!.toLowerCase().includes(normalized))
       );
     });
-  }, [entries, goal, query, selectedType]);
+  }, [entries, query, selectedEntity, selectedGoal, selectedType]);
 
   const types = [...new Set(entries.map((entry) => entry.category).filter(Boolean))].sort();
-  const brands = visible.filter((entry) => entry.entity_type === "brand_family");
-  const devices = visible.filter((entry) => entry.entity_type === "device");
-  const products = visible.filter((entry) => entry.entity_type === "product");
-  const procedures = visible.filter((entry) => entry.entity_type === "procedure");
-  const classes = visible.filter((entry) => entry.entity_type === "class");
+  const grouped = new Map<EntityType, CatalogEntryView[]>(
+    ENTITY_TABS.map(({ entity }) => [
+      entity,
+      visible.filter((entry) => entry.entity_type === entity),
+    ]),
+  );
+  const hasFilters = Boolean(query || selectedType || selectedGoal || selectedEntity);
 
   return (
     <>
-      <header>
-        <h1 className="font-display text-4xl">Explore</h1>
-        <p className="mt-3 max-w-2xl text-muted-foreground">
-          Browse by goal, treatment type, brand, product, or device.
+      <header className="mx-auto max-w-3xl text-center">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+          Treatment catalog
+        </p>
+        <h1 className="mt-3 font-display text-4xl sm:text-5xl">Explore Aesthetic Index</h1>
+        <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
+          Understand the difference between treatment classes, brands, products, devices, and
+          procedures before you compare them.
         </p>
       </header>
 
-      <div className="mt-7">
-        <label className="flex min-h-12 items-center gap-2 rounded-full border border-input bg-card px-4">
-          <Search aria-hidden="true" className="size-4 text-muted-foreground" />
+      <div className="mx-auto mt-8 max-w-3xl">
+        <label className="flex min-h-14 items-center gap-3 rounded-2xl border border-input bg-card px-4 shadow-card">
+          <Search aria-hidden="true" className="size-5 text-muted-foreground" />
           <span className="sr-only">Search the treatment catalog</span>
           <input
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search treatments, brands, products or devices"
-            className="w-full bg-transparent text-sm outline-none"
+            className="w-full bg-transparent text-base outline-none"
           />
         </label>
       </div>
 
-      {!query && !selectedType ? (
-        <section className="mt-12">
+      <nav aria-label="Explore catalog sections" className="mt-9">
+        <ul className="flex flex-wrap justify-center gap-2">
+          <li>
+            <Link
+              to="/explore"
+              search={{}}
+              className={`inline-flex rounded-full border px-4 py-2 text-sm ${
+                !selectedEntity && !selectedGoal && !selectedType
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-rule bg-card hover:border-primary"
+              }`}
+            >
+              Everything
+            </Link>
+          </li>
+          {ENTITY_TABS.map(({ entity, label }) => (
+            <li key={entity}>
+              <Link
+                to="/explore"
+                search={{ entity }}
+                className={`inline-flex rounded-full border px-4 py-2 text-sm ${
+                  selectedEntity === entity
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-rule bg-card hover:border-primary"
+                }`}
+              >
+                {label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      {!query && !selectedEntity && !selectedType ? (
+        <section className="mt-14">
           <SectionHeading>Browse by treatment goal</SectionHeading>
-          <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            {GOAL_FILTERS.map((item) => (
-              <li key={item.slug}>
-                <button
-                  type="button"
-                  aria-pressed={goal === item.slug}
-                  onClick={() => setGoal((current) => (current === item.slug ? "" : item.slug))}
-                  className={`block h-full w-full rounded-xl border p-4 text-left text-sm ${
-                    goal === item.slug
-                      ? "border-primary bg-secondary text-secondary-foreground"
-                      : "border-rule bg-card hover:border-primary"
+          <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {GOAL_FILTERS.map((goal, index) => (
+              <li key={goal.slug}>
+                <Link
+                  to="/explore"
+                  search={{ goal: selectedGoal === goal.slug ? undefined : goal.slug }}
+                  className={`block h-full rounded-2xl border p-4 transition hover:border-primary ${
+                    selectedGoal === goal.slug
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : index % 2
+                        ? "border-rule bg-secondary"
+                        : "border-rule bg-sage"
                   }`}
                 >
-                  {item.label}
-                </button>
+                  <span className="font-medium">{goal.label}</span>
+                  <span
+                    className={`mt-1 block text-xs ${
+                      selectedGoal === goal.slug
+                        ? "text-primary-foreground/80"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {goal.detail}
+                  </span>
+                </Link>
               </li>
             ))}
           </ul>
         </section>
       ) : null}
 
-      {!query && !selectedType && types.length ? (
-        <section className="mt-12">
+      {!query && !selectedEntity && !selectedGoal && types.length ? (
+        <section className="mt-14">
           <SectionHeading>Browse by treatment type</SectionHeading>
           <ul className="mt-4 flex flex-wrap gap-2">
             {types.map((type) => (
               <li key={type}>
                 <Link
                   to="/explore"
-                  search={{ type: slugify(type) }}
+                  search={{ type: slugifyType(type) }}
                   className="inline-flex rounded-full border border-rule bg-card px-4 py-2 text-sm hover:border-primary"
                 >
                   {type}
@@ -171,19 +224,27 @@ function Explore() {
         </section>
       ) : null}
 
-      {selectedType ? (
-        <div className="mt-7">
+      {hasFilters ? (
+        <div className="mt-8 flex items-center justify-between gap-4 rounded-xl bg-muted/55 px-4 py-3">
+          <p className="text-sm">
+            {visible.length} {visible.length === 1 ? "result" : "results"}
+          </p>
           <Link to="/explore" search={{}} className="text-sm underline underline-offset-4">
-            Clear treatment-type filter
+            Clear filters
           </Link>
         </div>
       ) : null}
 
-      <CatalogSection title="Brands" entries={brands} />
-      <CatalogSection title="Products" entries={products} />
-      <CatalogSection title="Devices" entries={devices} />
-      <CatalogSection title="Procedures" entries={procedures} />
-      <CatalogSection title={ENTITY_GROUP_LABEL.class} entries={classes} />
+      {ENTITY_TABS.map(({ entity, label }) => (
+        <CatalogSection
+          key={entity}
+          title={label}
+          description={ENTITY_DESCRIPTION[entity]}
+          entries={grouped.get(entity) ?? []}
+          showAll={!selectedEntity && !hasFilters}
+          entity={entity}
+        />
+      ))}
 
       {visible.length === 0 ? (
         <p className="mt-12 rounded-xl border border-rule bg-card p-5 text-sm text-muted-foreground">
@@ -191,16 +252,26 @@ function Explore() {
         </p>
       ) : null}
 
-      {popularComparisons.length ? (
-        <section className="mt-12">
-          <SectionHeading>Popular comparisons</SectionHeading>
-          <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+      {popularComparisons.length && !hasFilters ? (
+        <section className="mt-16 border-t border-rule pt-12">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <SectionHeading>Popular comparisons</SectionHeading>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Structured side-by-side views of related treatments and treatment approaches.
+              </p>
+            </div>
+            <Link to="/compare" className="hidden items-center gap-1 text-sm sm:inline-flex">
+              Compare anything <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+          </div>
+          <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {popularComparisons.map((comparison) => (
               <li key={comparison.slug}>
                 <Link
                   to="/compare/$slug"
                   params={{ slug: comparison.slug }}
-                  className="block rounded-xl border border-rule bg-card p-4 hover:border-primary"
+                  className="block rounded-xl border border-rule bg-card p-4 font-medium hover:border-primary"
                 >
                   {comparison.label}
                 </Link>
@@ -213,23 +284,57 @@ function Explore() {
   );
 }
 
-function CatalogSection({ title, entries }: { title: string; entries: CatalogEntryView[] }) {
+function CatalogSection({
+  title,
+  description,
+  entries,
+  showAll,
+  entity,
+}: {
+  title: string;
+  description: string;
+  entries: CatalogEntryView[];
+  showAll: boolean;
+  entity: EntityType;
+}) {
   if (!entries.length) return null;
+  const shown = showAll ? entries.slice(0, 8) : entries;
   return (
-    <section className="mt-12">
-      <SectionHeading>{title}</SectionHeading>
-      <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-        {entries.map((entry) => (
+    <section id={entity} className="mt-14 scroll-mt-28">
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          <SectionHeading>{title}</SectionHeading>
+          <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+        </div>
+        {showAll && entries.length > shown.length ? (
+          <Link
+            to="/explore"
+            search={{ entity }}
+            className="hidden items-center gap-1 text-sm font-medium sm:inline-flex"
+          >
+            See all {ENTITY_GROUP_LABEL[entity].toLowerCase()}
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        ) : null}
+      </div>
+      <ul className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        {shown.map((entry) => (
           <li key={entry.id}>
             <Link
               to="/treatments/$slug"
               params={{ slug: entry.slug }}
-              className="flex h-full items-center gap-3 rounded-xl border border-rule bg-card px-4 py-3 hover:border-primary"
+              className="group flex h-full flex-col rounded-2xl border border-rule bg-card p-3 transition hover:-translate-y-0.5 hover:border-primary hover:shadow-card"
             >
-              <TreatmentVisual name={entry.name} media={entry.media} />
-              <span className="min-w-0">
-                <span className="block truncate font-medium">{entry.name}</span>
-                <span className="block truncate text-xs text-muted-foreground">
+              <TreatmentVisual
+                name={entry.name}
+                media={entry.media}
+                className="aspect-square size-auto w-full border-0 bg-muted/55"
+              />
+              <span className="mt-3 min-w-0">
+                <span className="block truncate font-medium group-hover:text-primary">
+                  {entry.name}
+                </span>
+                <span className="mt-1 block truncate text-xs text-muted-foreground">
                   {entry.parent_name ? `${entry.parent_name} · ` : ""}
                   {entry.category}
                 </span>
@@ -240,11 +345,4 @@ function CatalogSection({ title, entries }: { title: string; entries: CatalogEnt
       </ul>
     </section>
   );
-}
-
-function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
 }

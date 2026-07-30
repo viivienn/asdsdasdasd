@@ -9,6 +9,7 @@ import {
   type SearchIndex,
   type SearchKind,
 } from "@/lib/search-index";
+import { TreatmentVisual } from "@/components/treatment-visual";
 
 const KIND_ICON: Record<SearchKind, typeof Search> = {
   category: FlaskConical,
@@ -58,12 +59,16 @@ function ResultRow({
           active ? "bg-secondary" : ""
         }`}
       >
-        <span
-          aria-hidden="true"
-          className="grid size-8 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground"
-        >
-          <Icon className="size-4" />
-        </span>
+        {entry.entityType ? (
+          <TreatmentVisual name={entry.label} media={entry.media ?? null} className="size-10" />
+        ) : (
+          <span
+            aria-hidden="true"
+            className="grid size-8 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground"
+          >
+            <Icon className="size-4" />
+          </span>
+        )}
         <span className="min-w-0">
           <span className="block truncate text-[0.95rem] font-medium">
             {at >= 0 ? (
@@ -191,7 +196,7 @@ export function SiteSearch({
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={onInputKeyDown}
-          placeholder="Search treatments, brands or categories"
+          placeholder="Find treatments, products, brands or devices"
           aria-label="Search treatments, brands, categories and comparisons"
           className="w-full bg-transparent outline-none placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden"
         />

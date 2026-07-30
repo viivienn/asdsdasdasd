@@ -315,6 +315,7 @@ test("public feature and navigation contracts match the MVP direction", async ()
     disclosure,
     shell,
     sitemap,
+    priceIndex,
     priceRoute,
     server,
     migration,
@@ -326,6 +327,7 @@ test("public feature and navigation contracts match the MVP direction", async ()
     readFile(new URL("../routes/advertising-disclosure.tsx", import.meta.url), "utf8"),
     readFile(new URL("../components/site-shell.tsx", import.meta.url), "utf8"),
     readFile(new URL("../routes/sitemap[.]xml.ts", import.meta.url), "utf8"),
+    readFile(new URL("../routes/prices.index.tsx", import.meta.url), "utf8"),
     readFile(new URL("../routes/prices.us.ca.$city.$treatment.tsx", import.meta.url), "utf8"),
     readFile(new URL("./content.server.ts", import.meta.url), "utf8"),
     readFile(
@@ -341,8 +343,10 @@ test("public feature and navigation contracts match the MVP direction", async ()
   assert.doesNotMatch(explore, />United States<|>Canada</);
   assert.doesNotMatch(home + about, /no sponsorships/i);
   assert.match(disclosure, /Commercial placements are clearly labeled/);
-  assert.match(shell, /FEATURES\.clinicPriceDirectory/);
+  assert.match(shell, /to="\/prices"/);
+  assert.doesNotMatch(shell, /to="\/prices\/us\/ca\/\$city\/\$treatment"/);
   assert.match(sitemap, /FEATURES\.clinicPriceDirectory/);
+  assert.match(priceIndex, /RegionalPriceLookup/);
   assert.match(priceRoute, /Clinic price directory unavailable/);
   assert.match(server, /from\("regional_price_estimates"\)/);
   assert.doesNotMatch(server, /\bfetch\s*\(/);
@@ -350,6 +354,26 @@ test("public feature and navigation contracts match the MVP direction", async ()
     migration,
     /drop table|alter table public\.(clinics|price_observations|offers)/i,
   );
+});
+
+test("discovery is the homepage and comparison remains a separate tool", async () => {
+  const [home, compare, shell, treatmentActions, explore] = await Promise.all([
+    readFile(new URL("../routes/index.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../routes/compare.index.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../components/site-shell.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../components/treatment-actions.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../routes/explore.index.tsx", import.meta.url), "utf8"),
+  ]);
+  assert.match(home, /<SiteSearch index=\{searchIndex\} variant="hero"/);
+  assert.doesNotMatch(home, /<TreatmentPicker/);
+  assert.match(compare, /<TreatmentPicker/);
+  assert.match(shell, /function ExploreMenu/);
+  assert.match(shell, /onMouseEnter=\{openMenu\}/);
+  assert.match(shell, /to="\/prices"/);
+  assert.match(treatmentActions, /listCompatibleTreatmentOptions/);
+  assert.match(treatmentActions, /role="listbox"/);
+  assert.match(explore, /Browse by treatment goal/);
+  assert.match(explore, /Treatment classes/);
 });
 
 test("mobile picker keeps the dialog and listbox accessibility contract", async () => {
