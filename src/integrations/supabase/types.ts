@@ -683,6 +683,7 @@ export type Database = {
           estimated_median: number | null
           id: string
           is_sample: boolean
+          limitations: string | null
           methodology_note: string
           pricing_unit: string
           publication_status: Database["public"]["Enums"]["publication_status"]
@@ -706,6 +707,7 @@ export type Database = {
           estimated_median?: number | null
           id?: string
           is_sample?: boolean
+          limitations?: string | null
           methodology_note: string
           pricing_unit: string
           publication_status?: Database["public"]["Enums"]["publication_status"]
@@ -729,6 +731,7 @@ export type Database = {
           estimated_median?: number | null
           id?: string
           is_sample?: boolean
+          limitations?: string | null
           methodology_note?: string
           pricing_unit?: string
           publication_status?: Database["public"]["Enums"]["publication_status"]
@@ -957,6 +960,7 @@ export type Database = {
           at_a_glance: Json | null
           brand_name: string | null
           bruising_text: string | null
+          canada_status: string | null
           category: string
           created_at: string
           downtime_text: string | null
@@ -1005,6 +1009,7 @@ export type Database = {
           at_a_glance?: Json | null
           brand_name?: string | null
           bruising_text?: string | null
+          canada_status?: string | null
           category: string
           created_at?: string
           downtime_text?: string | null
@@ -1053,6 +1058,7 @@ export type Database = {
           at_a_glance?: Json | null
           brand_name?: string | null
           bruising_text?: string | null
+          canada_status?: string | null
           category?: string
           created_at?: string
           downtime_text?: string | null
