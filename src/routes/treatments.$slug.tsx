@@ -94,14 +94,19 @@ function TreatmentPage() {
         </ol>
       </nav>
 
-      <header className="mt-5 grid gap-5 sm:grid-cols-[8rem_1fr] sm:items-center">
-        <TreatmentVisual
-          name={treatment.name}
-          media={pickerTreatment?.media ?? null}
-          className="size-28 sm:size-32"
-          showCredit
-        />
-        <div>
+      <header className="mt-6 grid gap-7 lg:grid-cols-[minmax(18rem,0.8fr)_minmax(0,1.2fr)] lg:items-start">
+        <div className="flex min-h-[22rem] items-center justify-center rounded-2xl bg-muted/55 p-6 sm:min-h-[28rem]">
+          <TreatmentVisual
+            name={treatment.name}
+            media={pickerTreatment?.media ?? null}
+            className="aspect-[4/5] h-auto w-full max-w-sm border-0 bg-transparent shadow-none"
+            showCredit
+          />
+        </div>
+        <div className="lg:py-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+            {treatment.manufacturer || treatment.brand_name || treatment.treatment_class}
+          </p>
           <h1 className="font-display text-4xl">{treatment.name}</h1>
           {treatment.summary ? (
             <p className="mt-3 max-w-2xl text-lg text-muted-foreground">{treatment.summary}</p>
@@ -113,23 +118,27 @@ function TreatmentPage() {
             ) : null}
             {sources.length ? <EvidenceState state="sourced" /> : null}
           </div>
+          <div className="mt-6 flex flex-wrap gap-3">
+            {pickerTreatment ? (
+              <CompareWith
+                slug={slug}
+                name={treatment.name}
+                treatments={experience.treatments}
+                familyRules={experience.familyRules}
+              />
+            ) : null}
+            <Link
+              to="/prices"
+              className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            >
+              See local prices
+            </Link>
+          </div>
+          <div className="mt-6 max-w-2xl">
+            <MatchGate name={treatment.name} />
+          </div>
         </div>
       </header>
-
-      {pickerTreatment ? (
-        <div className="mt-7">
-          <CompareWith
-            slug={slug}
-            name={treatment.name}
-            treatments={experience.treatments}
-            familyRules={experience.familyRules}
-          />
-        </div>
-      ) : null}
-
-      <div className="mt-6 max-w-2xl">
-        <MatchGate name={treatment.name} />
-      </div>
 
       {profileRows.length ? (
         <section className="mt-10">

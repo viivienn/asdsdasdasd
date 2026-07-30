@@ -11,14 +11,20 @@ export default defineTool({
     targetType: z
       .enum(["treatment", "comparison", "price", "page", "other"])
       .describe("What the suggestion is about."),
-    targetSlug: z.string().trim().optional().describe("Slug or path the suggestion applies to, if any."),
+    targetSlug: z
+      .string()
+      .trim()
+      .optional()
+      .describe("Slug or path the suggestion applies to, if any."),
     title: z.string().trim().min(3).max(200).describe("Short summary of the suggestion."),
     body: z
       .string()
       .trim()
       .min(10)
       .max(8000)
-      .describe("The detail: what to change and why. Include a ready-to-paste Lovable prompt when useful."),
+      .describe(
+        "The detail: what to change and why. Include a ready-to-paste Lovable prompt when useful.",
+      ),
     sources: z
       .array(z.string().url())
       .max(20)

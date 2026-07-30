@@ -39,15 +39,15 @@ export function ComparisonDisclaimer() {
   return (
     <Panel heading="Educational information only" label="Educational information only">
       <p className="mt-2">
-        This comparison is intended to help readers understand commonly reported differences
-        between aesthetic treatments. It is not a personalized treatment recommendation and should
-        not be used to diagnose a condition, select a procedure, or replace an evaluation by a
-        qualified licensed healthcare professional.
+        This comparison is intended to help readers understand commonly reported differences between
+        aesthetic treatments. It is not a personalized treatment recommendation and should not be
+        used to diagnose a condition, select a procedure, or replace an evaluation by a qualified
+        licensed healthcare professional.
       </p>
       <p>
-        Treatment risks, results, contraindications, product selection, dosage, device settings,
-        and suitability depend on individual anatomy, medical history, provider technique, and
-        other factors.
+        Treatment risks, results, contraindications, product selection, dosage, device settings, and
+        suitability depend on individual anatomy, medical history, provider technique, and other
+        factors.
       </p>
     </Panel>
   );
@@ -74,11 +74,11 @@ export function PricingDisclaimer({ className = "" }: { className?: string }) {
     >
       <h2 className="text-base font-medium">Pricing notice</h2>
       <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-        Prices shown are publicly listed or otherwise sourced observations captured on the
-        displayed verification date. They are not quotes or guarantees. Final cost may vary based
-        on provider, treatment area, quantity, consultation requirements, membership status,
-        promotions, taxes, and individual treatment needs. Confirm all pricing directly with the
-        clinic before booking or purchasing.
+        Prices shown are publicly listed or otherwise sourced observations captured on the displayed
+        verification date. They are not quotes or guarantees. Final cost may vary based on provider,
+        treatment area, quantity, consultation requirements, membership status, promotions, taxes,
+        and individual treatment needs. Confirm all pricing directly with the clinic before booking
+        or purchasing.
       </p>
       <p className="mt-3 text-sm">
         <Link to="/medical-disclaimer" className="underline underline-offset-4">

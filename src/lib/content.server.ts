@@ -21,7 +21,7 @@ import type {
   RegionalPriceEstimate,
   RegionalPriceResult,
 } from "./content-types";
-import { canonicalPairSlug } from "./content-types";
+import { canonicalPairSlug, isPublishableTreatmentMedia } from "./content-types";
 import {
   comparisonSlugForPair,
   hasMinimumComparisonProfile,
@@ -82,7 +82,7 @@ async function loadTreatmentRows(
 }
 
 const MEDIA_COLUMNS =
-  "id,treatment_id,url,alt_text,media_role,credit,source_url,license,license_url";
+  "id,treatment_id,url,alt_text,media_role,credit,source_url,license,license_url,rights_verified_at,publication_status,is_sample";
 
 export interface DemoAware<T> {
   data: T;
@@ -134,6 +134,7 @@ export async function listCatalog(): Promise<CatalogEntry[]> {
   for (const m of (media.data ?? []) as unknown as Array<
     TreatmentMedia & { treatment_id: string }
   >) {
+    if (!isPublishableTreatmentMedia(m)) continue;
     if (!mediaByTreatment.has(m.treatment_id)) mediaByTreatment.set(m.treatment_id, m);
   }
   return list.map((t) => {
@@ -156,6 +157,7 @@ export async function listMediaFor(ids: string[]): Promise<Record<string, Treatm
     .in("treatment_id", ids);
   const out: Record<string, TreatmentMedia> = {};
   for (const m of (data ?? []) as unknown as Array<TreatmentMedia & { treatment_id: string }>) {
+    if (!isPublishableTreatmentMedia(m)) continue;
     if (!out[m.treatment_id]) out[m.treatment_id] = m;
   }
   return out;
@@ -299,6 +301,7 @@ export async function listComparisonExperience(): Promise<ComparisonExperience> 
   const treatmentBySlug = new Map(base.map((treatment) => [treatment.slug, treatment]));
   const media = new Map<string, TreatmentMedia>();
   for (const row of mediaResult.data ?? []) {
+    if (!isPublishableTreatmentMedia(row as TreatmentMedia)) continue;
     if (!media.has(row.treatment_id)) media.set(row.treatment_id, row as TreatmentMedia);
   }
   const groups = new Map<string, string[]>();

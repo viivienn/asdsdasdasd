@@ -15,42 +15,42 @@ The deployed Supabase project was inspected read-only. It still reflects the ear
 
 ## Existing entities before this pack
 
-| Entity type | Existing slugs |
-|---|---|
-| Class | `neuromodulator`, `ha-filler`, `collagen-stimulator`, `energy-device` |
-| Brand family | `juvederm`, `restylane` |
-| Product | `botox`, `dysport`, `xeomin`, `daxxify`, `juvederm-voluma`, `restylane-lyft`, `sculptra`, `radiesse` |
-| Device | `thermage`, `ultherapy`, `morpheus8` |
-| Procedure | `hydrafacial`, `diamondglow` |
+| Entity type  | Existing slugs                                                                                       |
+| ------------ | ---------------------------------------------------------------------------------------------------- |
+| Class        | `neuromodulator`, `ha-filler`, `collagen-stimulator`, `energy-device`                                |
+| Brand family | `juvederm`, `restylane`                                                                              |
+| Product      | `botox`, `dysport`, `xeomin`, `daxxify`, `juvederm-voluma`, `restylane-lyft`, `sculptra`, `radiesse` |
+| Device       | `thermage`, `ultherapy`, `morpheus8`                                                                 |
+| Procedure    | `hydrafacial`, `diamondglow`                                                                         |
 
 ## Missing launch entities added
 
-| Slug | Type | Parent | Reason |
-|---|---|---|---|
-| `restylane-kysse` | Product | `restylane` | Required for Juvéderm Voluma vs. Restylane Kysse |
-| `potenza` | Device | `energy-device` | Required for Morpheus8 vs. Potenza |
+| Slug              | Type    | Parent          | Reason                                           |
+| ----------------- | ------- | --------------- | ------------------------------------------------ |
+| `restylane-kysse` | Product | `restylane`     | Required for Juvéderm Voluma vs. Restylane Kysse |
+| `potenza`         | Device  | `energy-device` | Required for Morpheus8 vs. Potenza               |
 
 The post-migration inventory is 21 records. Existing IDs are preserved because the migration updates by slug and inserts only when a slug does not exist.
 
 ## Launch comparison subjects
 
-| Entity | Slug | Type | Parent | Pack status |
-|---|---|---|---|---|
-| Botox Cosmetic | `botox` | Product | `neuromodulator` | Published |
-| Dysport | `dysport` | Product | `neuromodulator` | Published |
-| Hyaluronic acid dermal fillers | `ha-filler` | Class | — | Published |
-| Juvéderm | `juvederm` | Brand family | `ha-filler` | Published |
-| Restylane | `restylane` | Brand family | `ha-filler` | Published |
-| Juvéderm Voluma XC | `juvederm-voluma` | Product | `juvederm` | Published |
-| Restylane Kysse | `restylane-kysse` | Product | `restylane` | Published |
-| Sculptra | `sculptra` | Product | `collagen-stimulator` | Published |
-| Radiesse | `radiesse` | Product | `collagen-stimulator` | Published |
-| Thermage FLX | `thermage` | Device | `energy-device` | Published |
-| Ultherapy | `ultherapy` | Device | `energy-device` | Published |
-| Morpheus8 | `morpheus8` | Device | `energy-device` | Published |
-| Potenza | `potenza` | Device | `energy-device` | Published |
-| HydraFacial | `hydrafacial` | Procedure | — | Published |
-| DiamondGlow | `diamondglow` | Procedure | — | Published |
+| Entity                         | Slug              | Type         | Parent                | Pack status |
+| ------------------------------ | ----------------- | ------------ | --------------------- | ----------- |
+| Botox Cosmetic                 | `botox`           | Product      | `neuromodulator`      | Published   |
+| Dysport                        | `dysport`         | Product      | `neuromodulator`      | Published   |
+| Hyaluronic acid dermal fillers | `ha-filler`       | Class        | —                     | Published   |
+| Juvéderm                       | `juvederm`        | Brand family | `ha-filler`           | Published   |
+| Restylane                      | `restylane`       | Brand family | `ha-filler`           | Published   |
+| Juvéderm Voluma XC             | `juvederm-voluma` | Product      | `juvederm`            | Published   |
+| Restylane Kysse                | `restylane-kysse` | Product      | `restylane`           | Published   |
+| Sculptra                       | `sculptra`        | Product      | `collagen-stimulator` | Published   |
+| Radiesse                       | `radiesse`        | Product      | `collagen-stimulator` | Published   |
+| Thermage FLX                   | `thermage`        | Device       | `energy-device`       | Published   |
+| Ultherapy                      | `ultherapy`       | Device       | `energy-device`       | Published   |
+| Morpheus8                      | `morpheus8`       | Device       | `energy-device`       | Published   |
+| Potenza                        | `potenza`         | Device       | `energy-device`       | Published   |
+| HydraFacial                    | `hydrafacial`     | Procedure    | —                     | Published   |
+| DiamondGlow                    | `diamondglow`     | Procedure    | —                     | Published   |
 
 ## Current treatment fields
 

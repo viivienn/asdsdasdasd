@@ -22,7 +22,7 @@ export default defineMcp({
     "Use list_treatments, get_treatment, list_comparisons and list_price_observations to inspect the underlying content and find gaps.",
     "To propose work, call suggest_change — include a ready-to-paste Lovable prompt in the body when the change needs code or design work. Check list_suggestions first to avoid duplicates.",
     "update_treatment_fields writes editorial text directly and only works for admin accounts.",
-    "Editorial rules: never write medical advice, diagnosis, treatment recommendations or dosage. Keep phrasing neutral (\"commonly used for\"), and cite a source URL for every factual claim.",
+    'Editorial rules: never write medical advice, diagnosis, treatment recommendations or dosage. Keep phrasing neutral ("commonly used for"), and cite a source URL for every factual claim.',
   ].join(" "),
   auth: auth.oauth.issuer({
     issuer: `https://${projectRef}.supabase.co/auth/v1`,

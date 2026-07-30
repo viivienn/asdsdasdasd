@@ -65,6 +65,19 @@ export interface TreatmentMedia {
   source_url: string;
   license: string;
   license_url: string | null;
+  rights_verified_at: string | null;
+  publication_status: PublicationStatus;
+  is_sample: boolean;
+}
+
+export function isPublishableTreatmentMedia(
+  media: Pick<TreatmentMedia, "publication_status" | "is_sample" | "rights_verified_at">,
+): boolean {
+  return (
+    media.publication_status === "published" &&
+    media.is_sample === false &&
+    media.rights_verified_at !== null
+  );
 }
 
 export interface Treatment {

@@ -11,11 +11,7 @@ export function SectionHeading({
 }
 
 /** Evidence / sourcing state. Always carries a text label, never colour alone. */
-export function EvidenceState({
-  state,
-}: {
-  state: "unsourced" | "sourced" | "reviewed";
-}) {
+export function EvidenceState({ state }: { state: "unsourced" | "sourced" | "reviewed" }) {
   const copy = {
     unsourced: {
       label: "Not yet sourced",
@@ -53,13 +49,7 @@ export function Prose({ children }: { children: ReactNode }) {
 }
 
 /** Wrapper marking a component as a preview of a not-yet-live feature. */
-export function FeaturePreview({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
+export function FeaturePreview({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="border border-dashed border-input bg-card p-4">
       <p className="mb-3 text-xs uppercase tracking-wider text-muted-foreground">

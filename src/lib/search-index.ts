@@ -2,7 +2,9 @@ import {
   ENTITY_LABEL,
   comparisonOtherSlug,
   type AvailableComparison,
+  type EntityType,
   type PopularComparison,
+  type TreatmentMedia,
   type TreatmentPickerRecord,
 } from "./content-types.ts";
 
@@ -13,6 +15,8 @@ export type SearchEntry = {
   sub: string;
   kind: SearchKind;
   slug: string;
+  entityType?: EntityType;
+  media?: TreatmentMedia | null;
 };
 
 export interface SearchIndex {
@@ -20,6 +24,7 @@ export interface SearchIndex {
   categories: SearchEntry[];
   popular: SearchEntry[];
   featuredTreatments: SearchEntry[];
+  browse: Record<EntityType, SearchEntry[]>;
 }
 
 export function buildSearchIndex(
@@ -39,6 +44,8 @@ export function buildSearchIndex(
           ? "device"
           : "treatment",
     slug: treatment.slug,
+    entityType: treatment.entity_type,
+    media: treatment.media,
   }));
 
   const categories = [...new Set(treatments.map((treatment) => treatment.category).filter(Boolean))]
@@ -81,6 +88,18 @@ export function buildSearchIndex(
     .map((treatment) => treatmentEntries.find((entry) => entry.slug === treatment.slug))
     .filter((entry): entry is SearchEntry => Boolean(entry));
 
+  const browse = {
+    class: treatmentEntries.filter((entry) => entry.entityType === "class"),
+    brand_family: treatmentEntries.filter((entry) => entry.entityType === "brand_family"),
+    product: treatmentEntries.filter((entry) => entry.entityType === "product"),
+    device: treatmentEntries.filter((entry) => entry.entityType === "device"),
+    procedure: treatmentEntries.filter((entry) => entry.entityType === "procedure"),
+  } satisfies Record<EntityType, SearchEntry[]>;
+
+  for (const group of Object.values(browse)) {
+    group.sort((a, b) => a.label.localeCompare(b.label));
+  }
+
   const seen = new Set<string>();
   const entries = [...categories, ...treatmentEntries, ...comparisonEntries].filter((entry) => {
     const key = `${entry.kind}:${entry.slug}`;
@@ -89,7 +108,7 @@ export function buildSearchIndex(
     return true;
   });
 
-  return { entries, categories, popular, featuredTreatments };
+  return { entries, categories, popular, featuredTreatments, browse };
 }
 
 const KIND_RANK: Record<SearchKind, number> = {
