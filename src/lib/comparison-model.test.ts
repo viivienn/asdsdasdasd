@@ -123,15 +123,12 @@ test("direct same-family products compare even with different intended areas", (
   assert.equal(listCompatibleTreatmentOptions(volume, [volume, kysse], [])[0]?.section, "family");
 });
 
-test("Botox and dermal fillers resolve as a separately labelled beginner comparison", () => {
+test("curated different-approach pairs resolve but are not suggested automatically", () => {
   const botox = pickerTreatment("botox", ["neuromodulator"], { entity_type: "product" });
   const filler = pickerTreatment("ha-filler", ["dermal-filler"], { entity_type: "class" });
   const compatibility = resolvePairCompatibility(botox, filler, [beginnerRule]);
   assert.equal(compatibility?.mode, "different_approach");
-  assert.equal(
-    listCompatibleTreatmentOptions(botox, [botox, filler], [beginnerRule])[0]?.section,
-    "beginner",
-  );
+  assert.deepEqual(listCompatibleTreatmentOptions(botox, [botox, filler], [beginnerRule]), []);
   assert.equal(
     compatibility && comparisonSlugForPair(botox, filler, compatibility),
     "botox-vs-dermal-fillers",

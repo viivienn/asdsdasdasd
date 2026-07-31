@@ -62,7 +62,7 @@ export type PairCompatibility = {
 
 export type CompatibleTreatmentOption = {
   treatment: TreatmentPickerRecord;
-  section: "closest" | "family" | "beginner";
+  section: "closest" | "family";
   compatibility: PairCompatibility;
 };
 
@@ -190,18 +190,19 @@ export function listCompatibleTreatmentOptions(
     .filter((candidate) => candidate.id !== selected.id)
     .flatMap((candidate) => {
       const compatibility = resolvePairCompatibility(selected, candidate, familyRules);
-      if (!compatibility || !hasMinimumComparisonProfile(candidate)) return [];
+      if (
+        !compatibility ||
+        compatibility.mode !== "direct" ||
+        !hasMinimumComparisonProfile(candidate)
+      ) {
+        return [];
+      }
       const overlappingAreas = candidate.intended_areas.some((area) => selectedAreas.has(area));
-      const section: CompatibleTreatmentOption["section"] =
-        compatibility.mode === "different_approach"
-          ? "beginner"
-          : overlappingAreas
-            ? "closest"
-            : "family";
+      const section: CompatibleTreatmentOption["section"] = overlappingAreas ? "closest" : "family";
       return [{ treatment: candidate, section, compatibility }];
     })
     .sort((a, b) => {
-      const rank = { closest: 0, family: 1, beginner: 2 };
+      const rank = { closest: 0, family: 1 };
       return (
         rank[a.section] - rank[b.section] ||
         a.treatment.sort_rank - b.treatment.sort_rank ||

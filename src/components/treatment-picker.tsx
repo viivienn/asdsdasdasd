@@ -168,7 +168,7 @@ export function TreatmentPicker({
               {selected.length === 0
                 ? "Start with a published treatment profile."
                 : selected.length === 1
-                  ? `Closest matches, other family options, and supported beginner comparisons with ${selected[0].name}.`
+                  ? `Closest matches and other options in the same treatment family as ${selected[0].name}.`
                   : "Two treatments selected."}
             </DialogDescription>
           </DialogHeader>
@@ -217,11 +217,7 @@ export function TreatmentPicker({
                         role="presentation"
                         className="sticky top-0 z-10 -mx-1 bg-background/95 px-1 pb-1 pt-4 text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground backdrop-blur"
                       >
-                        {section === "closest"
-                          ? "Closest matches"
-                          : section === "family"
-                            ? "Other options in this family"
-                            : "Beginner comparisons"}
+                        {section === "closest" ? "Closest matches" : "Other options in this family"}
                       </li>
                     ) : null}
                     <li className="flex items-center gap-3 border-b border-rule py-3 last:border-0">

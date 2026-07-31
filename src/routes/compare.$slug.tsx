@@ -16,6 +16,7 @@ import { ComparisonDisclaimer } from "@/components/disclaimers";
 import { RegionalPriceLookup } from "@/components/regional-price-lookup";
 import { SaveComparisonButton } from "@/components/account-actions";
 import { ComparisonSignupPrompt } from "@/components/comparison-signup-prompt";
+import { consolidateTreatmentSources, formatEditorialDate } from "@/lib/presentation";
 
 export const Route = createFileRoute("/compare/$slug")({
   loader: async ({ params }) => {
@@ -152,7 +153,7 @@ function ComparisonPage() {
   const a = data.a as Treatment;
   const b = data.b as Treatment;
   const comparison = data.comparison;
-  const label = `${a.name} vs. ${b.name}`;
+  const label = comparison?.title_override ?? `${a.name} vs. ${b.name}`;
   const template = resolveTemplate(
     a,
     b,
@@ -170,9 +171,7 @@ function ComparisonPage() {
           {comparison?.last_verified_at || comparison?.last_reviewed_at ? (
             <p className="mt-2 text-sm text-muted-foreground">
               Last verified{" "}
-              {new Date(
-                comparison.last_verified_at ?? comparison.last_reviewed_at!,
-              ).toLocaleDateString()}
+              {formatEditorialDate(comparison.last_verified_at ?? comparison.last_reviewed_at!)}
             </p>
           ) : null}
         </div>
@@ -310,7 +309,9 @@ function SourcesByTreatment({
   return (
     <div className="mt-4 grid gap-6 md:grid-cols-2">
       {[a, b].map((treatment) => {
-        const rows = sources.filter((source) => source.treatment_id === treatment.id);
+        const rows = consolidateTreatmentSources(
+          sources.filter((source) => source.treatment_id === treatment.id),
+        );
         return (
           <div key={treatment.id}>
             <h3 className="text-base font-medium">{treatment.name}</h3>
@@ -329,6 +330,9 @@ function SourcesByTreatment({
                     {" "}
                     · {sourcePublisher(source.source_url)}
                     {source.publication_date ? `, ${source.publication_date.slice(0, 10)}` : ""}
+                    {source.claim_fields.length > 1
+                      ? ` · supports ${source.claim_fields.length} fields`
+                      : ""}
                   </span>
                 </li>
               ))}

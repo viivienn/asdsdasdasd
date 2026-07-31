@@ -41,7 +41,7 @@ export const fetchSearchIndex = createServerFn({ method: "GET" }).handler(async 
 });
 
 export const fetchTreatment = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) => z.object({ slug: z.string().max(80) }).parse(input))
+  .validator((input: unknown) => z.object({ slug: z.string().max(80) }).parse(input))
   .handler(async ({ data }) => {
     const { getTreatmentBySlug, listComparisonExperience } = await import("./content.server");
     const [record, experience] = await Promise.all([
@@ -52,7 +52,7 @@ export const fetchTreatment = createServerFn({ method: "GET" })
   });
 
 export const fetchComparison = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) => z.object({ slug: z.string().max(80) }).parse(input))
+  .validator((input: unknown) => z.object({ slug: z.string().max(80) }).parse(input))
   .handler(async ({ data }) => {
     const { getComparisonBySlug, listTreatments } = await import("./content.server");
     const [comparison, treatments] = await Promise.all([
@@ -63,7 +63,7 @@ export const fetchComparison = createServerFn({ method: "GET" })
   });
 
 export const fetchCityPrices = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ city: z.string().max(80), treatment: z.string().max(80) }).parse(input),
   )
   .handler(async ({ data }) => {
@@ -72,7 +72,7 @@ export const fetchCityPrices = createServerFn({ method: "GET" })
   });
 
 export const fetchRegionalPriceEstimate = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         postalCode: z.string().trim().min(3).max(12),
@@ -91,7 +91,7 @@ export const fetchRegionalPriceEstimate = createServerFn({ method: "POST" })
   });
 
 export const fetchComparisonPair = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         a: z.string().max(80),
@@ -130,7 +130,7 @@ const cityRequestSchema = z.object({
 });
 
 export const submitCityRequest = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => cityRequestSchema.parse(input))
+  .validator((input: unknown) => cityRequestSchema.parse(input))
   .handler(async ({ data }) => {
     if (data.company) return { ok: false as const, error: "Submission rejected." };
     const ip = getRequestHeader("x-forwarded-for") ?? "unknown";
@@ -157,7 +157,7 @@ const comparisonRequestSchema = z.object({
 });
 
 export const submitComparisonRequest = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => comparisonRequestSchema.parse(input))
+  .validator((input: unknown) => comparisonRequestSchema.parse(input))
   .handler(async ({ data }) => {
     if (data.company) return { ok: false as const, error: "Submission rejected." };
     const ip = getRequestHeader("x-forwarded-for") ?? "unknown";

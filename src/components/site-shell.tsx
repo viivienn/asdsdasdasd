@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { FOOTER_DISCLAIMER } from "@/components/disclaimers";
 import { SiteSearch } from "@/components/site-search";
 import { HeaderAccountControl } from "@/components/account-provider";
@@ -64,9 +65,14 @@ function ExploreMenu({ index }: { index: SearchIndex }) {
     function onKey(event: KeyboardEvent) {
       if (event.key === "Escape") setOpen(false);
     }
+    function onPointerDown(event: PointerEvent) {
+      if (ref.current && !ref.current.contains(event.target as Node)) setOpen(false);
+    }
     document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onPointerDown);
     return () => {
       document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onPointerDown);
       if (closeTimer.current) clearTimeout(closeTimer.current);
     };
   }, []);
@@ -78,7 +84,6 @@ function ExploreMenu({ index }: { index: SearchIndex }) {
         aria-expanded={open}
         aria-haspopup="menu"
         onClick={() => setOpen((current) => !current)}
-        onFocus={openMenu}
         className="flex items-center gap-1 rounded-full px-3 py-2 text-sm transition-colors hover:bg-secondary"
       >
         Explore
@@ -237,110 +242,113 @@ function MobileMenu({ index }: { index: SearchIndex }) {
       >
         <Menu className="size-5" aria-hidden="true" />
       </button>
-      {open ? (
-        <div className="fixed inset-0 z-[70] overflow-y-auto bg-background px-5 pb-10 pt-4 lg:hidden">
-          <div className="flex items-center justify-between">
-            <Link
-              to="/"
-              onClick={() => setOpen(false)}
-              className="font-display text-lg font-semibold"
-            >
-              Aesthetic Index
-            </Link>
-            <button
-              type="button"
-              aria-label="Close navigation"
-              onClick={() => setOpen(false)}
-              className="grid size-11 place-items-center rounded-full border border-rule"
-            >
-              <X className="size-5" aria-hidden="true" />
-            </button>
-          </div>
+      {open && typeof document !== "undefined"
+        ? createPortal(
+            <div className="fixed inset-0 z-[70] overflow-y-auto bg-background px-5 pb-10 pt-4 lg:hidden">
+              <div className="flex items-center justify-between">
+                <Link
+                  to="/"
+                  onClick={() => setOpen(false)}
+                  className="font-display text-lg font-semibold"
+                >
+                  Aesthetic Index
+                </Link>
+                <button
+                  type="button"
+                  aria-label="Close navigation"
+                  onClick={() => setOpen(false)}
+                  className="grid size-11 place-items-center rounded-full border border-rule"
+                >
+                  <X className="size-5" aria-hidden="true" />
+                </button>
+              </div>
 
-          <nav aria-label="Mobile navigation" className="mt-8">
-            <div className="grid grid-cols-2 gap-2">
-              <Link
-                to="/explore"
-                search={{}}
-                onClick={() => setOpen(false)}
-                className="rounded-xl bg-secondary px-4 py-3 font-medium"
-              >
-                Explore
-              </Link>
-              <Link
-                to="/compare"
-                onClick={() => setOpen(false)}
-                className="rounded-xl bg-secondary px-4 py-3 font-medium"
-              >
-                Compare
-              </Link>
-              <Link
-                to="/prices"
-                onClick={() => setOpen(false)}
-                className="rounded-xl bg-secondary px-4 py-3 font-medium"
-              >
-                Local prices
-              </Link>
-              <Link
-                to="/about"
-                onClick={() => setOpen(false)}
-                className="rounded-xl bg-secondary px-4 py-3 font-medium"
-              >
-                About
-              </Link>
-            </div>
-
-            <p className="mt-8 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-              Treatment goals
-            </p>
-            <ul className="mt-2 divide-y divide-rule">
-              {GOAL_FILTERS.map((goal) => (
-                <li key={goal.slug}>
+              <nav aria-label="Mobile navigation" className="mt-8">
+                <div className="grid grid-cols-2 gap-2">
                   <Link
                     to="/explore"
-                    search={{ goal: goal.slug }}
+                    search={{}}
                     onClick={() => setOpen(false)}
-                    className="block py-3 text-sm"
+                    className="rounded-xl bg-secondary px-4 py-3 font-medium"
                   >
-                    {goal.label}
+                    Explore
                   </Link>
-                </li>
-              ))}
-            </ul>
+                  <Link
+                    to="/compare"
+                    onClick={() => setOpen(false)}
+                    className="rounded-xl bg-secondary px-4 py-3 font-medium"
+                  >
+                    Compare
+                  </Link>
+                  <Link
+                    to="/prices"
+                    onClick={() => setOpen(false)}
+                    className="rounded-xl bg-secondary px-4 py-3 font-medium"
+                  >
+                    Local prices
+                  </Link>
+                  <Link
+                    to="/about"
+                    onClick={() => setOpen(false)}
+                    className="rounded-xl bg-secondary px-4 py-3 font-medium"
+                  >
+                    About
+                  </Link>
+                </div>
 
-            <p className="mt-8 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-              Browse
-            </p>
-            <div className="mt-3 grid gap-2">
-              {(
-                [
-                  ["product", "Products"],
-                  ["brand_family", "Brands"],
-                  ["device", "Devices"],
-                  ["procedure", "Procedures"],
-                  ["class", "Treatment classes"],
-                ] as const
-              ).map(([entity, label]) => (
-                <Link
-                  key={entity}
-                  to="/explore"
-                  search={{ entity }}
-                  onClick={() => setOpen(false)}
-                  className="flex items-center justify-between rounded-xl border border-rule bg-card px-4 py-3 text-sm"
-                >
-                  {label}
-                  <span className="text-xs text-muted-foreground">
-                    {index.browse[entity].length}
-                  </span>
-                </Link>
-              ))}
-            </div>
-            <div className="mt-8 border-t border-rule pt-5">
-              <HeaderAccountControl mobile />
-            </div>
-          </nav>
-        </div>
-      ) : null}
+                <p className="mt-8 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                  Treatment goals
+                </p>
+                <ul className="mt-2 divide-y divide-rule">
+                  {GOAL_FILTERS.map((goal) => (
+                    <li key={goal.slug}>
+                      <Link
+                        to="/explore"
+                        search={{ goal: goal.slug }}
+                        onClick={() => setOpen(false)}
+                        className="block py-3 text-sm"
+                      >
+                        {goal.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+
+                <p className="mt-8 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                  Browse
+                </p>
+                <div className="mt-3 grid gap-2">
+                  {(
+                    [
+                      ["product", "Products"],
+                      ["brand_family", "Brands"],
+                      ["device", "Devices"],
+                      ["procedure", "Procedures"],
+                      ["class", "Treatment classes"],
+                    ] as const
+                  ).map(([entity, label]) => (
+                    <Link
+                      key={entity}
+                      to="/explore"
+                      search={{ entity }}
+                      onClick={() => setOpen(false)}
+                      className="flex items-center justify-between rounded-xl border border-rule bg-card px-4 py-3 text-sm"
+                    >
+                      {label}
+                      <span className="text-xs text-muted-foreground">
+                        {index.browse[entity].length}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+                <div className="mt-8 border-t border-rule pt-5">
+                  <HeaderAccountControl mobile />
+                </div>
+              </nav>
+            </div>,
+            document.body,
+          )
+        : null}
     </>
   );
 }

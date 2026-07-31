@@ -58,11 +58,11 @@ function TreatmentHeader({
   media: TreatmentMedia | null;
 }) {
   return (
-    <article className="flex min-w-0 flex-col items-center gap-3 rounded-2xl border border-rule bg-card p-3 text-center sm:flex-row sm:p-4 sm:text-left">
+    <article className="flex min-w-0 max-w-full flex-col items-center gap-3 overflow-hidden rounded-2xl border border-rule bg-card p-3 text-center sm:flex-row sm:p-4 sm:text-left">
       <div className="w-fit shrink-0">
         <TreatmentVisual name={name} media={media} className="size-20 sm:size-24" showCredit />
       </div>
-      <div className="min-w-0">
+      <div className="w-full min-w-0">
         <h2 className="truncate font-display text-lg sm:text-xl">{name}</h2>
         <p className="mt-1 truncate text-xs uppercase tracking-[0.1em] text-muted-foreground">
           {treatment.manufacturer || treatment.brand_name || treatment.category}
@@ -91,7 +91,7 @@ function QuickComparisonTable({
   rows: Array<{ key: keyof Treatment; label: string }>;
 }) {
   return (
-    <div className="mt-4 overflow-hidden rounded-2xl border border-rule bg-card">
+    <div className="mt-4 min-w-0 max-w-full overflow-hidden rounded-2xl border border-rule bg-card">
       <table className="hidden w-full border-collapse text-sm md:table">
         <caption className="sr-only">
           Quick attribute comparison of {nameA} and {nameB}
@@ -134,13 +134,17 @@ function QuickComparisonTable({
               {row.label}
             </h3>
             <dl className="grid grid-cols-2 divide-x divide-rule">
-              <div className="min-w-0 px-3 py-3">
+              <div className="min-w-0 overflow-hidden px-3 py-3">
                 <dt className="mb-1 text-xs font-medium text-muted-foreground">{nameA}</dt>
-                <dd className="text-sm leading-5">{displayValue(a, row.key)}</dd>
+                <dd className="break-words text-sm leading-5 [overflow-wrap:anywhere]">
+                  {displayValue(a, row.key)}
+                </dd>
               </div>
-              <div className="min-w-0 px-3 py-3">
+              <div className="min-w-0 overflow-hidden px-3 py-3">
                 <dt className="mb-1 text-xs font-medium text-muted-foreground">{nameB}</dt>
-                <dd className="text-sm leading-5">{displayValue(b, row.key)}</dd>
+                <dd className="break-words text-sm leading-5 [overflow-wrap:anywhere]">
+                  {displayValue(b, row.key)}
+                </dd>
               </div>
             </dl>
           </section>

@@ -13,6 +13,7 @@ import { CompareWith } from "@/components/treatment-actions";
 import { AccountValueCard, SaveTreatmentButton } from "@/components/account-actions";
 import { TreatmentVisual } from "@/components/treatment-visual";
 import { absoluteUrl } from "@/lib/site";
+import { consolidateTreatmentSources, formatEditorialDate } from "@/lib/presentation";
 import type { AvailableComparison, TreatmentPickerRecord } from "@/lib/content-types";
 
 export const Route = createFileRoute("/treatments/$slug")({
@@ -64,6 +65,7 @@ function TreatmentPage() {
   const { data, experience } = Route.useLoaderData();
   const treatment = data.treatment as Treatment;
   const sources = data.sources as TreatmentSource[];
+  const sourceDocuments = consolidateTreatmentSources(sources);
   const pickerTreatment = experience.treatments.find(
     (entry: TreatmentPickerRecord) => entry.slug === slug,
   );
@@ -115,7 +117,7 @@ function TreatmentPage() {
           <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
             <span className="uppercase tracking-wider">{treatment.treatment_class}</span>
             {treatment.last_reviewed_at ? (
-              <span>Reviewed {new Date(treatment.last_reviewed_at).toLocaleDateString()}</span>
+              <span>Reviewed {formatEditorialDate(treatment.last_reviewed_at)}</span>
             ) : null}
             {sources.length ? <EvidenceState state="sourced" /> : null}
           </div>
@@ -170,7 +172,7 @@ function TreatmentPage() {
         <section className="mt-12">
           <h2 className="text-2xl">Sources</h2>
           <ul className="mt-3 space-y-2 text-sm">
-            {sources.map((source) => (
+            {sourceDocuments.map((source) => (
               <li key={source.id}>
                 <a
                   href={source.source_url}
@@ -183,6 +185,9 @@ function TreatmentPage() {
                 <span className="ml-2 text-muted-foreground">
                   {source.source_type}
                   {source.evidence_level ? ` · ${source.evidence_level}` : ""}
+                  {source.claim_fields.length > 1
+                    ? ` · supports ${source.claim_fields.length} profile fields`
+                    : ""}
                 </span>
               </li>
             ))}

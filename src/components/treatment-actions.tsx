@@ -70,9 +70,7 @@ export function CompareWith({
       <DialogContent className="bottom-0 left-0 top-auto h-[100dvh] max-w-none translate-x-0 translate-y-0 grid-rows-[auto_auto_auto_1fr_auto] gap-0 rounded-none p-0 sm:bottom-auto sm:left-1/2 sm:top-1/2 sm:h-[min(44rem,88vh)] sm:max-w-xl sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl">
         <DialogHeader className="border-b border-rule px-5 pb-4 pt-5 text-left">
           <DialogTitle>Compare {name}</DialogTitle>
-          <DialogDescription>
-            Choose one closely related product, device, or treatment approach.
-          </DialogDescription>
+          <DialogDescription>Choose one closely related product or device.</DialogDescription>
         </DialogHeader>
 
         <div className="border-b border-rule bg-secondary/55 px-5 py-3">
@@ -109,11 +107,7 @@ export function CompareWith({
               <li key={treatment.id}>
                 {index === 0 || options[index - 1]?.section !== section ? (
                   <p className="sticky top-0 z-10 bg-background/95 pb-1 pt-3 text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground backdrop-blur">
-                    {section === "closest"
-                      ? "Closest matches"
-                      : section === "family"
-                        ? "Other options in this family"
-                        : "Different approaches"}
+                    {section === "closest" ? "Closest matches" : "Other options in this family"}
                   </p>
                 ) : null}
                 <button

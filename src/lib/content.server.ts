@@ -327,9 +327,9 @@ export async function listComparisonExperience(): Promise<ComparisonExperience> 
     const b = treatmentBySlug.get(comparison.treatment_b_slug);
     popularMap.set(comparison.slug, {
       slug: comparison.slug,
-      label: `${a?.name ?? comparison.treatment_a_slug} vs. ${
-        b?.name ?? comparison.treatment_b_slug
-      }`,
+      label:
+        stored?.title_override?.trim() ||
+        `${a?.name ?? comparison.treatment_a_slug} vs. ${b?.name ?? comparison.treatment_b_slug}`,
       markets: [],
       sort_rank: stored?.sort_rank ?? 0,
     });
