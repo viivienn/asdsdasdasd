@@ -5,7 +5,7 @@ import {
   PriceDatasetSummary,
   PriceObservationTable,
 } from "@/components/pricing-preview";
-import { CoverageRequestForm, PriceAlertForm } from "@/components/demand-forms";
+import { PriceUpdatesControl } from "@/components/account-actions";
 import { FeaturePreview } from "@/components/editorial";
 import { PricingDisclaimer } from "@/components/disclaimers";
 import type { PriceObservation } from "@/lib/content-types";
@@ -206,11 +206,9 @@ function PricingPage() {
       </section>
 
       <section className="mt-12">
-        <PriceAlertForm treatmentSlug={treatment} />
-      </section>
-
-      <section className="mt-8">
-        <CoverageRequestForm treatmentSlug={treatment} />
+        <PriceUpdatesControl
+          comparisonGroupSlug={treatment === "botox" ? "neuromodulator-brand" : treatment}
+        />
       </section>
     </>
   );

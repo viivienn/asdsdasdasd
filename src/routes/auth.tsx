@@ -1,30 +1,36 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
-
-function safeNext(next: string | undefined): string {
-  if (!next) return "/";
-  return next.startsWith("/") && !next.startsWith("//") ? next : "/";
-}
+import { safeNextPath, SIGNUP_SOURCE_KEY, type SignupTrigger } from "@/lib/account-flow";
+import { trackEvent } from "@/lib/analytics";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
-  validateSearch: (s: Record<string, unknown>) => ({
-    next: typeof s.next === "string" ? s.next : undefined,
-  }),
+  validateSearch: (s: Record<string, unknown>) => {
+    const search: {
+      next?: string;
+      mode?: "signin" | "signup";
+      source?: string;
+    } = {};
+    if (typeof s.next === "string") search.next = s.next;
+    if (s.mode === "signup" || s.mode === "signin") search.mode = s.mode;
+    if (typeof s.source === "string") search.source = s.source;
+    return search;
+  },
   head: () => ({
     meta: [
       { title: "Sign in — Aesthetic Index" },
       {
         name: "description",
         content:
-          "Sign in to Aesthetic Index to connect assistants and manage your saved treatment comparisons.",
+          "Create an account to save treatments and comparisons, organize your research, and manage regional price updates.",
       },
       { property: "og:title", content: "Sign in — Aesthetic Index" },
       {
         property: "og:description",
-        content: "Sign in to Aesthetic Index to connect assistants and manage saved comparisons.",
+        content:
+          "Create an account to save treatments and comparisons, organize research, and manage price updates.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -35,21 +41,30 @@ export const Route = createFileRoute("/auth")({
 });
 
 function AuthPage() {
-  const { next } = Route.useSearch();
-  const navigate = useNavigate();
-  const target = safeNext(next);
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const { next, mode: initialMode, source: rawSource } = Route.useSearch();
+  const target = safeNextPath(next);
+  const source = (rawSource ?? "header") as SignupTrigger;
+  const [mode, setMode] = useState<"signin" | "signup">(initialMode ?? "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
+  useEffect(() => {
+    void supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) return;
+      window.location.replace(target);
+    });
+  }, [source, target]);
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     setError(null);
     setNotice(null);
+    localStorage.setItem(SIGNUP_SOURCE_KEY, source);
+    trackEvent("signup_started", { source });
     if (mode === "signin") {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       setBusy(false);
@@ -65,16 +80,21 @@ function AuthPage() {
     setBusy(false);
     if (error) return setError(error.message);
     const { data } = await supabase.auth.getSession();
-    if (data.session) window.location.href = target;
-    else setNotice("Check your inbox to confirm your email, then come back to this link.");
-    void navigate;
+    if (data.session) {
+      window.location.href = target;
+    } else setNotice("Check your inbox to confirm your email, then come back to this link.");
   }
 
   async function google() {
     setBusy(true);
     setError(null);
+    localStorage.setItem(SIGNUP_SOURCE_KEY, source);
+    trackEvent("signup_started", { source });
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/auth?next=${encodeURIComponent(target)}`,
+      redirect_uri: `${window.location.origin}/auth?${new URLSearchParams({
+        next: target,
+        source,
+      }).toString()}`,
     });
     if (result.error) {
       setBusy(false);
@@ -92,7 +112,8 @@ function AuthPage() {
           {mode === "signin" ? "Sign in" : "Create an account"}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Accounts are used to connect assistants and tools to Aesthetic Index.
+          Create an account to save treatments and comparisons, organize your research, and manage
+          regional price updates.
         </p>
 
         <button

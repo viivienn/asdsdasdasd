@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteShell } from "../components/site-shell";
+import { AccountProvider } from "../components/account-provider";
 import { SITE, SITE_URL, organizationJsonLd } from "../lib/site";
 import { fetchSearchIndex } from "../lib/content.functions";
 import { buildSearchIndex } from "../lib/search-index";
@@ -157,10 +158,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SiteShell searchIndex={searchIndex} popularComparisons={experience.popularComparisons}>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-      </SiteShell>
+      <AccountProvider>
+        <SiteShell searchIndex={searchIndex} popularComparisons={experience.popularComparisons}>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+        </SiteShell>
+      </AccountProvider>
     </QueryClientProvider>
   );
 }

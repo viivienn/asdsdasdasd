@@ -671,6 +671,57 @@ export type Database = {
           },
         ]
       }
+      price_update_subscriptions: {
+        Row: {
+          comparison_group_slug: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          postal_code: string | null
+          region_slug: string | null
+          treatment_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comparison_group_slug?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          postal_code?: string | null
+          region_slug?: string | null
+          treatment_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comparison_group_slug?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          postal_code?: string | null
+          region_slug?: string | null
+          treatment_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_update_subscriptions_comparison_group_slug_fkey"
+            columns: ["comparison_group_slug"]
+            isOneToOne: false
+            referencedRelation: "comparison_groups"
+            referencedColumns: ["slug"]
+          },
+          {
+            foreignKeyName: "price_update_subscriptions_treatment_id_fkey"
+            columns: ["treatment_id"]
+            isOneToOne: false
+            referencedRelation: "treatments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       regional_price_estimates: {
         Row: {
           comparison_group_slug: string | null
@@ -754,6 +805,77 @@ export type Database = {
           },
           {
             foreignKeyName: "regional_price_estimates_treatment_id_fkey"
+            columns: ["treatment_id"]
+            isOneToOne: false
+            referencedRelation: "treatments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saved_comparisons: {
+        Row: {
+          canonical_pair_key: string
+          created_at: string
+          id: string
+          treatment_a_id: string
+          treatment_b_id: string
+          user_id: string
+        }
+        Insert: {
+          canonical_pair_key: string
+          created_at?: string
+          id?: string
+          treatment_a_id: string
+          treatment_b_id: string
+          user_id: string
+        }
+        Update: {
+          canonical_pair_key?: string
+          created_at?: string
+          id?: string
+          treatment_a_id?: string
+          treatment_b_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_comparisons_treatment_a_id_fkey"
+            columns: ["treatment_a_id"]
+            isOneToOne: false
+            referencedRelation: "treatments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saved_comparisons_treatment_b_id_fkey"
+            columns: ["treatment_b_id"]
+            isOneToOne: false
+            referencedRelation: "treatments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saved_treatments: {
+        Row: {
+          created_at: string
+          id: string
+          treatment_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          treatment_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          treatment_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_treatments_treatment_id_fkey"
             columns: ["treatment_id"]
             isOneToOne: false
             referencedRelation: "treatments"
@@ -1110,6 +1232,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_research_preferences: {
+        Row: {
+          postal_code: string | null
+          region_slug: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          postal_code?: string | null
+          region_slug?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          postal_code?: string | null
+          region_slug?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {

@@ -147,41 +147,6 @@ export const submitCityRequest = createServerFn({ method: "POST" })
     });
   });
 
-const priceAlertSchema = z.object({
-  email: z.string().trim().email().max(254),
-  postal_code: z
-    .string()
-    .trim()
-    .min(3)
-    .max(12)
-    .regex(/^[A-Za-z0-9 -]+$/),
-  treatment_slug: z
-    .string()
-    .trim()
-    .min(1)
-    .max(80)
-    .regex(/^[a-z0-9-]+$/),
-  max_unit_price: z.number().positive().max(100000).nullable().optional(),
-  source_path: z.string().max(200).optional(),
-  company: z.string().max(0).optional().or(z.literal("")),
-});
-
-export const submitPriceAlertInterest = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => priceAlertSchema.parse(input))
-  .handler(async ({ data }) => {
-    if (data.company) return { ok: false as const, error: "Submission rejected." };
-    const ip = getRequestHeader("x-forwarded-for") ?? "unknown";
-    const ipHash = createHash("sha256").update(ip).digest("hex");
-    const { recordPriceAlertInterest } = await import("./content.server");
-    return recordPriceAlertInterest({
-      email: data.email,
-      postal_code: data.postal_code,
-      treatment_slug: data.treatment_slug,
-      max_unit_price: data.max_unit_price ?? null,
-      source_path: data.source_path ?? null,
-      ipHash,
-    });
-  });
 const comparisonRequestSchema = z.object({
   treatment_a: z.string().trim().min(2).max(80),
   treatment_b: z.string().trim().min(2).max(80),

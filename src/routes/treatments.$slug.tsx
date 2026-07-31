@@ -9,7 +9,8 @@ import {
 import { EvidenceState } from "@/components/editorial";
 import { RegionalPriceLookup } from "@/components/regional-price-lookup";
 import { TreatmentDisclaimer } from "@/components/disclaimers";
-import { CompareWith, MatchGate } from "@/components/treatment-actions";
+import { CompareWith } from "@/components/treatment-actions";
+import { AccountValueCard, SaveTreatmentButton } from "@/components/account-actions";
 import { TreatmentVisual } from "@/components/treatment-visual";
 import { absoluteUrl } from "@/lib/site";
 import type { AvailableComparison, TreatmentPickerRecord } from "@/lib/content-types";
@@ -119,6 +120,7 @@ function TreatmentPage() {
             {sources.length ? <EvidenceState state="sourced" /> : null}
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
+            <SaveTreatmentButton treatmentId={treatment.id} treatmentName={treatment.name} />
             {pickerTreatment ? (
               <CompareWith
                 slug={slug}
@@ -135,7 +137,7 @@ function TreatmentPage() {
             </Link>
           </div>
           <div className="mt-6 max-w-2xl">
-            <MatchGate name={treatment.name} />
+            <AccountValueCard treatmentName={treatment.name} />
           </div>
         </div>
       </header>
