@@ -17,6 +17,7 @@ import { Route as IndexnowKeyDottxtRouteImport } from './routes/indexnow-key[.]t
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as MedicalDisclaimerRouteImport } from './routes/medical-disclaimer'
 import { Route as MethodologyRouteImport } from './routes/methodology'
+import { Route as MyResearchRouteImport } from './routes/my-research'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
@@ -69,6 +70,11 @@ const MedicalDisclaimerRoute = MedicalDisclaimerRouteImport.update({
 const MethodologyRoute = MethodologyRouteImport.update({
   id: '/methodology',
   path: '/methodology',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyResearchRoute = MyResearchRouteImport.update({
+  id: '/my-research',
+  path: '/my-research',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/mcp': typeof McpRoute
   '/medical-disclaimer': typeof MedicalDisclaimerRoute
   '/methodology': typeof MethodologyRoute
+  '/my-research': typeof MyResearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -172,6 +179,7 @@ export interface FileRoutesByTo {
   '/mcp': typeof McpRoute
   '/medical-disclaimer': typeof MedicalDisclaimerRoute
   '/methodology': typeof MethodologyRoute
+  '/my-research': typeof MyResearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -196,6 +204,7 @@ export interface FileRoutesById {
   '/mcp': typeof McpRoute
   '/medical-disclaimer': typeof MedicalDisclaimerRoute
   '/methodology': typeof MethodologyRoute
+  '/my-research': typeof MyResearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -221,6 +230,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/medical-disclaimer'
     | '/methodology'
+    | '/my-research'
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
@@ -244,6 +254,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/medical-disclaimer'
     | '/methodology'
+    | '/my-research'
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
@@ -267,6 +278,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/medical-disclaimer'
     | '/methodology'
+    | '/my-research'
     | '/sitemap.xml'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
@@ -291,6 +303,7 @@ export interface RootRouteChildren {
   McpRoute: typeof McpRoute
   MedicalDisclaimerRoute: typeof MedicalDisclaimerRoute
   MethodologyRoute: typeof MethodologyRoute
+  MyResearchRoute: typeof MyResearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -362,6 +375,13 @@ declare module '@tanstack/react-router' {
       path: '/methodology'
       fullPath: '/methodology'
       preLoaderRoute: typeof MethodologyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-research': {
+      id: '/my-research'
+      path: '/my-research'
+      fullPath: '/my-research'
+      preLoaderRoute: typeof MyResearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -467,6 +487,7 @@ const rootRouteChildren: RootRouteChildren = {
   McpRoute: McpRoute,
   MedicalDisclaimerRoute: MedicalDisclaimerRoute,
   MethodologyRoute: MethodologyRoute,
+  MyResearchRoute: MyResearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:

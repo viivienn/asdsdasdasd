@@ -3,6 +3,7 @@ import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { FOOTER_DISCLAIMER } from "@/components/disclaimers";
 import { SiteSearch } from "@/components/site-search";
+import { HeaderAccountControl } from "@/components/account-provider";
 import { trackAnswerEngineReferral } from "@/lib/analytics";
 import type { EntityType, PopularComparison } from "@/lib/content-types";
 import type { SearchEntry, SearchIndex } from "@/lib/search-index";
@@ -334,6 +335,9 @@ function MobileMenu({ index }: { index: SearchIndex }) {
                 </Link>
               ))}
             </div>
+            <div className="mt-8 border-t border-rule pt-5">
+              <HeaderAccountControl mobile />
+            </div>
           </nav>
         </div>
       ) : null}
@@ -400,6 +404,9 @@ export function SiteShell({
                 >
                   Local prices
                 </Link>
+              </li>
+              <li>
+                <HeaderAccountControl />
               </li>
             </ul>
           </nav>

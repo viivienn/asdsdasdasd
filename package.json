@@ -8,7 +8,7 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
-    "test": "node --experimental-strip-types --test src/lib/comparison-model.test.ts src/lib/content-pack-validation.test.ts",
+    "test": "node --experimental-strip-types --test src/lib/comparison-model.test.ts src/lib/content-pack-validation.test.ts src/lib/account-flow.test.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --write ."

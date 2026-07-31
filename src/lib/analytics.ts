@@ -7,15 +7,16 @@
  * data is ever included — only coarse, non-identifying properties.
  */
 export type AnalyticsEvent =
-  | "scroll_prompt_impression"
-  | "scroll_prompt_step_completed"
-  | "scroll_prompt_submitted"
-  | "price_alert_submitted"
-  | "alert_signup_success"
   | "answer_engine_referral"
   | "compare_started"
-  | "match_gate_opened"
-  | "match_gate_signup";
+  | "signup_prompt_impression"
+  | "signup_prompt_dismissed"
+  | "signup_started"
+  | "signup_completed"
+  | "treatment_saved"
+  | "comparison_saved"
+  | "price_subscription_created"
+  | "my_research_viewed";
 
 export type AnalyticsProps = Record<string, string | number | boolean | undefined>;
 

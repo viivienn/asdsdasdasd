@@ -5,9 +5,7 @@
   "auth": {
     "type": "oauth",
     "issuer": "https://gvutkcqoameywszdstol.supabase.co/auth/v1",
-    "accepted_audiences": [
-      "authenticated"
-    ]
+    "accepted_audiences": ["authenticated"]
   },
   "mcp": {
     "server": {
@@ -79,9 +77,7 @@
               "description": "Treatment slug, e.g. 'botox'."
             }
           },
-          "required": [
-            "slug"
-          ]
+          "required": ["slug"]
         },
         "outputSchema": null
       },
@@ -150,11 +146,7 @@
           "properties": {
             "status": {
               "type": "string",
-              "enum": [
-                "new",
-                "accepted",
-                "rejected"
-              ]
+              "enum": ["new", "accepted", "rejected"]
             },
             "limit": {
               "default": 25,
@@ -181,13 +173,7 @@
           "properties": {
             "targetType": {
               "type": "string",
-              "enum": [
-                "treatment",
-                "comparison",
-                "price",
-                "page",
-                "other"
-              ],
+              "enum": ["treatment", "comparison", "price", "page", "other"],
               "description": "What the suggestion is about."
             },
             "targetSlug": {
@@ -217,11 +203,7 @@
               }
             }
           },
-          "required": [
-            "targetType",
-            "title",
-            "body"
-          ]
+          "required": ["targetType", "title", "body"]
         },
         "outputSchema": null
       },
@@ -306,10 +288,7 @@
               "description": "Map of editable field name to new text."
             }
           },
-          "required": [
-            "slug",
-            "fields"
-          ]
+          "required": ["slug", "fields"]
         },
         "outputSchema": null
       }

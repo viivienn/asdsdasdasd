@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { fetchRegionalPriceEstimate } from "@/lib/content.functions";
 import type { RegionalPriceResult } from "@/lib/content-types";
 import { FEATURES } from "@/lib/features";
+import { PriceUpdatesControl } from "@/components/account-actions";
 
 type TreatmentOption = { id: string; slug: string; name: string };
 
@@ -17,6 +18,7 @@ export function RegionalPriceLookup({ treatments }: { treatments: TreatmentOptio
   if (!FEATURES.regionalPriceEstimates || treatments.length === 0) return null;
   const selectedName =
     treatments.find((treatment) => treatment.slug === treatmentSlug)?.name ?? "Treatment";
+  const selectedTreatment = treatments.find((treatment) => treatment.slug === treatmentSlug);
 
   return (
     <section className="rounded-2xl border border-rule bg-card p-5" aria-labelledby="price-lookup">
@@ -94,6 +96,11 @@ export function RegionalPriceLookup({ treatments }: { treatments: TreatmentOptio
         </p>
       ) : null}
       {result ? <EstimateResult result={result} treatmentName={selectedName} /> : null}
+      {result && selectedTreatment ? (
+        <div className="mt-4">
+          <PriceUpdatesControl treatmentId={selectedTreatment.id} initialPostalCode={postalCode} />
+        </div>
+      ) : null}
     </section>
   );
 }

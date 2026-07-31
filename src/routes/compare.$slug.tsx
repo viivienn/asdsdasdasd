@@ -14,6 +14,8 @@ import { ComparisonGlance } from "@/components/comparison-glance";
 import { ComparisonDetails } from "@/components/comparison-details";
 import { ComparisonDisclaimer } from "@/components/disclaimers";
 import { RegionalPriceLookup } from "@/components/regional-price-lookup";
+import { SaveComparisonButton } from "@/components/account-actions";
+import { ComparisonSignupPrompt } from "@/components/comparison-signup-prompt";
 
 export const Route = createFileRoute("/compare/$slug")({
   loader: async ({ params }) => {
@@ -174,12 +176,15 @@ function ComparisonPage() {
             </p>
           ) : null}
         </div>
-        <Link
-          to="/compare"
-          className="rounded-full border border-rule bg-card px-4 py-2 text-sm font-medium hover:border-primary"
-        >
-          Change comparison
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <SaveComparisonButton treatmentAId={a.id} treatmentBId={b.id} label={label} />
+          <Link
+            to="/compare"
+            className="inline-flex min-h-11 items-center rounded-full border border-rule bg-card px-4 py-2 text-sm font-medium hover:border-primary"
+          >
+            Change comparison
+          </Link>
+        </div>
       </header>
 
       {data.compatibility?.mode === "different_approach" ? (
@@ -237,6 +242,7 @@ function ComparisonPage() {
       </section>
 
       <RelatedComparisons currentSlug={slug} reviewedSlugs={data.reviewedSlugs ?? []} />
+      <ComparisonSignupPrompt comparisonSlug={slug} />
     </>
   );
 }
