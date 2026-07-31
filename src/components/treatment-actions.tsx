@@ -100,7 +100,11 @@ export function CompareWith({
           />
         </label>
 
-        <ul className="overflow-y-auto px-5 pb-4" role="listbox" aria-label="Compatible treatments">
+        <ul
+          className="min-h-0 overflow-y-auto px-5 pb-4"
+          role="listbox"
+          aria-label="Compatible treatments"
+        >
           {options.map(({ treatment, section }, index) => {
             const active = other === treatment.slug;
             return (

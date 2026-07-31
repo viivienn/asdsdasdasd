@@ -8,6 +8,7 @@ import { RegionalPriceLookup } from "@/components/regional-price-lookup";
 import { buildSearchIndex } from "@/lib/search-index";
 import { GOAL_FILTERS } from "@/lib/taxonomy";
 import { absoluteUrl } from "@/lib/site";
+import type { PopularComparison, TreatmentPickerRecord } from "@/lib/content-types";
 
 export const Route = createFileRoute("/")({
   loader: () => fetchCompareIndex(),
@@ -181,7 +182,7 @@ function Home() {
             </Link>
           </div>
           <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {popularComparisons.slice(0, 6).map((comparison) => (
+            {popularComparisons.slice(0, 6).map((comparison: PopularComparison) => (
               <li key={comparison.slug}>
                 <Link
                   to="/compare/$slug"
@@ -229,7 +230,7 @@ function Home() {
         </div>
         <div className="border-t border-rule bg-muted/35 p-4 sm:p-6 lg:border-l lg:border-t-0">
           <RegionalPriceLookup
-            treatments={treatments.map((treatment) => ({
+            treatments={treatments.map((treatment: TreatmentPickerRecord) => ({
               id: treatment.id,
               slug: treatment.slug,
               name: treatment.name,

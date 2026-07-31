@@ -3,6 +3,7 @@ import { BadgeDollarSign, CalendarClock, FileSearch } from "lucide-react";
 import { fetchCompareIndex } from "@/lib/content.functions";
 import { RegionalPriceLookup } from "@/components/regional-price-lookup";
 import { absoluteUrl } from "@/lib/site";
+import type { TreatmentPickerRecord } from "@/lib/content-types";
 
 export const Route = createFileRoute("/prices/")({
   loader: () => fetchCompareIndex(),
@@ -44,7 +45,7 @@ function Prices() {
 
       <div className="mx-auto mt-10 max-w-4xl">
         <RegionalPriceLookup
-          treatments={treatments.map((treatment) => ({
+          treatments={treatments.map((treatment: TreatmentPickerRecord) => ({
             id: treatment.id,
             slug: treatment.slug,
             name: treatment.name,
