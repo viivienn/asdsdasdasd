@@ -1,5 +1,5 @@
 {
-  "schema_version": "2026-07-29",
+  "schema_version": "2026-07-30",
   "methodology": "Coarse routing prefixes for price-estimate selection, not administrative-boundary definitions. The resolver uses the longest matching normalized prefix.",
   "mappings": [
     {
@@ -236,9 +236,24 @@
       "region_slug": "new-york-city",
       "city_name": "New York City"
     },
-    { "country_code": "US", "postal_prefix": "330", "region_slug": "miami", "city_name": "Miami" },
-    { "country_code": "US", "postal_prefix": "331", "region_slug": "miami", "city_name": "Miami" },
-    { "country_code": "US", "postal_prefix": "332", "region_slug": "miami", "city_name": "Miami" },
+    {
+      "country_code": "US",
+      "postal_prefix": "330",
+      "region_slug": "miami",
+      "city_name": "Miami"
+    },
+    {
+      "country_code": "US",
+      "postal_prefix": "331",
+      "region_slug": "miami",
+      "city_name": "Miami"
+    },
+    {
+      "country_code": "US",
+      "postal_prefix": "332",
+      "region_slug": "miami",
+      "city_name": "Miami"
+    },
     {
       "country_code": "US",
       "postal_prefix": "786",

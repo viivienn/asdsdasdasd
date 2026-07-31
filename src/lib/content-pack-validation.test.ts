@@ -128,6 +128,7 @@ const [
   mappingDocument,
   familyRuleDocument,
   comparisonDocument,
+  legacyComparisonDocument,
   priceDocument,
   mediaDocument,
 ] = await Promise.all([
@@ -136,6 +137,7 @@ const [
   readJson<{ treatment_area_values: string[] }>("comparison_groups.json"),
   readJson<{ mappings: PackGroupMapping[] }>("treatment_comparison_groups.json"),
   readJson<{ rules: PackFamilyRule[] }>("comparison_family_rules.json"),
+  readJson<{ comparisons: PackComparison[] }>("featured_comparisons.json"),
   readJson<{ comparisons: PackComparison[] }>("indexable_comparisons.json"),
   readJson<{ estimates: PackPriceEstimate[] }>("regional_price_estimates.json"),
   readJson<{ media: PackMedia[] }>("treatment_media.json"),
@@ -180,8 +182,52 @@ test("generated database types cover the source-pack schema", () => {
 
 test("every published treatment is complete, source-backed, and non-demonstration", () => {
   const published = treatments.filter((row) => row.publication_status === "published");
+  const review = treatments.filter((row) => row.publication_status === "review");
+  assert.equal(treatments.length, 21);
   assert.equal(published.length, 15);
+  assert.deepEqual(review.map((row) => row.slug).sort(), [
+    "collagen-stimulator",
+    "daxxify",
+    "energy-device",
+    "neuromodulator",
+    "restylane-lyft",
+    "xeomin",
+  ]);
+  assert.ok(review.every((row) => row.last_reviewed_at === null));
   assert.equal(new Set(published.map((row) => row.slug)).size, published.length);
+
+  const sourcedMedicalFields = [
+    "summary",
+    "primary_purpose",
+    "mechanism",
+    "intended_areas",
+    "what_it_changes",
+    "what_it_does_not_change",
+    "adds_volume",
+    "tightening_level",
+    "result_timing",
+    "sessions_text",
+    "appointment_time",
+    "downtime_text",
+    "swelling_text",
+    "bruising_text",
+    "exercise_restrictions",
+    "longevity_text",
+    "pain_level",
+    "reversibility",
+    "major_risks",
+    "most_likely_disappointment",
+    "marketing_misconception",
+    "provider_variables",
+    "skin_tone_notes",
+    "pricing_basis",
+    "expected_result_magnitude",
+    "true_substitute_notes",
+    "when_not_appropriate",
+    "fda_status",
+    "canada_status",
+    "evidence_grade",
+  ] as const;
 
   for (const treatment of published) {
     assert.equal(treatment.is_sample, false, `${treatment.slug} is marked as sample`);
@@ -203,6 +249,17 @@ test("every published treatment is complete, source-backed, and non-demonstratio
       ),
       `${treatment.slug} has no source record`,
     );
+    for (const field of sourcedMedicalFields) {
+      const value = treatment[field];
+      if (value === null || value === undefined || value === "") continue;
+      if (Array.isArray(value) && value.length === 0) continue;
+      assert.ok(
+        sources.some(
+          (source) => source.treatment_slug === treatment.slug && source.claim_field === field,
+        ),
+        `${treatment.slug}.${field} has no claim-level source`,
+      );
+    }
   }
 
   const publicPayload = {
@@ -214,6 +271,11 @@ test("every published treatment is complete, source-backed, and non-demonstratio
     JSON.stringify(publicPayload),
     /demonstration text|pending sourcing|pending research/i,
   );
+});
+
+test("featured comparison artifact remains compatible with the legacy import filename", () => {
+  assert.deepEqual(comparisonDocument.comparisons, legacyComparisonDocument.comparisons);
+  assert.equal(comparisons.length, 8);
 });
 
 test("published intended areas use the controlled values", () => {
@@ -270,7 +332,7 @@ test("different-approach pages render the non-substitute notice", async () => {
 
 test("published regional estimates retain sources, units, dates, ranges, and currencies", () => {
   const published = prices.filter((row) => row.publication_status === "published");
-  assert.equal(published.length, 56);
+  assert.equal(published.length, 58);
   assert.deepEqual(new Set(published.map((row) => row.currency)), new Set(["USD", "CAD"]));
 
   for (const estimate of published) {
@@ -347,14 +409,23 @@ test("unpublished or unverified media cannot pass the rendering gate", async () 
   assert.match(guardMigration, /update public\.treatment_media media/i);
 });
 
-test("the import preserves treatment IDs and covers every requested table", async () => {
-  const sourceMigration = await readFile(
-    new URL(
-      "../../supabase/migrations/20260730010000_source_backed_mvp_content.sql",
-      import.meta.url,
+test("the additive audit preserves treatment IDs and the migration chain covers every requested table", async () => {
+  const [sourceMigration, initialContentMigration] = await Promise.all([
+    readFile(
+      new URL(
+        "../../supabase/migrations/20260730040000_complete_mvp_content_audit.sql",
+        import.meta.url,
+      ),
+      "utf8",
     ),
-    "utf8",
-  );
+    readFile(
+      new URL(
+        "../../supabase/migrations/20260730010000_source_backed_mvp_content.sql",
+        import.meta.url,
+      ),
+      "utf8",
+    ),
+  ]);
   const guardMigration = await readFile(
     new URL(
       "../../supabase/migrations/20260730020000_source_backed_mvp_validation_guards.sql",
@@ -362,8 +433,10 @@ test("the import preserves treatment IDs and covers every requested table", asyn
     ),
     "utf8",
   );
-  assert.match(sourceMigration, /on conflict \(slug\) do update set/i);
+  assert.match(sourceMigration, /update public\.treatments\b/i);
+  assert.doesNotMatch(sourceMigration, /insert into public\.treatments\b/i);
   assert.doesNotMatch(sourceMigration, /\bid\s*=\s*excluded\.id\b/i);
+  const contentMigrationChain = `${initialContentMigration}\n${sourceMigration}`;
   for (const table of [
     "treatments",
     "treatment_sources",
@@ -376,9 +449,9 @@ test("the import preserves treatment IDs and covers every requested table", asyn
     "postal_region_map",
   ]) {
     assert.match(
-      sourceMigration,
+      contentMigrationChain,
       new RegExp(`(?:insert into|update) public\\.${table}\\b`, "i"),
-      `Source migration does not import ${table}`,
+      `Content migration chain does not import ${table}`,
     );
   }
   assert.match(guardMigration, /update public\.treatment_media\b/i);
@@ -395,7 +468,7 @@ test("content migrations leave clinic and submission structures intact", async (
     ),
     readFile(
       new URL(
-        "../../supabase/migrations/20260730010000_source_backed_mvp_content.sql",
+        "../../supabase/migrations/20260730040000_complete_mvp_content_audit.sql",
         import.meta.url,
       ),
       "utf8",

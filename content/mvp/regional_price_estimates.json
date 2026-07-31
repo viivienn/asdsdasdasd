@@ -1,6 +1,6 @@
 {
-  "schema_version": "2026-07-29",
-  "researched_at": "2026-07-29",
+  "schema_version": "2026-07-30",
+  "researched_at": "2026-07-30",
   "currency_rule": "US estimates are USD and Canadian estimates are CAD. No currency conversion was performed.",
   "inclusion_rule": "At least two usable current public sources with a compatible pricing unit. Promotions, memberships, new-patient offers, and manufacturer rewards were excluded from regular estimates.",
   "calculation_rule": "Low and high are the observed regular-price bounds. For three or more sources, average and median use one representative regular value per source; the midpoint represents a published range. With only two sources, average and median are null because the sample is too small.",
@@ -1318,6 +1318,53 @@
       "limitations": "Protocols range from short clinic facials to a 75-minute hotel-spa service; promotions and trial prices were excluded.",
       "publication_status": "published",
       "researched_at": "2026-07-29",
+      "is_sample": false
+    },
+    {
+      "entity_slug": "potenza",
+      "country": "US",
+      "region_slug": "los-angeles",
+      "region": "Los Angeles",
+      "currency": "USD",
+      "pricing_unit": "per full-face session",
+      "treatment_area": "face",
+      "estimated_average": null,
+      "estimated_median": null,
+      "estimated_low": 1200,
+      "estimated_high": 1600,
+      "source_count": 2,
+      "source_urls": [
+        "https://www.deluxemedspa.com/non-surgical/potenza/",
+        "https://beautyranchspa.com/potenza-rf-microneedling-los-angeles/"
+      ],
+      "methodology_note": "Compared Beauty Ranch's starting single-session full-face price with Deluxe Med Spa's regular full-face price. First-patient and package prices were excluded.",
+      "limitations": "Only two current public sources qualified. Protocol, tip, area, anaesthesia, and provider can materially change a quote.",
+      "publication_status": "published",
+      "researched_at": "2026-07-30",
+      "is_sample": false
+    },
+    {
+      "entity_slug": "diamondglow",
+      "country": "US",
+      "region_slug": "los-angeles",
+      "region": "Los Angeles",
+      "currency": "USD",
+      "pricing_unit": "per facial session",
+      "treatment_area": "face",
+      "estimated_average": 227.67,
+      "estimated_median": 199,
+      "estimated_low": 199,
+      "estimated_high": 285,
+      "source_count": 3,
+      "source_urls": [
+        "https://www.dermfx.com/pricing/",
+        "https://shop.shorrbeauty.com/pages/diamond-glow-facial",
+        "https://beautyranchspa.com/pricing/"
+      ],
+      "methodology_note": "Used DermFX's $199 listed session, Shorr Beauty's $199 45-minute session, and Beauty Ranch's $285 regular price. Beauty Ranch's temporary $199 special was excluded.",
+      "limitations": "Session duration, serum, extractions, dermaplaning, masks, and other add-ons differ among providers.",
+      "publication_status": "published",
+      "researched_at": "2026-07-30",
       "is_sample": false
     }
   ]

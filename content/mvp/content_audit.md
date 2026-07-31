@@ -1,129 +1,136 @@
-# Source-backed MVP content audit
+# Aesthetic Index source-backed MVP content audit
 
-Research completed: 2026-07-29  
-Experience: one universal United States and Canada website, with no country tabs
+Research and repository audit completed: 2026-07-30
+Public experience: one universal United States and Canada site, without country tabs
 
-## Outcome
+## Executive outcome
 
-The pack completes the 15 comparison subjects required for the eight launch pairs, adds the missing `restylane-kysse` and `potenza` records, refreshes outdated regulatory wording, creates claim-level source rows, and adds comparison, market, price, postal, and media metadata.
+The current repository contains 21 treatment entities. Fifteen are complete enough for the eight requested launch comparisons and remain published. Six existing records—`neuromodulator`, `collagen-stimulator`, `energy-device`, `xeomin`, `daxxify`, and `restylane-lyft`—are preserved but returned to `review` because they do not have the full clinical, US/Canada regulatory, market, and source coverage required by the existing public gate.
 
-All 15 launch profiles meet the repository’s publication gate. Nulls remain where a field could not be supported responsibly: notably most `pain_level` values and durable longevity for RF microneedling and superficial facials. A null is preferable to a clinic-derived or marketing-derived estimate.
+The content pack now contains:
 
-No clinic page was used for a clinical mechanism, regulatory indication, contraindication, product equivalence, dosing conversion, or treatment-suitability claim. Clinic and marketplace pages are used only in the regional-price dataset.
+- 21 current entities;
+- 403 claim-level source rows;
+- 8 featured, indexable comparisons;
+- 58 regional price estimates across the 9 requested regions;
+- 61 postal-prefix mappings;
+- 15 original-media briefs, but zero copied or rights-cleared manufacturer images.
 
-## Research hierarchy
+The audit does not claim medical review. A profile's `last_reviewed_at` is an editorial and source-verification date only. Null values remain where the evidence does not support a responsible statement.
 
-1. FDA prescribing information, approval letters, PMA/SSED records, 510(k) summaries, device listings, and safety communications.
+## Research and publication method
+
+Core medical claims use this hierarchy:
+
+1. FDA prescribing information, approval letters, PMA/SSED records, 510(k) summaries, device classifications, and safety communications.
 2. Health Canada Drug Product Database and Medical Devices Active Licence Listing.
 3. Official manufacturer prescribing information, patient labelling, and instructions for use.
-4. Peer-reviewed systematic reviews when a label does not establish comparative magnitude, discomfort, or evidence quality.
-5. Clinic menus, booking pages, and credible marketplaces only for public price observations.
+4. Peer-reviewed systematic reviews when regulatory records do not answer an evidence-strength, discomfort, or durability field.
+5. Clinic menus and booking pages only for public price observations.
 
-The FDA treats dermal-filler approval as product- and indication-specific, not as a class-wide approval ([FDA dermal fillers](https://www.fda.gov/medical-devices/aesthetic-cosmetic-devices/dermal-fillers-soft-tissue-fillers), [FDA-approved fillers](https://www.fda.gov/medical-devices/aesthetic-cosmetic-devices/fda-approved-dermal-fillers)). Health Canada’s MDALL similarly provides active licences for Class II–IV devices, while Class I devices do not receive an MDALL device licence ([Health Canada MDALL guidance](https://www.canada.ca/en/health-canada/services/drugs-health-products/medical-devices/licences/medical-devices-active-licence-listing.html)).
+The FDA regulates fillers product by product and for specific indications rather than approving an interchangeable “filler” class ([FDA dermal-filler overview](https://www.fda.gov/medical-devices/aesthetic-cosmetic-devices/dermal-fillers-soft-tissue-fillers), [FDA-approved fillers](https://www.fda.gov/medical-devices/aesthetic-cosmetic-devices/fda-approved-dermal-fillers)). Health Canada similarly uses product-specific drug records and active medical-device licences ([Health Canada DPD](https://health-products.canada.ca/dpd-bdpp/), [Health Canada MDALL](https://health-products.canada.ca/mdall-limh/)).
 
-## Entity findings
+No clinic blog supports a mechanism, indication, risk, contraindication, dosing relationship, product equivalence, or treatment-suitability claim.
 
-### Botox vs. Dysport
+## Priority comparison findings
 
-Botox Cosmetic’s current US label includes glabellar, lateral-canthal, forehead, and platysma-band indications and describes onabotulinumtoxinA’s SNAP-25 mechanism, boxed warning, contraindications, and approximately three-to-four-month glabellar effect ([FDA Botox Cosmetic label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/103000s5316s5319s5323s5326s5331lbl.pdf)). Health Canada lists Botox Cosmetic DIN 02531445 as approved ([Health Canada DPD](https://health-products.canada.ca/dpd-bdpp/info?code=102058&lang=eng)).
+### 1. Botox vs. Dysport
 
-Dysport’s US cosmetic indication remains moderate-to-severe glabellar lines in adults younger than 65, with retreatment no more often than every three months. Its label explicitly states that potency units are not interchangeable with another botulinum toxin product ([FDA Dysport label](https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/125274s123lbl.pdf)). Health Canada lists Dysport Aesthetic DIN 02387735 as marketed ([Health Canada DPD](https://health-products.canada.ca/dpd-bdpp/info?code=87332&lang=eng)).
+Botox Cosmetic's current US label covers glabellar, lateral-canthal, forehead, and platysma-band indications. It states that Botox potency units cannot be compared with or converted into units of another botulinum-toxin preparation and describes the boxed warning, contraindications, onset, and approximately three-to-four-month glabellar effect ([FDA Botox Cosmetic prescribing information](https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/103000s5316s5319s5323s5326s5331lbl.pdf)).
 
-No onset-superiority or dose-conversion claim is published. Regional prices retain each brand’s raw units.
+Dysport's US cosmetic indication remains moderate-to-severe glabellar lines in adults younger than 65, with its own non-interchangeable potency units and retreatment limits ([FDA Dysport prescribing information](https://www.accessdata.fda.gov/drugsatfda_docs/label/2023/125274s123lbl.pdf)).
 
-### Botox vs. dermal fillers
+Health Canada records support separate Canadian status fields for Botox Cosmetic and Dysport Aesthetic ([Health Canada DPD search](https://health-products.canada.ca/dpd-bdpp/)). The comparison intentionally publishes no conversion ratio, diffusion-superiority claim, universal winner, or personalized treatment recommendation.
 
-This is a `different_approach` comparison between the Botox product and the `ha-filler` class. The profile rows carry the distinction:
+### 2. Botox vs. dermal fillers
 
-- Botox reduces selected muscle activity and does not add volume.
-- HA filler occupies soft-tissue space and does not reduce muscle contraction.
-- Botox is not immediately reversible.
-- Many HA fillers may often be reduced with clinician-administered hyaluronidase, but that use is off-label in the US and complete reversal is not guaranteed ([review of hyaluronidase use](https://pmc.ncbi.nlm.nih.gov/articles/PMC5242216/)).
+This is a `different_approach` comparison:
 
-The comparison’s recommendation, winner, candidate, and “best for” fields are null. FDA safety guidance supports the filler vascular-risk language, including rare necrosis, blindness, and stroke ([FDA filler safety guidance](https://www.fda.gov/consumers/consumer-updates/dermal-filler-dos-and-donts-wrinkles-lips-and-more)).
+- Botox temporarily reduces selected muscle activity and does not add volume.
+- HA filler occupies soft-tissue space and does not produce a neuromodulator effect.
+- Botox has no immediate reversal method.
+- Many HA fillers may be reduced with clinician-administered hyaluronidase, but this is off-label in the US, product response varies, and complete reversal is not guaranteed ([peer-reviewed hyaluronidase review](https://pmc.ncbi.nlm.nih.gov/articles/PMC5242216/)).
 
-### Juvéderm vs. Restylane
+FDA guidance supports the product-specific filler model and the rare but serious vascular risks, including tissue necrosis, blindness, and stroke ([FDA dermal-filler safety guidance](https://www.fda.gov/consumers/consumer-updates/dermal-filler-dos-and-donts-wrinkles-lips-and-more)).
 
-Both are brand families, not single products. The Juvéderm manufacturer page enumerates distinct products and treatment areas ([Juvéderm treatment areas](https://www.juvederm.com/treatment-areas)); Restylane does the same for its portfolio ([Restylane products and areas](https://www.restylaneusa.com/explore-restylane)). The audit therefore rejects family-wide duration, equivalence, or superiority claims.
+### 3. Juvéderm vs. Restylane
 
-FDA status is described through product-specific PMAs rather than a family approval ([Juvéderm PMA example](https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpma/pma.cfm?id=P050047S052), [Restylane PMA P040024](https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpma/pma.cfm?id=P040024)). Health Canada company records show active Class III device licences for both portfolios ([Allergan MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=112685&lang=eng), [Q-Med MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=108608&lang=eng)).
+These are brand families rather than two single formulations. The comparison therefore emphasizes portfolio structure, product-specific areas, and the need to compare the exact products rather than publishing a family-wide duration or superiority claim ([Juvéderm treatment areas](https://www.juvederm.com/treatment-areas), [Restylane product portfolio](https://www.restylaneusa.com/explore-restylane)).
 
-### Juvéderm Voluma vs. Restylane Kysse
+US status is tied to product-specific PMAs ([Juvéderm PMA example](https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpma/pma.cfm?id=P050047S052), [Restylane PMA P040024](https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpma/pma.cfm?id=P040024)). Canadian status is tied to active manufacturer/device records, not inferred from US approval ([Allergan MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=112685&lang=eng), [Q-Med MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=108608&lang=eng)).
 
-The pair is intentionally allowed even though the intended areas differ. Voluma’s current US labelling covers deep structural augmentation of cheeks, chin, and temples and describes its 20 mg/mL cross-linked HA formulation with lidocaine ([Voluma IFU](https://www.accessdata.fda.gov/cdrh_docs/pdf11/P110033S070C.pdf), [FDA PMA P110033/S070](https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpma/pma.cfm?id=P110033S070)).
+### 4. Juvéderm Voluma vs. Restylane Kysse
 
-Kysse is approved for lip augmentation and upper perioral rhytids, with a pivotal-study 60% responder rate at week 48 ([FDA PMA P140029/S021](https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpma/pma.cfm?id=P140029S021), [FDA SSED](https://www.accessdata.fda.gov/cdrh_docs/pdf14/P140029S021B.pdf), [Kysse IFU](https://www.restylaneusa.com/docs/Restylane-Kysse-IFU)).
+This deliberately area-mismatched comparison helps users understand why two famous HA products are not direct substitutes.
 
-The profiles explicitly state that they are not true substitutes. Health Canada lists Voluma with lidocaine under licence 77899 and Kysse under licence 95283 in the manufacturers’ active MDALL records ([Allergan MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=112685&lang=eng), [Q-Med MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=108608&lang=eng)).
+Voluma's current US labelling covers structural augmentation of cheeks, chin, and temples ([FDA PMA P110033/S070](https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpma/pma.cfm?id=P110033S070), [Voluma IFU](https://www.accessdata.fda.gov/cdrh_docs/pdf11/P110033S070C.pdf)). Kysse is approved for lip augmentation and upper-perioral rhytids ([FDA PMA P140029/S021](https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpma/pma.cfm?id=P140029S021), [FDA SSED](https://www.accessdata.fda.gov/cdrh_docs/pdf14/P140029S021B.pdf)).
 
-### Sculptra vs. Radiesse
+Health Canada lists product-family/device licences for both manufacturers ([Allergan MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=112685&lang=eng), [Q-Med MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=108608&lang=eng)). The comparison does not name a winner because the intended treatment areas differ.
 
-Sculptra is PLLA-SCA and develops gradually over a typical two-to-three-session course; the current US information includes cheek fine lines and wrinkles and warns about papules, nodules, granuloma, and vascular injection ([Sculptra IFU](https://www.sculptrausa.com/docs/Sculptra-e-IFU), [FDA PMA P030050/S039](https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfPMA/pma.cfm?id=P030050S039), [FDA SSED](https://www.accessdata.fda.gov/cdrh_docs/pdf3/P030050S039B.pdf)).
+### 5. Sculptra vs. Radiesse
 
-Radiesse contains calcium-hydroxylapatite microspheres in a gel carrier and provides immediate filler volume before a longer tissue response. It is not dissolvable with hyaluronidase ([Radiesse (+) IFU](https://radiesse.com/app/uploads/2024/04/instructions-for-use-radiesse-plus-lidocaine.pdf), [FDA PMA family](https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpma/pma.cfm?id=P050052S148)).
+Sculptra is a PLLA-SCA injectable with gradual tissue response and a treatment course rather than a simple one-step HA-style volume result ([FDA PMA P030050/S039](https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpma/pma.cfm?id=P030050S039), [FDA SSED](https://www.accessdata.fda.gov/cdrh_docs/pdf3/P030050S039B.pdf), [Sculptra IFU](https://www.sculptrausa.com/docs/Sculptra-e-IFU)).
 
-Health Canada lists active Class III licences for Sculptra 71658, Radiesse 78893, and Radiesse (+) 95140 ([Q-Med MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=108608&lang=eng), [Merz MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=116080&lang=eng)).
+Radiesse contains calcium-hydroxylapatite microspheres in a gel carrier and provides an immediate filler component before the longer tissue response. It is not an HA filler and is not dissolvable with hyaluronidase ([Radiesse (+) IFU](https://radiesse.com/app/uploads/2024/04/instructions-for-use-radiesse-plus-lidocaine.pdf), [FDA Radiesse PMA family](https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpma/pma.cfm?id=P050052)).
 
-### Thermage FLX vs. Ultherapy
+Canadian status is recorded separately through active device licences ([Q-Med MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=108608&lang=eng), [Merz MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=116080&lang=eng)).
 
-Thermage FLX uses 6.78 MHz monopolar radiofrequency with surface cooling and controlled tissue coagulation ([FDA 510(k) K170758](https://www.accessdata.fda.gov/cdrh_docs/pdf17/K170758.pdf)). Manufacturer duration language is labelled as a manufacturer estimate rather than independent certainty ([Thermage](https://www.thermage.com/)). A systematic review supports describing efficacy as modest and heterogeneous rather than facelift-like ([systematic review](https://pubmed.ncbi.nlm.nih.gov/35877937/)).
+### 6. Thermage FLX vs. Ultherapy
 
-Ultherapy uses imaging-guided microfocused ultrasound and has US clearances for brow, submental, and neck lifting and décolletage lines ([FDA K121700](https://www.accessdata.fda.gov/cdrh_docs/pdf12/K121700.pdf), [FDA K134032](https://www.accessdata.fda.gov/cdrh_docs/pdf13/k134032.pdf), [Ultherapy IFU](https://ultherapy.com/app/uploads/2023/02/1015107_Ultherapy_IFU_2023.pdf)). Systematic reviews support modest results, moderate average discomfort, and mostly transient adverse events, with protocols and follow-up varying ([2024 meta-analysis](https://pubmed.ncbi.nlm.nih.gov/39540440/), [2023 review](https://pubmed.ncbi.nlm.nih.gov/36674277/)).
+Thermage FLX uses monopolar radiofrequency with surface cooling and controlled tissue coagulation ([FDA 510(k) K170758](https://www.accessdata.fda.gov/cdrh_docs/pdf17/K170758.pdf)). A systematic review supports describing aesthetic change as modest and heterogeneous rather than facelift-equivalent ([systematic review](https://pubmed.ncbi.nlm.nih.gov/35877937/)).
 
-Health Canada lists Thermage FLX licence 112966 and the Ulthera System licence 79689 ([Solta MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=126264&lang=eng), [Ulthera MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=128516&lang=eng)).
+Ultherapy uses imaging-guided microfocused ultrasound and has device-specific US clearances for brow, submental, neck, and décolletage uses ([FDA 510(k) K121700](https://www.accessdata.fda.gov/cdrh_docs/pdf12/K121700.pdf), [FDA 510(k) K134032](https://www.accessdata.fda.gov/cdrh_docs/pdf13/k134032.pdf), [Ultherapy IFU](https://ultherapy.com/app/uploads/2023/02/1015107_Ultherapy_IFU_2023.pdf)). Systematic reviews support modest outcomes and mostly transient adverse events while showing protocol heterogeneity ([systematic review](https://pubmed.ncbi.nlm.nih.gov/36674277/), [meta-analysis](https://pubmed.ncbi.nlm.nih.gov/39540440/)).
 
-### Morpheus8 vs. Potenza
+Canadian status remains device-licence specific ([Solta MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=126264&lang=eng), [Ulthera MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=128516&lang=eng)).
 
-Morpheus8’s K231790 record supports specified electrocoagulation, hemostasis, and soft-tissue coagulation/contraction uses and limits energy above 62 mJ per pin to Fitzpatrick I–IV ([FDA K231790](https://www.accessdata.fda.gov/cdrh_docs/pdf23/K231790.pdf)).
+### 7. Morpheus8 vs. Potenza
 
-Potenza’s K192545 clearance is narrower: dermatologic and general surgical procedures for electrocoagulation and hemostasis. It is not rewritten as an FDA-cleared wrinkle, acne-scar, or skin-tightening indication ([FDA K192545](https://www.accessdata.fda.gov/cdrh_docs/pdf19/K192545.pdf)). Tip and mode variety comes from manufacturer technical material and is not used as proof of superiority ([Potenza physician brochure](https://www.cynosure.com/wp-content/uploads/2021/04/PRD_4362_Potenza-Physician-Brochure-Fusion-Tip-web.pdf)).
+Morpheus8's K231790 record supports specified electrocoagulation, hemostasis, and soft-tissue coagulation/contraction uses; it does not justify a universal treatment claim for every marketed concern ([FDA 510(k) K231790](https://www.accessdata.fda.gov/cdrh_docs/pdf23/K231790.pdf)).
 
-The FDA’s October 2025 safety communication reports serious complications with certain RF-microneedling uses, including burns, scarring, fat loss, disfigurement, and nerve damage ([FDA safety communication](https://www.fda.gov/medical-devices/safety-communications/potential-risks-certain-uses-radiofrequency-rf-microneedling-fda-safety-communication)). Health Canada active records include InMode Morpheus8 configurations and Potenza licence 106699 ([InMode MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=129694&lang=eng), [Jeisys MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=132079&lang=eng)).
+Potenza's K192545 clearance is narrower and supports dermatologic/general surgical electrocoagulation and hemostasis. It is not rewritten as an FDA-cleared acne-scar, wrinkle, or tightening indication ([FDA 510(k) K192545](https://www.accessdata.fda.gov/cdrh_docs/pdf19/K192545.pdf)). Tip and mode descriptions come from official technical material and are not evidence of clinical superiority ([Potenza physician brochure](https://www.cynosure.com/wp-content/uploads/2021/04/PRD_4362_Potenza-Physician-Brochure-Fusion-Tip-web.pdf)).
 
-### HydraFacial vs. DiamondGlow
+The FDA's 2025 safety communication reports serious complications with certain RF-microneedling uses, including burns, scarring, fat loss, disfigurement, and nerve damage ([FDA RF-microneedling safety communication](https://www.fda.gov/medical-devices/safety-communications/potential-risks-certain-uses-radiofrequency-rf-microneedling-fda-safety-communication)). Health Canada lists Potenza under active licence 106699 ([Jeisys MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=132079&lang=eng)); Morpheus8 status is kept separate in the InMode licence record ([InMode MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=129694&lang=eng)).
 
-HydraFacial combines superficial exfoliation, suction, and topical-fluid delivery according to the manufacturer’s treatment description and model-specific eIFU hub ([HydraFacial treatment](https://hydrafacial.com/treatment/), [HydraFacial eIFU](https://www.hydrafacial.com/pages/electronic-instructions-for-use-eifu)). A HydraFacial-branded PMA, De Novo, or 510(k) indication was not identified in the FDA databases during this review, so the procedure is not described as “FDA approved.” Health Canada’s active record lists microdermabrasion systems under Class II licence 79154 ([HydraFacial MDALL](https://health-products.canada.ca/mdall-limh/information?companyId=120660&lang=eng)).
+### 8. HydraFacial vs. DiamondGlow
 
-DiamondGlow uses diamond-tip superficial abrasion, suction, and simultaneous topical delivery ([DiamondGlow mechanism](https://www.diamondglow.com/how-it-works/), [DiamondGlow FAQ](https://www.diamondglow.com/faq/)). FDA records list the underlying Envy Medical/SilkPeel/Dermalinfusion powered-dermabrasion family as Class I product code GFE, and a device report identifies the pathway as 510(k)-exempt ([FDA device listing](https://www.accessdata.fda.gov/scrIpts/cdrh/cfdocs/cfRL/rl.cfm?lid=964029&lpcd=GFE), [FDA MAUDE record](https://www.accessdata.fda.gov/scripts/cdrh/cfmaude/detail.cfm?mdrfoi__id=9919070&pc=GFE)).
+HydraFacial combines superficial exfoliation, suction, and topical-fluid delivery in model-specific official instructions ([HydraFacial eIFU](https://www.hydrafacial.com/pages/electronic-instructions-for-use-eifu), [HydraFacial treatment description](https://hydrafacial.com/treatment/)). A branded PMA, De Novo, or 510(k) indication was not identified during this review, so the page does not call the procedure “FDA approved.”
 
-No durable longevity is published for either facial. Both profiles limit the expected result to temporary superficial cosmetic improvement.
+DiamondGlow uses a diamond-tip abrasion surface, suction, and simultaneous topical delivery ([DiamondGlow mechanism](https://www.diamondglow.com/how-it-works/), [DiamondGlow FAQ](https://www.diamondglow.com/faq/)). The underlying powered-dermabrasion product code GFE is Class I and 510(k)-exempt ([FDA GFE classification](https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfPCD/classification.cfm?ID=GFE), [FDA device listing](https://www.accessdata.fda.gov/scrIpts/cdrh/cfdocs/cfRL/rl.cfm?lid=964029&lpcd=GFE)).
 
-## Comparison and market audit
+Neither profile publishes a durable longevity promise. Both are framed as superficial procedures whose visible result and protocol vary.
 
-All eight requested comparisons are featured and indexable only after the two sourced profiles exist:
+## Entity/publication reconciliation
 
-1. Botox vs. Dysport
-2. Botox vs. dermal fillers
-3. Juvéderm vs. Restylane
-4. Juvéderm Voluma vs. Restylane Kysse
-5. Sculptra vs. Radiesse
-6. Thermage FLX vs. Ultherapy
-7. Morpheus8 vs. Potenza
-8. HydraFacial vs. DiamondGlow
+The complete row-by-row audit is in [`content_inventory.md`](content_inventory.md). The six review-state entities are retained so existing IDs, parent relationships, saved research, and future comparison work remain stable. They are not included in `treatment_markets.json`, featured comparisons, media briefs, or public publication.
 
-Every launch treatment and comparison maps to both `US` and `CA`. This is availability/regulatory metadata inside one universal route system, not a country switcher.
+The 15 launch profiles meet the existing minimum publication gate:
 
-The controlled intended-area values are stored on profiles. Voluma and Kysse remain comparable because both are specific HA products, while `true_substitute_notes` and the highlighted area rows prevent an equivalence inference.
+- published and non-sample;
+- primary purpose, mechanism, risks, US status, Canadian status, evidence grade, and verification date populated;
+- claim-level sources attached to every populated public medical/decision field;
+- intended areas use the controlled vocabulary;
+- no demonstration or pending-sourcing copy;
+- no fake medical reviewer.
 
-## Regional price methodology
+## Regional price research
 
-Regular public pricing is isolated from promotions, memberships, new-patient offers, and packages. For example, the Bay Area source set distinguishes Nob Hill’s regular and member Botox prices ([Nob Hill](https://nobhillaesthetics.com/pages/botox)); Los Angeles keeps Skinsation’s regular and member columns separate ([Skinsation](https://skinsationla.com/membership/)); Toronto keeps Signature’s single and package columns separate ([Signature](https://signaturemedispa.com/price-list/)); and Montreal uses Elle’s regular rather than trial prices ([Elle](https://elle.clinic/our-price-list/)).
+Regional estimates contain ordinary public prices only. Promotions, memberships, first-patient pricing, package discounts, and manufacturer rewards are either excluded or called out in the method. Currency and billing basis remain explicit: US dollars or Canadian dollars; per unit, syringe, vial, session, area, line, or other source-specific basis.
 
-Representative current regional sources include:
+Representative current sources:
 
 - San Francisco Bay Area: [Epi Center](https://epicentermedspa.com/botox-and-dysport/), [Nob Hill Aesthetics](https://nobhillaesthetics.com/pages/fillers/), [Serenity](https://serenitymedspa.com/specials/)
-- Los Angeles: [DermFX](https://www.dermfx.com/pricing/), [My Med Spa LA](https://www.mymedspala.com/pricing), [Go Smooch](https://www.gosmoochla.com/pricing-face), [2026 LA directory methodology](https://medicalspareviews.com/guides/med-spa-pricing-los-angeles-2026/)
+- Los Angeles: [DermFX](https://www.dermfx.com/pricing/), [Beauty Ranch](https://beautyranchspa.com/pricing/), [Deluxe Med Spa Potenza](https://www.deluxemedspa.com/non-surgical/potenza/), [Shorr Beauty DiamondGlow](https://shop.shorrbeauty.com/pages/diamond-glow-facial)
 - New York City: [Elite Aesthetics](https://eliteaestheticsnyc.com/pricing/), [Ratio NYC](https://www.ratio.nyc/pricing), [PBK Medspa](https://pbkmedspa.com/pricing/)
-- Miami: [4Beauty](https://4beautymedspa.com/menu/), [Miami Skin Spa](https://www.miamiskinspa.com/pricing/), [2026 Miami market index](https://medspafind.com/blog/best-med-spas-in-miami-2026)
-- Austin: [The Med Spa Austin](https://www.themedspaaustin.com/wp-content/uploads/2024/03/2024-Medspa-Austin-Menu.pdf), [Austin MD](https://austinmdclinic.com/pricing/), [Austin Plastic Surgeon](https://www.austinplasticsurgeon.com/about/pricing/medspa/), [Vetiver HydraFacial](https://www.vetiverskinstudio.com/hydrafacial)
+- Miami: [4Beauty](https://4beautymedspa.com/menu/), [Miami Skin Spa](https://www.miamiskinspa.com/pricing/)
+- Austin: [Austin MD](https://austinmdclinic.com/pricing/), [Austin Plastic Surgeon](https://www.austinplasticsurgeon.com/about/pricing/medspa/), [Vetiver HydraFacial](https://www.vetiverskinstudio.com/hydrafacial)
 - Chicago: [Chicago Aesthetics](https://chicagoaesthetics.com/treatment-pricing/), [Shah Facial Plastics](https://www.shahfacialplastics.com/pricing/), [Stay Beautiful](https://staybeautifulmedspa.com/wp-content/uploads/2025/01/Price-List.pdf)
-- Toronto: [Signature](https://signaturemedispa.com/price-list/), [ART Clinic](https://www.artclinic.ca/pricing), [Precision Esthetics](https://precision-estheticsinc.com/med-spa/), [Bar Beauty Morpheus8](https://barbeauty.ca/morpheus-8-cost-toronto-2026/)
+- Toronto: [Signature](https://signaturemedispa.com/price-list/), [ART Clinic](https://www.artclinic.ca/pricing), [Precision Esthetics](https://precision-estheticsinc.com/med-spa/)
 - Vancouver: [Medical Rejuvenation Centre](https://mrcbc.com/price-list/), [Azin Yazdani](https://www.azinyazdani.com/book-online), [Vancouver Laser](https://shop.vancouverlaser.com/collections/anti-aging-and-needling)
-- Montreal: [Elle](https://elle.clinic/our-price-list/), [Clinique DUÓ](https://cliniqueduo.com/tarifs-et-financement/), [La Clé](https://cliniquelacle.com/en), [Four Seasons HydraFacial](https://www.fourseasons.com/montreal/spa/hydrafacial/)
+- Montreal: [Elle](https://elle.clinic/our-price-list/), [Clinique DUO](https://cliniqueduo.com/tarifs-et-financement/), [La Clé](https://cliniquelacle.com/en), [Four Seasons HydraFacial](https://www.fourseasons.com/montreal/spa/hydrafacial/)
 
-### Price publication coverage
+### Published estimate coverage
 
-`P` means the JSON contains a published estimate with at least two usable sources. `—` means the treatment/region cell was researched but withheld because there were too few sources, incompatible areas/units, promotion-only pricing, or quote-only pages.
+`P` means at least two compatible current public sources support a published estimate. `—` means the cell was researched but withheld because sources were quote-only, promotion-only, too few, or used incompatible units/areas.
 
 | Treatment        | SF Bay |  LA | NYC | Miami | Austin | Chicago | Toronto | Vancouver | Montreal |
 | ---------------- | -----: | --: | --: | ----: | -----: | ------: | ------: | --------: | -------: |
@@ -139,39 +146,42 @@ Representative current regional sources include:
 | Thermage FLX     |      — |   — |   — |     — |      — |       — |       P |         P |        — |
 | Ultherapy        |      — |   — |   — |     — |      — |       — |       P |         P |        — |
 | Morpheus8        |      — |   P |   — |     P |      — |       — |       P |         — |        P |
-| Potenza          |      — |   — |   — |     — |      — |       — |       — |         — |        — |
+| Potenza          |      — |   P |   — |     — |      — |       — |       — |         — |        — |
 | HydraFacial      |      — |   — |   — |     — |      P |       P |       — |         — |        P |
-| DiamondGlow      |      — |   — |   — |     — |      — |       — |       — |         — |        — |
+| DiamondGlow      |      — |   P |   — |     — |      — |       — |       — |         — |        — |
 
-The Chicago HA class is represented by separate Juvéderm and Restylane family estimates rather than a pooled class estimate. Potenza and DiamondGlow were often quote-only or had only one regular public price in a city; they remain absent rather than borrowing category prices. Every published estimate includes its own URLs, method, limitations, and research date.
+The two newly completed Los Angeles cells are:
 
-## Media and rights audit
+- Potenza: $1,200–$1,600 per full-face session from two ordinary/starting public prices; first-patient and package prices excluded ([Beauty Ranch](https://beautyranchspa.com/potenza-rf-microneedling-los-angeles/), [Deluxe Med Spa](https://www.deluxemedspa.com/non-surgical/potenza/)).
+- DiamondGlow: $199–$285 per facial session, median $199, from three regular prices; Beauty Ranch's temporary $199 special excluded in favor of its $285 regular value ([DermFX](https://www.dermfx.com/pricing/), [Shorr Beauty](https://shop.shorrbeauty.com/pages/diamond-glow-facial), [Beauty Ranch](https://beautyranchspa.com/pricing/)).
 
-No manufacturer image, before/after photograph, product shot, or clinic media is included. Availability on an official site does not establish reuse rights. `treatment_media.json` recommends original neutral diagrams and states what each illustration must not imply.
+Every published row carries source URLs, source count, research date, calculation method, currency, pricing basis, and limitations. These are estimates, not clinic quotes.
 
-The source-pack migration deliberately inserts no `treatment_media` asset rows because the manifest contains briefs rather than reusable files. Existing media is not deleted or republished. The follow-up validation guard moves any published launch media without `rights_verified_at` to review, and the repository’s public-media gate continues to require a permitted licence plus verified rights.
+## Media audit
 
-## Migration safety audit
+No manufacturer packshot, logo, before/after photograph, clinic image, or search-result image was copied. A public manufacturer page proves provenance, not reuse permission.
 
-The migration:
+`treatment_media.json` contains 15 briefs for future original illustrations. All are `review`, `publish: false`, and marked `new own-work asset required`. The migration does not insert or publish media. The six incomplete entities do not yet have media briefs.
 
-- adds `canada_status` and regional-estimate `limitations` additively;
-- updates treatment rows by `slug`, preserving existing IDs;
-- inserts only missing slugs;
-- resolves parents after upsert;
-- updates or inserts source rows by treatment, claim field, and URL without creating duplicates;
-- inserts mappings with conflict-safe joins;
-- canonicalizes comparison IDs with `least`/`greatest` and updates by `pair_key`;
-- nulls recommendation fields for the Botox-versus-fillers comparison;
-- publishes only rows marked published in this pack;
-- does not delete treatments, clinics, locations, offers, submissions, price observations, or existing media;
-- removes only obsolete launch-group mappings when the replacement mapping for that same launch entity exists;
-- performs no media insert from illustration briefs, moves unverified launch media to review, and cannot publish unlicensed media.
+## Migration safety
+
+The existing migration chain plus the new additive audit migration:
+
+- preserves treatment IDs by resolving records through stable slugs rather than replacing identity rows;
+- retains the existing parent relationships, comparison groups, mappings, market metadata, and clinic infrastructure;
+- inserts missing claim-level source rows only when the treatment/field/source combination does not already exist;
+- updates or inserts the two new regional price rows without deleting unrelated history;
+- keeps the eight canonical launch comparisons featured and indexable;
+- publishes only the 15 complete source-backed records;
+- explicitly returns the 6 incomplete records to `review`;
+- leaves uncertain values null;
+- creates no media rows and invents no image rights;
+- validates the entity inventory, publication gate, source gate, and featured-comparison gate before committing.
 
 ## Known limitations and next review
 
-- DPD and MDALL are live registries; licence status and product monographs should be rechecked at the next review.
-- Negative FDA database findings for a branded facial are recorded as “not identified in this review,” never as proof that no model record exists.
-- Brand-family profiles cannot substitute for checking the exact product IFU.
-- Regional prices are snapshots, not quotes. Taxes, consultation fees, injector tier, amount, area, device line/pulse count, and packages can materially change total cost.
-- The next medical/regulatory review should occur by 2027-01-29 or sooner after a label, licence, safety communication, or device recall changes.
+- DPD and MDALL are live registries. Status and product monographs should be rechecked at the next review.
+- A negative database search is described as “not identified in this review,” not as proof that no record exists.
+- Brand-family profiles cannot replace the exact product IFU.
+- The regional-price dataset remains sparse for expensive devices whose public prices use incompatible areas, line counts, pulse counts, or quote-only workflows.
+- The next source review should occur by 2027-01-30, or sooner after a label change, safety communication, licence change, recall, or material pricing-method change.

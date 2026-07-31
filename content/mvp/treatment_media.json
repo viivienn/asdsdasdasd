@@ -1,5 +1,5 @@
 {
-  "schema_version": "2026-07-29",
+  "schema_version": "2026-07-30",
   "policy": "No media is publishable in this pack. Manufacturer galleries and product photographs were not copied because reuse rights were not explicit. The import does not create asset rows from these briefs, and the validation guard moves any existing unverified launch media to review.",
   "media": [
     {

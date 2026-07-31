@@ -7,7 +7,9 @@ const contentDir = path.join(root, "content", "mvp");
 const read = (name) => JSON.parse(fs.readFileSync(path.join(contentDir, name), "utf8"));
 const json = (value) => JSON.stringify(value);
 
-const treatments = read("treatments.json").treatments;
+const treatmentDocument = read("treatments.json");
+const treatments = treatmentDocument.treatments;
+const reviewedAt = `${treatmentDocument.last_reviewed_date}T00:00:00Z`;
 const sources = read("treatment_sources.json").sources;
 const groups = read("comparison_groups.json").comparison_groups;
 const groupMappings = read("treatment_comparison_groups.json").mappings;
@@ -15,7 +17,7 @@ const familyRules = read("comparison_family_rules.json").rules;
 const treatmentMarkets = read("treatment_markets.json").mappings.flatMap((row) =>
   row.markets.map((country_code) => ({ treatment_slug: row.treatment_slug, country_code })),
 );
-const comparisons = read("indexable_comparisons.json").comparisons;
+const comparisons = read("featured_comparisons.json").comparisons;
 const comparisonMarkets = comparisons.flatMap((row) =>
   ["US", "CA"].map((country_code, index) => ({
     comparison_slug: row.slug,
@@ -260,7 +262,7 @@ set
   source_title = payload.source_title,
   source_type = payload.source_type,
   publication_date = payload.publication_date,
-  retrieved_at = '2026-07-29T00:00:00Z'::timestamptz,
+  retrieved_at = '${reviewedAt}'::timestamptz,
   evidence_level = payload.evidence_level,
   notes = payload.notes,
   is_sample = false
@@ -302,7 +304,7 @@ select
   payload.source_url,
   payload.source_type,
   payload.publication_date,
-  '2026-07-29T00:00:00Z'::timestamptz,
+  '${reviewedAt}'::timestamptz,
   payload.evidence_level,
   payload.notes,
   false
@@ -500,8 +502,8 @@ select
   sort_rank,
   publication_status,
   false,
-  '2026-07-29T00:00:00Z'::timestamptz,
-  '2026-07-29T00:00:00Z'::timestamptz
+  '${reviewedAt}'::timestamptz,
+  '${reviewedAt}'::timestamptz
 from resolved
 on conflict (pair_key) do update set
   slug = excluded.slug,
@@ -808,7 +810,7 @@ const output = path.join(
   root,
   "supabase",
   "migrations",
-  "20260730010000_source_backed_mvp_content.sql",
+  process.argv[2] ?? "20260730010000_source_backed_mvp_content.sql",
 );
 fs.writeFileSync(output, sql);
 console.log(`Wrote ${path.relative(root, output)} (${sql.length.toLocaleString()} bytes)`);
