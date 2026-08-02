@@ -75,7 +75,12 @@ export function CompareWith({
 
         <div className="border-b border-rule bg-secondary/55 px-5 py-3">
           <div className="flex items-center gap-3 rounded-xl border-2 border-primary bg-card p-3">
-            <TreatmentVisual name={selected.name} media={selected.media} className="size-14" />
+            <TreatmentVisual
+              slug={selected.slug}
+              name={selected.name}
+              media={selected.media}
+              className="size-14"
+            />
             <div className="min-w-0 flex-1">
               <span className="inline-flex items-center gap-1 text-xs font-medium text-primary">
                 <Check className="size-3.5" aria-hidden="true" /> Selected
@@ -124,6 +129,7 @@ export function CompareWith({
                   }`}
                 >
                   <TreatmentVisual
+                    slug={treatment.slug}
                     name={treatment.name}
                     media={treatment.media}
                     className="size-12"

@@ -60,7 +60,12 @@ function ResultRow({
         }`}
       >
         {entry.entityType ? (
-          <TreatmentVisual name={entry.label} media={entry.media ?? null} className="size-10" />
+          <TreatmentVisual
+            slug={entry.slug}
+            name={entry.label}
+            media={entry.media ?? null}
+            className="size-10"
+          />
         ) : (
           <span
             aria-hidden="true"

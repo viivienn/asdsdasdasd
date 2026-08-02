@@ -326,6 +326,7 @@ function CatalogSection({
               className="group flex h-full flex-col rounded-2xl border border-rule bg-card p-3 transition hover:-translate-y-0.5 hover:border-primary hover:shadow-card"
             >
               <TreatmentVisual
+                slug={entry.slug}
                 name={entry.name}
                 media={entry.media}
                 className="aspect-square size-auto w-full border-0 bg-muted/55"

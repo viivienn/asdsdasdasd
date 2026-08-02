@@ -100,6 +100,7 @@ function TreatmentPage() {
       <header className="mt-6 grid gap-7 lg:grid-cols-[minmax(18rem,0.8fr)_minmax(0,1.2fr)] lg:items-start">
         <div className="flex min-h-[22rem] items-center justify-center rounded-2xl bg-muted/55 p-6 sm:min-h-[28rem]">
           <TreatmentVisual
+            slug={slug}
             name={treatment.name}
             media={pickerTreatment?.media ?? null}
             className="aspect-[4/5] h-auto w-full max-w-sm border-0 bg-transparent shadow-none"

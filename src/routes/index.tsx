@@ -58,6 +58,7 @@ function Home() {
               }`}
             >
               <TreatmentVisual
+                slug={treatment.slug}
                 name={treatment.name}
                 media={treatment.media}
                 className="size-32 border-0 bg-transparent shadow-none"
@@ -118,6 +119,7 @@ function Home() {
                   className="group flex h-full flex-col rounded-2xl border border-rule bg-card p-3 transition hover:-translate-y-0.5 hover:border-primary hover:shadow-card sm:p-4"
                 >
                   <TreatmentVisual
+                    slug={treatment.slug}
                     name={treatment.name}
                     media={treatment.media}
                     className="aspect-square size-auto w-full border-0 bg-muted/55"
