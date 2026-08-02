@@ -50,7 +50,7 @@ export function TreatmentVisual({
           className={`${className} shrink-0 rounded-xl border border-rule bg-card object-cover`}
         />
         {showCredit ? (
-          <figcaption className="mt-1 max-w-44 truncate text-[0.68rem] text-muted-foreground">
+          <figcaption className="mt-1 text-[0.68rem] text-muted-foreground">
             Original illustration · Aesthetic Index
           </figcaption>
         ) : null}
