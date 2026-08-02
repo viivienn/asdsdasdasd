@@ -221,7 +221,11 @@ export function TreatmentPicker({
                       </li>
                     ) : null}
                     <li className="flex items-center gap-3 border-b border-rule py-3 last:border-0">
-                      <TreatmentVisual slug={treatment.slug} name={treatment.name} media={treatment.media} />
+                      <TreatmentVisual
+                        slug={treatment.slug}
+                        name={treatment.name}
+                        media={treatment.media}
+                      />
                       <div className="min-w-0 flex-1">
                         <p className="font-medium">{treatment.name}</p>
                         <p className="truncate text-xs text-muted-foreground">

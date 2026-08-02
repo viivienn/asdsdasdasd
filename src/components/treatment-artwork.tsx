@@ -37,7 +37,17 @@ function Studio({ uid }: { uid: string }) {
   );
 }
 
-function Floor({ uid, cx = 200, rx = 108, cy = 408 }: { uid: string; cx?: number; rx?: number; cy?: number }) {
+function Floor({
+  uid,
+  cx = 200,
+  rx = 108,
+  cy = 408,
+}: {
+  uid: string;
+  cx?: number;
+  rx?: number;
+  cy?: number;
+}) {
   return <ellipse cx={cx} cy={cy} rx={rx} ry="17" fill={`url(#${uid}-shadow)`} />;
 }
 
@@ -110,16 +120,72 @@ function Vial({
 }) {
   return (
     <g>
-      <rect x={x} y={y + 26} width={w} height={h - 26} rx={9} fill={`url(#${uid}-glass)`} stroke={P.rule} />
-      <rect x={x + w * 0.28} y={y} width={w * 0.44} height={20} rx={4} fill={`url(#${uid}-glass)`} stroke={P.rule} />
-      <rect x={x + w * 0.2} y={y + 12} width={w * 0.6} height={22} rx={6} fill={`url(#${uid}-metal)`} stroke={P.rule} />
+      <rect
+        x={x}
+        y={y + 26}
+        width={w}
+        height={h - 26}
+        rx={9}
+        fill={`url(#${uid}-glass)`}
+        stroke={P.rule}
+      />
+      <rect
+        x={x + w * 0.28}
+        y={y}
+        width={w * 0.44}
+        height={20}
+        rx={4}
+        fill={`url(#${uid}-glass)`}
+        stroke={P.rule}
+      />
+      <rect
+        x={x + w * 0.2}
+        y={y + 12}
+        width={w * 0.6}
+        height={22}
+        rx={6}
+        fill={`url(#${uid}-metal)`}
+        stroke={P.rule}
+      />
       <rect x={x + w * 0.2} y={y + 20} width={w * 0.6} height={3} fill="#FFFFFF" opacity="0.7" />
-      <rect x={x + 7} y={y + 62} width={w - 14} height={h - 92} rx={5} fill={label} stroke={P.rule} />
+      <rect
+        x={x + 7}
+        y={y + 62}
+        width={w - 14}
+        height={h - 92}
+        rx={5}
+        fill={label}
+        stroke={P.rule}
+      />
       {stripe ? <rect x={x + 7} y={y + 62} width={w - 14} height={7} rx={3} fill={stripe} /> : null}
       <rect x={x + 16} y={y + 82} width={w - 40} height={5} rx={2.5} fill={accent} opacity="0.85" />
-      <rect x={x + 16} y={y + 94} width={w - 52} height={4} rx={2} fill={P.inkSoft} opacity="0.35" />
-      <rect x={x + 16} y={y + 104} width={w - 30} height={3} rx={1.5} fill={P.inkSoft} opacity="0.22" />
-      <rect x={x + 11} y={y + 34} width={7} height={h - 46} rx={3.5} fill="#FFFFFF" opacity="0.55" />
+      <rect
+        x={x + 16}
+        y={y + 94}
+        width={w - 52}
+        height={4}
+        rx={2}
+        fill={P.inkSoft}
+        opacity="0.35"
+      />
+      <rect
+        x={x + 16}
+        y={y + 104}
+        width={w - 30}
+        height={3}
+        rx={1.5}
+        fill={P.inkSoft}
+        opacity="0.22"
+      />
+      <rect
+        x={x + 11}
+        y={y + 34}
+        width={7}
+        height={h - 46}
+        rx={3.5}
+        fill="#FFFFFF"
+        opacity="0.55"
+      />
     </g>
   );
 }
@@ -142,9 +208,25 @@ function Syringe({
   const w = 46;
   return (
     <g>
-      <rect x={x - 16} y={y} width={w + 32} height={12} rx={6} fill={`url(#${uid}-shell)`} stroke={P.rule} />
+      <rect
+        x={x - 16}
+        y={y}
+        width={w + 32}
+        height={12}
+        rx={6}
+        fill={`url(#${uid}-shell)`}
+        stroke={P.rule}
+      />
       <rect x={x + 14} y={y + 12} width={18} height={40} rx={9} fill={`url(#${uid}-metal)`} />
-      <rect x={x} y={y + 46} width={w} height={h - 96} rx={14} fill={`url(#${uid}-glass)`} stroke={P.rule} />
+      <rect
+        x={x}
+        y={y + 46}
+        width={w}
+        height={h - 96}
+        rx={14}
+        fill={`url(#${uid}-glass)`}
+        stroke={P.rule}
+      />
       <rect x={x + 6} y={y + 78} width={w - 12} height={h - 142} rx={9} fill={gel} opacity="0.75" />
       <rect x={x + 9} y={y + 54} width={6} height={h - 108} rx={3} fill="#FFFFFF" opacity="0.6" />
       <rect x={x - 6} y={y + h - 52} width={w + 12} height={14} rx={7} fill={accent} />
@@ -182,8 +264,24 @@ function Carton({
       <rect x={x} y={y} width={w} height={h} rx={6} fill={body} stroke={P.rule} />
       <rect x={x} y={y} width={w * 0.34} height={h} rx={6} fill="#FFFFFF" opacity="0.35" />
       <rect x={x} y={y + h * 0.2} width={w} height={8} fill={accent} opacity="0.9" />
-      <rect x={x + 10} y={y + h * 0.38} width={w - 30} height={4} rx={2} fill={P.inkSoft} opacity="0.35" />
-      <rect x={x + 10} y={y + h * 0.46} width={w - 42} height={4} rx={2} fill={P.inkSoft} opacity="0.2" />
+      <rect
+        x={x + 10}
+        y={y + h * 0.38}
+        width={w - 30}
+        height={4}
+        rx={2}
+        fill={P.inkSoft}
+        opacity="0.35"
+      />
+      <rect
+        x={x + 10}
+        y={y + h * 0.46}
+        width={w - 42}
+        height={4}
+        rx={2}
+        fill={P.inkSoft}
+        opacity="0.2"
+      />
       <rect x={x + 10} y={y + h * 0.72} width={18} height={18} rx={4} fill={accent} opacity="0.3" />
     </g>
   );
@@ -208,9 +306,33 @@ function Console({
     <g>
       <rect x={x} y={y} width={w} height={h} rx={18} fill={`url(#${uid}-shell)`} stroke={P.rule} />
       <rect x={x + 14} y={y + 16} width={w - 28} height={h * 0.34} rx={10} fill={screen} />
-      <rect x={x + 14} y={y + 16} width={w - 28} height={h * 0.12} rx={10} fill="#FFFFFF" opacity="0.18" />
-      <rect x={x + 22} y={y + h * 0.56} width={w - 44} height={5} rx={2.5} fill={P.inkSoft} opacity="0.25" />
-      <rect x={x + 22} y={y + h * 0.66} width={w - 74} height={5} rx={2.5} fill={P.inkSoft} opacity="0.16" />
+      <rect
+        x={x + 14}
+        y={y + 16}
+        width={w - 28}
+        height={h * 0.12}
+        rx={10}
+        fill="#FFFFFF"
+        opacity="0.18"
+      />
+      <rect
+        x={x + 22}
+        y={y + h * 0.56}
+        width={w - 44}
+        height={5}
+        rx={2.5}
+        fill={P.inkSoft}
+        opacity="0.25"
+      />
+      <rect
+        x={x + 22}
+        y={y + h * 0.66}
+        width={w - 74}
+        height={5}
+        rx={2.5}
+        fill={P.inkSoft}
+        opacity="0.16"
+      />
     </g>
   );
 }
@@ -232,7 +354,16 @@ function Handpiece({
 }) {
   return (
     <g transform={`translate(${x} ${y}) rotate(${rotate})`}>
-      <rect x="0" y="0" width="40" height="112" rx="16" fill={body} stroke={P.rule} strokeWidth="0.8" />
+      <rect
+        x="0"
+        y="0"
+        width="40"
+        height="112"
+        rx="16"
+        fill={body}
+        stroke={P.rule}
+        strokeWidth="0.8"
+      />
       <rect x="6" y="10" width="8" height="86" rx="4" fill="#FFFFFF" opacity="0.35" />
       <rect x="8" y="104" width="24" height="16" rx="5" fill={tip} />
       <rect x="10" y="30" width="20" height="5" rx="2.5" fill="#FFFFFF" opacity="0.4" />
@@ -257,7 +388,16 @@ const botox: Art = (uid) => (
 const dysport: Art = (uid) => (
   <g>
     <Floor uid={uid} rx={92} cy={404} />
-    <Vial uid={uid} x={152} y={218} w={86} h={166} label="#FBFBF9" accent={P.teal} stripe={P.teal} />
+    <Vial
+      uid={uid}
+      x={152}
+      y={218}
+      w={86}
+      h={166}
+      label="#FBFBF9"
+      accent={P.teal}
+      stripe={P.teal}
+    />
     <rect x="120" y="356" width="160" height="6" rx="3" fill={P.teal} opacity="0.18" />
     <circle cx="300" cy="214" r="26" fill={P.teal} opacity="0.1" />
   </g>
@@ -384,7 +524,16 @@ const sculptra: Art = (uid) => (
       opacity="0.45"
       strokeLinecap="round"
     />
-    <Vial uid={uid} x={158} y={238} w={84} h={148} label="#F6F5EE" accent={P.sageDeep} stripe={P.sage} />
+    <Vial
+      uid={uid}
+      x={158}
+      y={238}
+      w={84}
+      h={148}
+      label="#F6F5EE"
+      accent={P.sageDeep}
+      stripe={P.sage}
+    />
     <rect x="167" y="330" width="66" height="42" rx={5} fill="#E9E5D8" opacity="0.9" />
     <rect x="167" y="330" width="66" height="6" rx={3} fill="#FFFFFF" opacity="0.5" />
   </g>
@@ -490,7 +639,15 @@ const morpheus8: Art = (uid) => (
     <g transform="translate(146 246) rotate(-6)">
       <rect x="0" y="0" width="112" height="52" rx="20" fill="#3A3733" />
       <rect x="10" y="10" width="52" height="10" rx="5" fill="#FFFFFF" opacity="0.16" />
-      <rect x="96" y="14" width="46" height="130" rx="18" fill="#312E2B" transform="rotate(18 96 14)" />
+      <rect
+        x="96"
+        y="14"
+        width="46"
+        height="130"
+        rx="18"
+        fill="#312E2B"
+        transform="rotate(18 96 14)"
+      />
     </g>
     <rect x="150" y="326" width="120" height="12" rx="6" fill={P.wine} opacity="0.18" />
   </g>
@@ -566,7 +723,12 @@ const diamondglow: Art = (uid) => (
     <Floor uid={uid} rx={100} cy={414} />
     <g transform="translate(200 152)">
       <path d="M0 -46 L38 -12 L0 46 L-38 -12 Z" fill="#F3EEE3" stroke={P.rule} />
-      <path d="M0 -46 L0 46 M-38 -12 L38 -12 M-20 -30 L0 46 M20 -30 L0 46" stroke={P.gold} strokeWidth="1.6" opacity="0.7" />
+      <path
+        d="M0 -46 L0 46 M-38 -12 L38 -12 M-20 -30 L0 46 M20 -30 L0 46"
+        stroke={P.gold}
+        strokeWidth="1.6"
+        opacity="0.7"
+      />
       <path d="M0 -46 L38 -12 L0 46 Z" fill="#FFFFFF" opacity="0.28" />
     </g>
     <Console uid={uid} x={96} y={228} w={144} h={164} screen="#EAE5DB" />
