@@ -60,7 +60,13 @@ function TreatmentHeader({
   return (
     <article className="flex min-w-0 max-w-full flex-col items-center gap-3 overflow-hidden rounded-2xl border border-rule bg-card p-3 text-center sm:flex-row sm:p-4 sm:text-left">
       <div className="w-fit shrink-0">
-        <TreatmentVisual name={name} media={media} className="size-20 sm:size-24" showCredit />
+        <TreatmentVisual
+          slug={treatment.slug}
+          name={name}
+          media={media}
+          className="size-20 sm:size-24"
+          showCredit
+        />
       </div>
       <div className="w-full min-w-0">
         <h2 className="truncate font-display text-lg sm:text-xl">{name}</h2>
