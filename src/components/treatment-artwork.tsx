@@ -549,7 +549,7 @@ const hydrafacial: Art = (uid) => (
       opacity="0.3"
       strokeLinecap="round"
     />
-    <Console uid={uid} x={84} y={200} w={150" .length ? 150 : 150} h={192} screen="#31393B" />
+    <Console uid={uid} x={84} y={200} w={150} h={192} screen="#31393B" />
     <path
       d="M234 250 q40 10 26 40 q-14 30 22 42"
       fill="none"
