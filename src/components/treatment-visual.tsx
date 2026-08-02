@@ -1,4 +1,5 @@
 import type { TreatmentMedia } from "@/lib/content-types";
+import { TreatmentArtwork, hasTreatmentArtwork } from "@/components/treatment-artwork";
 
 function initials(name: string) {
   return name
@@ -10,11 +11,13 @@ function initials(name: string) {
 }
 
 export function TreatmentVisual({
+  slug,
   name,
   media,
   className = "size-16",
   showCredit = false,
 }: {
+  slug: string;
   name: string;
   media: TreatmentMedia | null;
   className?: string;
@@ -32,6 +35,23 @@ export function TreatmentVisual({
         {showCredit ? (
           <figcaption className="mt-1 max-w-44 truncate text-[0.68rem] text-muted-foreground">
             {media.credit}
+          </figcaption>
+        ) : null}
+      </figure>
+    );
+  }
+
+  if (hasTreatmentArtwork(slug)) {
+    return (
+      <figure className="min-w-0">
+        <TreatmentArtwork
+          slug={slug}
+          name={name}
+          className={`${className} shrink-0 rounded-xl border border-rule bg-card object-cover`}
+        />
+        {showCredit ? (
+          <figcaption className="mt-1 max-w-44 truncate text-[0.68rem] text-muted-foreground">
+            Original illustration · Aesthetic Index
           </figcaption>
         ) : null}
       </figure>
