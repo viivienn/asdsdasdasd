@@ -1,6 +1,24 @@
 import type { TreatmentMedia } from "@/lib/content-types";
 import { TreatmentArtwork, hasTreatmentArtwork } from "@/components/treatment-artwork";
 
+const GENERATED_TREATMENT_IMAGES: Record<string, string> = {
+  botox: "/treatment-images/botox.jpg",
+  dysport: "/treatment-images/dysport.webp",
+  "ha-filler": "/treatment-images/ha-filler.jpg",
+  juvederm: "/treatment-images/juvederm.webp",
+  restylane: "/treatment-images/restylane.webp",
+  "juvederm-voluma": "/treatment-images/juvederm-voluma.webp",
+  "restylane-kysse": "/treatment-images/restylane-kysse.webp",
+  sculptra: "/treatment-images/sculptra.webp",
+  radiesse: "/treatment-images/radiesse.webp",
+  thermage: "/treatment-images/thermage.webp",
+  ultherapy: "/treatment-images/ultherapy.webp",
+  morpheus8: "/treatment-images/morpheus8.webp",
+  potenza: "/treatment-images/potenza.webp",
+  hydrafacial: "/treatment-images/hydrafacial.webp",
+  diamondglow: "/treatment-images/diamondglow.webp",
+};
+
 function initials(name: string) {
   return name
     .split(/\s+/)
@@ -23,6 +41,26 @@ export function TreatmentVisual({
   className?: string;
   showCredit?: boolean;
 }) {
+  const generatedImage = GENERATED_TREATMENT_IMAGES[slug];
+
+  if (generatedImage) {
+    return (
+      <figure className="min-w-0">
+        <img
+          src={generatedImage}
+          alt={`${name} product image`}
+          loading="lazy"
+          className={`${className} shrink-0 rounded-xl border border-rule bg-card object-cover`}
+        />
+        {showCredit ? (
+          <figcaption className="mt-1 max-w-44 truncate text-[0.68rem] text-muted-foreground">
+            Generated product visualization · Aesthetic Index
+          </figcaption>
+        ) : null}
+      </figure>
+    );
+  }
+
   if (media) {
     return (
       <figure className="min-w-0">
