@@ -83,15 +83,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Aesthetic Index — Compare before you book." },
+      { title: "Aesthetic Index — Understand cosmetic treatments" },
       {
         name: "description",
         content:
-          "Source-backed cosmetic treatment comparisons with researched regional price estimates.",
+          "Explore cosmetic treatment products, devices, and procedures. Compare similar options and see researched regional price estimates.",
       },
       { property: "og:site_name", content: "Aesthetic Index" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:title", content: "Aesthetic Index — Understand cosmetic treatments" },
+      { name: "twitter:title", content: "Aesthetic Index — Understand cosmetic treatments" },
+      { property: "og:description", content: "Explore cosmetic treatment products, devices, and procedures. Compare similar options and see researched regional price estimates." },
+      { name: "twitter:description", content: "Explore cosmetic treatment products, devices, and procedures. Compare similar options and see researched regional price estimates." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/299475be-5c96-4713-a20d-70799437d328" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/299475be-5c96-4713-a20d-70799437d328" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },

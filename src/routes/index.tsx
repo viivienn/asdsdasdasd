@@ -20,11 +20,11 @@ export const Route = createFileRoute("/")({
         content:
           "Explore cosmetic treatment products, devices, and procedures. Compare similar options and see researched regional price estimates.",
       },
-      { property: "og:title", content: "Understand cosmetic treatments before you book" },
+      { property: "og:title", content: "Aesthetic Index — Understand cosmetic treatments" },
       {
         property: "og:description",
         content:
-          "Explore treatment profiles, compare related options, and check researched regional price estimates.",
+          "Explore cosmetic treatment products, devices, and procedures. Compare similar options and see researched regional price estimates.",
       },
       { property: "og:url", content: absoluteUrl("/") },
       { property: "og:type", content: "website" },
