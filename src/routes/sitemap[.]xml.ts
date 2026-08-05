@@ -1,95 +1,74 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
-import { SITE_URL } from "@/lib/site";
 import { FEATURES } from "@/lib/features";
+import { INDEXABLE_STATIC_ROUTES, renderSitemap, type SitemapEntry } from "@/lib/seo";
+import { CLASS_LANDINGS, CONCERN_LANDINGS } from "@/lib/seo-taxonomy";
 
-const BASE_URL = SITE_URL;
-
-/**
- * Only published, non-sample routes belong here. Comparison, treatment, and
- * pricing routes are excluded until sourced, verified records exist.
- */
+/** Canonical, complete, public URLs only. Draft and user-specific routes never enter this list. */
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const entries: Array<{
-          path: string;
-          changefreq: string;
-          priority: string;
-          lastmod?: string;
-        }> = [
-          { path: "/", changefreq: "weekly", priority: "1.0" },
-          { path: "/explore", changefreq: "weekly", priority: "0.9" },
-          { path: "/compare", changefreq: "weekly", priority: "0.8" },
-          { path: "/prices", changefreq: "monthly", priority: "0.7" },
-          { path: "/treatments", changefreq: "weekly", priority: "0.8" },
-          { path: "/methodology", changefreq: "monthly", priority: "0.5" },
-          { path: "/about", changefreq: "monthly", priority: "0.5" },
-          { path: "/medical-disclaimer", changefreq: "yearly", priority: "0.2" },
-          { path: "/advertising-disclosure", changefreq: "yearly", priority: "0.2" },
-        ];
-
-        const { listReviewedComparisons, listTreatments, listIndexablePricePages } =
-          await import("@/lib/content.server");
-        const [reviewed, treatments, pricePages] = await Promise.all([
+        const {
+          getTaxonomyLanding,
+          listIndexablePricePages,
+          listRegionalPriceLandings,
+          listReviewedComparisons,
+          listTreatments,
+        } = await import("@/lib/content.server");
+        const [
+          reviewed,
+          treatments,
+          regionalPricePages,
+          clinicPricePages,
+          concernPages,
+          classPages,
+        ] = await Promise.all([
           listReviewedComparisons(),
           listTreatments(),
+          listRegionalPriceLandings(),
           FEATURES.clinicPriceDirectory ? listIndexablePricePages() : Promise.resolve([]),
+          Promise.all(
+            CONCERN_LANDINGS.map((landing) => getTaxonomyLanding("concern", landing.slug)),
+          ),
+          Promise.all(CLASS_LANDINGS.map((landing) => getTaxonomyLanding("class", landing.slug))),
         ]);
 
-        // Only profile-complete, sourced, explicitly indexable comparisons are
-        // listed. Arbitrary compatible long-tail pairs remain noindex.
-        for (const c of reviewed) {
-          entries.push({
-            path: `/compare/${c.slug}`,
-            changefreq: "monthly",
-            priority: "0.7",
-            lastmod: c.last_reviewed_at?.slice(0, 10),
-          });
-        }
-        if (!treatments.isDemo) {
-          for (const t of treatments.data) {
-            entries.push({
-              path: `/treatments/${t.slug}`,
-              changefreq: "monthly",
-              priority: "0.7",
-              lastmod: t.last_reviewed_at ? t.last_reviewed_at.slice(0, 10) : undefined,
-            });
-          }
-        }
-        // Price pages appear only when a real, non-sample observation exists.
-        if (FEATURES.clinicPriceDirectory) {
-          for (const p of pricePages) {
-            entries.push({
-              path: `/prices/us/ca/${p.city}/${p.treatment}`,
-              changefreq: "weekly",
-              priority: "0.6",
-              lastmod: p.lastmod,
-            });
-          }
-        }
+        const entries: SitemapEntry[] = INDEXABLE_STATIC_ROUTES.map((path) => ({ path }));
+        entries.push(
+          ...CONCERN_LANDINGS.filter((_, index) =>
+            Boolean(concernPages[index]?.treatments.length && concernPages[index]?.sources.length),
+          ).map((landing) => ({ path: `/concerns/${landing.slug}` })),
+          ...CLASS_LANDINGS.filter((_, index) =>
+            Boolean(classPages[index]?.treatments.length && classPages[index]?.sources.length),
+          ).map((landing) => ({ path: `/treatment-classes/${landing.slug}` })),
+          ...reviewed.map((comparison) => ({
+            path: `/compare/${comparison.slug}`,
+            lastmod: comparison.last_reviewed_at,
+          })),
+          ...(!treatments.isDemo
+            ? treatments.data
+                .filter((treatment) => treatment.last_reviewed_at)
+                .map((treatment) => ({
+                  path: `/treatments/${treatment.slug}`,
+                  lastmod: treatment.last_reviewed_at,
+                }))
+            : []),
+          ...regionalPricePages.map((page) => ({
+            path: `/prices/${page.treatment.slug}/${page.estimate.region_slug}`,
+            lastmod: page.lastmod,
+          })),
+          ...clinicPricePages.map((page) => ({
+            path: `/prices/us/ca/${page.city}/${page.treatment}`,
+            lastmod: page.lastmod,
+          })),
+        );
 
-        const xml = [
-          `<?xml version="1.0" encoding="UTF-8"?>`,
-          `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
-          ...entries.map((e) =>
-            [
-              `  <url>`,
-              `    <loc>${BASE_URL}${e.path}</loc>`,
-              e.lastmod ? `    <lastmod>${e.lastmod}</lastmod>` : null,
-              `    <changefreq>${e.changefreq}</changefreq>`,
-              `    <priority>${e.priority}</priority>`,
-              `  </url>`,
-            ]
-              .filter(Boolean)
-              .join("\n"),
-          ),
-          `</urlset>`,
-        ].join("\n");
-
-        return new Response(xml, {
-          headers: { "Content-Type": "application/xml", "Cache-Control": "public, max-age=3600" },
+        return new Response(renderSitemap(entries), {
+          headers: {
+            "Content-Type": "application/xml; charset=utf-8",
+            "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+          },
         });
       },
     },

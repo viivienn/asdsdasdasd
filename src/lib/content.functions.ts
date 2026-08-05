@@ -90,6 +90,48 @@ export const fetchRegionalPriceEstimate = createServerFn({ method: "POST" })
     return getRegionalPriceEstimate(data.postalCode, data.treatmentSlug);
   });
 
+export const fetchRegionalPriceDirectory = createServerFn({ method: "GET" }).handler(async () => {
+  const { listRegionalPriceLandings } = await import("./content.server");
+  return listRegionalPriceLandings();
+});
+
+export const fetchRegionalPriceLanding = createServerFn({ method: "GET" })
+  .validator((input: unknown) =>
+    z
+      .object({
+        treatment: z
+          .string()
+          .max(80)
+          .regex(/^[a-z0-9-]+$/),
+        region: z
+          .string()
+          .max(80)
+          .regex(/^[a-z0-9-]+$/),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { getRegionalPriceLanding } = await import("./content.server");
+    return getRegionalPriceLanding(data.treatment, data.region);
+  });
+
+export const fetchTaxonomyLanding = createServerFn({ method: "GET" })
+  .validator((input: unknown) =>
+    z
+      .object({
+        kind: z.enum(["concern", "class"]),
+        slug: z
+          .string()
+          .max(80)
+          .regex(/^[a-z0-9-]+$/),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { getTaxonomyLanding } = await import("./content.server");
+    return getTaxonomyLanding(data.kind, data.slug);
+  });
+
 export const fetchComparisonPair = createServerFn({ method: "GET" })
   .validator((input: unknown) =>
     z

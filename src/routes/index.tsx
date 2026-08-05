@@ -14,11 +14,11 @@ export const Route = createFileRoute("/")({
   loader: () => fetchCompareIndex(),
   head: () => ({
     meta: [
-      { title: "Aesthetic Index — Understand cosmetic treatments" },
+      { title: "Aesthetic Index | Compare Cosmetic Treatments, Risks, Downtime & Prices" },
       {
         name: "description",
         content:
-          "Explore cosmetic treatment products, devices, and procedures. Compare similar options and see researched regional price estimates.",
+          "Compare cosmetic treatments, risks, downtime, and researched regional prices using source-backed profiles for injectables, devices, and procedures.",
       },
       { property: "og:title", content: "Aesthetic Index — Understand cosmetic treatments" },
       {
@@ -75,12 +75,15 @@ function Home() {
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
             The structured index for aesthetic treatments
           </p>
-          <h1 className="max-w-2xl font-display text-4xl leading-[1.03] tracking-tight sm:text-5xl lg:text-6xl">
-            Understand treatments before you book.
+          <h1 className="max-w-3xl font-display text-4xl leading-[1.03] tracking-tight sm:text-5xl lg:text-6xl">
+            Compare cosmetic treatments, risks, downtime, and prices.
           </h1>
           <p className="mt-4 max-w-xl text-base text-muted-foreground sm:text-lg">
-            Search products, devices, and procedures. See what each one does, then compare similar
-            options side by side.
+            Explore source-backed profiles and side-by-side comparisons for injectables, devices,
+            skin treatments, and aesthetic procedures.
+          </p>
+          <p className="mt-3 text-sm text-muted-foreground">
+            {treatments.length} published profiles · {comparisons.length} source-backed comparisons
           </p>
           <div className="mt-8 w-full max-w-2xl rounded-2xl border border-rule bg-background/95 p-3 shadow-lift backdrop-blur">
             <SiteSearch index={searchIndex} variant="hero" />
@@ -147,8 +150,8 @@ function Home() {
           {GOAL_FILTERS.map((goal, index) => (
             <li key={goal.slug}>
               <Link
-                to="/explore"
-                search={{ goal: goal.slug }}
+                to="/concerns/$slug"
+                params={{ slug: goal.slug }}
                 className={`block h-full rounded-2xl border border-rule p-5 transition hover:-translate-y-0.5 hover:border-primary ${
                   index % 4 === 0
                     ? "bg-sage"

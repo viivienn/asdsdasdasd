@@ -141,8 +141,8 @@ function ExploreMenu({ index }: { index: SearchIndex }) {
                 {GOAL_FILTERS.map((goal) => (
                   <li key={goal.slug}>
                     <Link
-                      to="/explore"
-                      search={{ goal: goal.slug }}
+                      to="/concerns/$slug"
+                      params={{ slug: goal.slug }}
                       onClick={() => setOpen(false)}
                       className="block rounded-lg px-2 py-2 transition-colors hover:bg-secondary"
                     >
@@ -191,12 +191,16 @@ function ExploreMenu({ index }: { index: SearchIndex }) {
                   detail="Techniques performed in clinic"
                   onNavigate={() => setOpen(false)}
                 />
-                <EntityLink
-                  entity="class"
-                  label="Treatment classes"
-                  detail="Understand the major approaches"
-                  onNavigate={() => setOpen(false)}
-                />
+                <Link
+                  to="/treatment-classes"
+                  onClick={() => setOpen(false)}
+                  className="block rounded-lg border border-rule bg-card px-3 py-2.5 transition-colors hover:border-primary"
+                >
+                  <span className="block text-sm font-medium">Treatment classes</span>
+                  <span className="mt-0.5 block text-xs text-muted-foreground">
+                    Understand the major approaches
+                  </span>
+                </Link>
               </div>
             </section>
           </div>
@@ -303,8 +307,8 @@ function MobileMenu({ index }: { index: SearchIndex }) {
                   {GOAL_FILTERS.map((goal) => (
                     <li key={goal.slug}>
                       <Link
-                        to="/explore"
-                        search={{ goal: goal.slug }}
+                        to="/concerns/$slug"
+                        params={{ slug: goal.slug }}
                         onClick={() => setOpen(false)}
                         className="block py-3 text-sm"
                       >
@@ -324,7 +328,6 @@ function MobileMenu({ index }: { index: SearchIndex }) {
                       ["brand_family", "Brands"],
                       ["device", "Devices"],
                       ["procedure", "Procedures"],
-                      ["class", "Treatment classes"],
                     ] as const
                   ).map(([entity, label]) => (
                     <Link
@@ -340,6 +343,16 @@ function MobileMenu({ index }: { index: SearchIndex }) {
                       </span>
                     </Link>
                   ))}
+                  <Link
+                    to="/treatment-classes"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center justify-between rounded-xl border border-rule bg-card px-4 py-3 text-sm"
+                  >
+                    Treatment classes
+                    <span className="text-xs text-muted-foreground">
+                      {index.browse.class.length}
+                    </span>
+                  </Link>
                 </div>
                 <div className="mt-8 border-t border-rule pt-5">
                   <HeaderAccountControl mobile />
@@ -376,7 +389,11 @@ export function SiteShell({
       </a>
       <header className="sticky top-0 z-40 border-b border-rule bg-background/92 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3">
-          <Link to="/" className="flex shrink-0 items-center gap-2.5">
+          <Link
+            to="/"
+            aria-label="Aesthetic Index home"
+            className="flex shrink-0 items-center gap-2.5"
+          >
             <span
               aria-hidden="true"
               className="grid size-9 place-items-center rounded-xl bg-primary font-display text-sm font-bold text-primary-foreground"
@@ -482,9 +499,9 @@ export function SiteShell({
               </Link>
             </li>
             <li>
-              <a href="mailto:corrections@aestheticindex.co" className="hover:text-foreground">
+              <Link to="/contact" className="hover:text-foreground">
                 Corrections &amp; contact
-              </a>
+              </Link>
             </li>
           </ul>
           <p className="mt-6 text-xs">© {new Date().getFullYear()} Aesthetic Index</p>
