@@ -9,86 +9,41 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AboutRouteImport } from './routes/about'
-import { Route as AdvertisingDisclosureRouteImport } from './routes/advertising-disclosure'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as IndexnowKeyDottxtRouteImport } from './routes/indexnow-key[.]txt'
-import { Route as McpRouteImport } from './routes/mcp'
-import { Route as MedicalDisclaimerRouteImport } from './routes/medical-disclaimer'
-import { Route as MethodologyRouteImport } from './routes/methodology'
-import { Route as MyResearchRouteImport } from './routes/my-research'
-import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
-import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
-import { Route as CompareIndexRouteImport } from './routes/compare.index'
-import { Route as CompareSlugRouteImport } from './routes/compare.$slug'
-import { Route as ConcernsIndexRouteImport } from './routes/concerns.index'
-import { Route as ConcernsSlugRouteImport } from './routes/concerns.$slug'
-import { Route as ExploreIndexRouteImport } from './routes/explore.index'
-import { Route as PricesIndexRouteImport } from './routes/prices.index'
-import { Route as ReportsAestheticTreatmentPriceIndexRouteImport } from './routes/reports.aesthetic-treatment-price-index'
-import { Route as ReportsAestheticTreatmentPriceIndexDotcsvRouteImport } from './routes/reports.aesthetic-treatment-price-index[.]csv'
-import { Route as TreatmentClassesIndexRouteImport } from './routes/treatment-classes.index'
-import { Route as TreatmentClassesSlugRouteImport } from './routes/treatment-classes.$slug'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as MyResearchRouteImport } from './routes/my-research'
+import { Route as MethodologyRouteImport } from './routes/methodology'
+import { Route as MedicalDisclaimerRouteImport } from './routes/medical-disclaimer'
+import { Route as McpRouteImport } from './routes/mcp'
+import { Route as IndexnowKeyDottxtRouteImport } from './routes/indexnow-key[.]txt'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdvertisingDisclosureRouteImport } from './routes/advertising-disclosure'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as TreatmentsIndexRouteImport } from './routes/treatments.index'
+import { Route as TreatmentClassesIndexRouteImport } from './routes/treatment-classes.index'
+import { Route as PricesIndexRouteImport } from './routes/prices.index'
+import { Route as ExploreIndexRouteImport } from './routes/explore.index'
+import { Route as ConcernsIndexRouteImport } from './routes/concerns.index'
+import { Route as CompareIndexRouteImport } from './routes/compare.index'
 import { Route as TreatmentsSlugRouteImport } from './routes/treatments.$slug'
-import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
-import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
-import { Route as ApiPublicIndexnowRouteImport } from './routes/api/public/indexnow'
+import { Route as TreatmentClassesSlugRouteImport } from './routes/treatment-classes.$slug'
+import { Route as ReportsAestheticTreatmentPriceIndexDotcsvRouteImport } from './routes/reports.aesthetic-treatment-price-index[.]csv'
+import { Route as ReportsAestheticTreatmentPriceIndexRouteImport } from './routes/reports.aesthetic-treatment-price-index'
+import { Route as ConcernsSlugRouteImport } from './routes/concerns.$slug'
+import { Route as CompareSlugRouteImport } from './routes/compare.$slug'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as PricesTreatmentRegionRouteImport } from './routes/prices.$treatment.$region'
+import { Route as ApiPublicIndexnowRouteImport } from './routes/api/public/indexnow'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as PricesUsCaCityTreatmentRouteImport } from './routes/prices.us.ca.$city.$treatment'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdvertisingDisclosureRoute = AdvertisingDisclosureRouteImport.update({
-  id: '/advertising-disclosure',
-  path: '/advertising-disclosure',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexnowKeyDottxtRoute = IndexnowKeyDottxtRouteImport.update({
-  id: '/indexnow-key.txt',
-  path: '/indexnow-key.txt',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const McpRoute = McpRouteImport.update({
-  id: '/mcp',
-  path: '/mcp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MedicalDisclaimerRoute = MedicalDisclaimerRouteImport.update({
-  id: '/medical-disclaimer',
-  path: '/medical-disclaimer',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MethodologyRoute = MethodologyRouteImport.update({
-  id: '/methodology',
-  path: '/methodology',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MyResearchRoute = MyResearchRouteImport.update({
-  id: '/my-research',
-  path: '/my-research',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
@@ -96,73 +51,54 @@ const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
   path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
+const MyResearchRoute = MyResearchRouteImport.update({
+  id: '/my-research',
+  path: '/my-research',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Char91DotmcpChar93ListToolsRoute =
-  Char91DotmcpChar93ListToolsRouteImport.update({
-    id: '/.mcp/list-tools',
-    path: '/.mcp/list-tools',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const Char91DotwellKnownChar93OauthProtectedResourceRoute =
-  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
-    id: '/.well-known/oauth-protected-resource',
-    path: '/.well-known/oauth-protected-resource',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const CompareIndexRoute = CompareIndexRouteImport.update({
-  id: '/compare/',
-  path: '/compare/',
+const MethodologyRoute = MethodologyRouteImport.update({
+  id: '/methodology',
+  path: '/methodology',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CompareSlugRoute = CompareSlugRouteImport.update({
-  id: '/compare/$slug',
-  path: '/compare/$slug',
+const MedicalDisclaimerRoute = MedicalDisclaimerRouteImport.update({
+  id: '/medical-disclaimer',
+  path: '/medical-disclaimer',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ConcernsIndexRoute = ConcernsIndexRouteImport.update({
-  id: '/concerns/',
-  path: '/concerns/',
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ConcernsSlugRoute = ConcernsSlugRouteImport.update({
-  id: '/concerns/$slug',
-  path: '/concerns/$slug',
+const IndexnowKeyDottxtRoute = IndexnowKeyDottxtRouteImport.update({
+  id: '/indexnow-key.txt',
+  path: '/indexnow-key.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ExploreIndexRoute = ExploreIndexRouteImport.update({
-  id: '/explore/',
-  path: '/explore/',
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PricesIndexRoute = PricesIndexRouteImport.update({
-  id: '/prices/',
-  path: '/prices/',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ReportsAestheticTreatmentPriceIndexRoute =
-  ReportsAestheticTreatmentPriceIndexRouteImport.update({
-    id: '/reports/aesthetic-treatment-price-index',
-    path: '/reports/aesthetic-treatment-price-index',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ReportsAestheticTreatmentPriceIndexDotcsvRoute =
-  ReportsAestheticTreatmentPriceIndexDotcsvRouteImport.update({
-    id: '/reports/aesthetic-treatment-price-index.csv',
-    path: '/reports/aesthetic-treatment-price-index.csv',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const TreatmentClassesIndexRoute = TreatmentClassesIndexRouteImport.update({
-  id: '/treatment-classes/',
-  path: '/treatment-classes/',
+const AdvertisingDisclosureRoute = AdvertisingDisclosureRouteImport.update({
+  id: '/advertising-disclosure',
+  path: '/advertising-disclosure',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TreatmentClassesSlugRoute = TreatmentClassesSlugRouteImport.update({
-  id: '/treatment-classes/$slug',
-  path: '/treatment-classes/$slug',
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TreatmentsIndexRoute = TreatmentsIndexRouteImport.update({
@@ -170,14 +106,83 @@ const TreatmentsIndexRoute = TreatmentsIndexRouteImport.update({
   path: '/treatments/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TreatmentClassesIndexRoute = TreatmentClassesIndexRouteImport.update({
+  id: '/treatment-classes/',
+  path: '/treatment-classes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricesIndexRoute = PricesIndexRouteImport.update({
+  id: '/prices/',
+  path: '/prices/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExploreIndexRoute = ExploreIndexRouteImport.update({
+  id: '/explore/',
+  path: '/explore/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConcernsIndexRoute = ConcernsIndexRouteImport.update({
+  id: '/concerns/',
+  path: '/concerns/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareIndexRoute = CompareIndexRouteImport.update({
+  id: '/compare/',
+  path: '/compare/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TreatmentsSlugRoute = TreatmentsSlugRouteImport.update({
   id: '/treatments/$slug',
   path: '/treatments/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
-  id: '/.lovable/oauth/consent',
-  path: '/.lovable/oauth/consent',
+const TreatmentClassesSlugRoute = TreatmentClassesSlugRouteImport.update({
+  id: '/treatment-classes/$slug',
+  path: '/treatment-classes/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsAestheticTreatmentPriceIndexDotcsvRoute =
+  ReportsAestheticTreatmentPriceIndexDotcsvRouteImport.update({
+    id: '/reports/aesthetic-treatment-price-index.csv',
+    path: '/reports/aesthetic-treatment-price-index.csv',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ReportsAestheticTreatmentPriceIndexRoute =
+  ReportsAestheticTreatmentPriceIndexRouteImport.update({
+    id: '/reports/aesthetic-treatment-price-index',
+    path: '/reports/aesthetic-treatment-price-index',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ConcernsSlugRoute = ConcernsSlugRouteImport.update({
+  id: '/concerns/$slug',
+  path: '/concerns/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareSlugRoute = CompareSlugRouteImport.update({
+  id: '/compare/$slug',
+  path: '/compare/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const PricesTreatmentRegionRoute = PricesTreatmentRegionRouteImport.update({
+  id: '/prices/$treatment/$region',
+  path: '/prices/$treatment/$region',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicIndexnowRoute = ApiPublicIndexnowRouteImport.update({
+  id: '/api/public/indexnow',
+  path: '/api/public/indexnow',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
@@ -186,14 +191,9 @@ const Char91DotmcpChar93InvokeToolToolRoute =
     path: '/.mcp/invoke-tool/$tool',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicIndexnowRoute = ApiPublicIndexnowRouteImport.update({
-  id: '/api/public/indexnow',
-  path: '/api/public/indexnow',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PricesTreatmentRegionRoute = PricesTreatmentRegionRouteImport.update({
-  id: '/prices/$treatment/$region',
-  path: '/prices/$treatment/$region',
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PricesUsCaCityTreatmentRoute = PricesUsCaCityTreatmentRouteImport.update({
@@ -440,74 +440,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/advertising-disclosure': {
-      id: '/advertising-disclosure'
-      path: '/advertising-disclosure'
-      fullPath: '/advertising-disclosure'
-      preLoaderRoute: typeof AdvertisingDisclosureRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/indexnow-key.txt': {
-      id: '/indexnow-key.txt'
-      path: '/indexnow-key.txt'
-      fullPath: '/indexnow-key.txt'
-      preLoaderRoute: typeof IndexnowKeyDottxtRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mcp': {
-      id: '/mcp'
-      path: '/mcp'
-      fullPath: '/mcp'
-      preLoaderRoute: typeof McpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/medical-disclaimer': {
-      id: '/medical-disclaimer'
-      path: '/medical-disclaimer'
-      fullPath: '/medical-disclaimer'
-      preLoaderRoute: typeof MedicalDisclaimerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/methodology': {
-      id: '/methodology'
-      path: '/methodology'
-      fullPath: '/methodology'
-      preLoaderRoute: typeof MethodologyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/my-research': {
-      id: '/my-research'
-      path: '/my-research'
-      fullPath: '/my-research'
-      preLoaderRoute: typeof MyResearchRouteImport
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/robots.txt': {
@@ -517,95 +454,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
+    '/my-research': {
+      id: '/my-research'
+      path: '/my-research'
+      fullPath: '/my-research'
+      preLoaderRoute: typeof MyResearchRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/.mcp/list-tools': {
-      id: '/.mcp/list-tools'
-      path: '/.mcp/list-tools'
-      fullPath: '/.mcp/list-tools'
-      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+    '/methodology': {
+      id: '/methodology'
+      path: '/methodology'
+      fullPath: '/methodology'
+      preLoaderRoute: typeof MethodologyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/.well-known/oauth-protected-resource': {
-      id: '/.well-known/oauth-protected-resource'
-      path: '/.well-known/oauth-protected-resource'
-      fullPath: '/.well-known/oauth-protected-resource'
-      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+    '/medical-disclaimer': {
+      id: '/medical-disclaimer'
+      path: '/medical-disclaimer'
+      fullPath: '/medical-disclaimer'
+      preLoaderRoute: typeof MedicalDisclaimerRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/compare/': {
-      id: '/compare/'
-      path: '/compare'
-      fullPath: '/compare/'
-      preLoaderRoute: typeof CompareIndexRouteImport
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/compare/$slug': {
-      id: '/compare/$slug'
-      path: '/compare/$slug'
-      fullPath: '/compare/$slug'
-      preLoaderRoute: typeof CompareSlugRouteImport
+    '/indexnow-key.txt': {
+      id: '/indexnow-key.txt'
+      path: '/indexnow-key.txt'
+      fullPath: '/indexnow-key.txt'
+      preLoaderRoute: typeof IndexnowKeyDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/concerns/': {
-      id: '/concerns/'
-      path: '/concerns'
-      fullPath: '/concerns/'
-      preLoaderRoute: typeof ConcernsIndexRouteImport
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/concerns/$slug': {
-      id: '/concerns/$slug'
-      path: '/concerns/$slug'
-      fullPath: '/concerns/$slug'
-      preLoaderRoute: typeof ConcernsSlugRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/explore/': {
-      id: '/explore/'
-      path: '/explore'
-      fullPath: '/explore/'
-      preLoaderRoute: typeof ExploreIndexRouteImport
+    '/advertising-disclosure': {
+      id: '/advertising-disclosure'
+      path: '/advertising-disclosure'
+      fullPath: '/advertising-disclosure'
+      preLoaderRoute: typeof AdvertisingDisclosureRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/prices/': {
-      id: '/prices/'
-      path: '/prices'
-      fullPath: '/prices/'
-      preLoaderRoute: typeof PricesIndexRouteImport
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/reports/aesthetic-treatment-price-index': {
-      id: '/reports/aesthetic-treatment-price-index'
-      path: '/reports/aesthetic-treatment-price-index'
-      fullPath: '/reports/aesthetic-treatment-price-index'
-      preLoaderRoute: typeof ReportsAestheticTreatmentPriceIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reports/aesthetic-treatment-price-index.csv': {
-      id: '/reports/aesthetic-treatment-price-index.csv'
-      path: '/reports/aesthetic-treatment-price-index.csv'
-      fullPath: '/reports/aesthetic-treatment-price-index.csv'
-      preLoaderRoute: typeof ReportsAestheticTreatmentPriceIndexDotcsvRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/treatment-classes/': {
-      id: '/treatment-classes/'
-      path: '/treatment-classes'
-      fullPath: '/treatment-classes/'
-      preLoaderRoute: typeof TreatmentClassesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/treatment-classes/$slug': {
-      id: '/treatment-classes/$slug'
-      path: '/treatment-classes/$slug'
-      fullPath: '/treatment-classes/$slug'
-      preLoaderRoute: typeof TreatmentClassesSlugRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/treatments/': {
@@ -615,6 +531,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TreatmentsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/treatment-classes/': {
+      id: '/treatment-classes/'
+      path: '/treatment-classes'
+      fullPath: '/treatment-classes/'
+      preLoaderRoute: typeof TreatmentClassesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prices/': {
+      id: '/prices/'
+      path: '/prices'
+      fullPath: '/prices/'
+      preLoaderRoute: typeof PricesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explore/': {
+      id: '/explore/'
+      path: '/explore'
+      fullPath: '/explore/'
+      preLoaderRoute: typeof ExploreIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/concerns/': {
+      id: '/concerns/'
+      path: '/concerns'
+      fullPath: '/concerns/'
+      preLoaderRoute: typeof ConcernsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare/': {
+      id: '/compare/'
+      path: '/compare'
+      fullPath: '/compare/'
+      preLoaderRoute: typeof CompareIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/treatments/$slug': {
       id: '/treatments/$slug'
       path: '/treatments/$slug'
@@ -622,18 +573,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TreatmentsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/.lovable/oauth/consent': {
-      id: '/.lovable/oauth/consent'
-      path: '/.lovable/oauth/consent'
-      fullPath: '/.lovable/oauth/consent'
-      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+    '/treatment-classes/$slug': {
+      id: '/treatment-classes/$slug'
+      path: '/treatment-classes/$slug'
+      fullPath: '/treatment-classes/$slug'
+      preLoaderRoute: typeof TreatmentClassesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/.mcp/invoke-tool/$tool': {
-      id: '/.mcp/invoke-tool/$tool'
-      path: '/.mcp/invoke-tool/$tool'
-      fullPath: '/.mcp/invoke-tool/$tool'
-      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+    '/reports/aesthetic-treatment-price-index.csv': {
+      id: '/reports/aesthetic-treatment-price-index.csv'
+      path: '/reports/aesthetic-treatment-price-index.csv'
+      fullPath: '/reports/aesthetic-treatment-price-index.csv'
+      preLoaderRoute: typeof ReportsAestheticTreatmentPriceIndexDotcsvRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports/aesthetic-treatment-price-index': {
+      id: '/reports/aesthetic-treatment-price-index'
+      path: '/reports/aesthetic-treatment-price-index'
+      fullPath: '/reports/aesthetic-treatment-price-index'
+      preLoaderRoute: typeof ReportsAestheticTreatmentPriceIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/concerns/$slug': {
+      id: '/concerns/$slug'
+      path: '/concerns/$slug'
+      fullPath: '/concerns/$slug'
+      preLoaderRoute: typeof ConcernsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare/$slug': {
+      id: '/compare/$slug'
+      path: '/compare/$slug'
+      fullPath: '/compare/$slug'
+      preLoaderRoute: typeof CompareSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prices/$treatment/$region': {
+      id: '/prices/$treatment/$region'
+      path: '/prices/$treatment/$region'
+      fullPath: '/prices/$treatment/$region'
+      preLoaderRoute: typeof PricesTreatmentRegionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/indexnow': {
@@ -643,11 +636,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicIndexnowRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/prices/$treatment/$region': {
-      id: '/prices/$treatment/$region'
-      path: '/prices/$treatment/$region'
-      fullPath: '/prices/$treatment/$region'
-      preLoaderRoute: typeof PricesTreatmentRegionRouteImport
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/prices/us/ca/$city/$treatment': {
