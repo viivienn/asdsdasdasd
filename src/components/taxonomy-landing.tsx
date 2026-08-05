@@ -49,9 +49,8 @@ export function TaxonomyLanding({ data }: { data: TaxonomyLandingData }) {
             How the approach categories differ
           </h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-            These classes use different materials, technologies, or treatment methods. Open a class
-            page to compare its published profiles and limitations; inclusion here is not a
-            recommendation.
+            {config.howItWorks} Open a class page to compare its published profiles and limitations;
+            inclusion here is not a recommendation.
           </p>
           <ul className="mt-4 flex flex-wrap gap-2">
             {relatedClasses.map((landing) => (
@@ -86,6 +85,31 @@ export function TaxonomyLanding({ data }: { data: TaxonomyLandingData }) {
               </li>
             ))}
           </ul>
+        </section>
+      ) : null}
+
+      {config.kind === "class" ? (
+        <section className="mt-10 grid gap-4 lg:grid-cols-3" aria-label="Class overview">
+          <article className="rounded-2xl border border-rule bg-card p-5">
+            <h2 className="font-display text-xl">How the class works</h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">{config.howItWorks}</p>
+          </article>
+          {config.keyDifferences ? (
+            <article className="rounded-2xl border border-rule bg-card p-5">
+              <h2 className="font-display text-xl">Important differences within the class</h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {config.keyDifferences}
+              </p>
+            </article>
+          ) : null}
+          {config.commonMistakes ? (
+            <article className="rounded-2xl border border-rule bg-card p-5">
+              <h2 className="font-display text-xl">Common comparison mistake</h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {config.commonMistakes}
+              </p>
+            </article>
+          ) : null}
         </section>
       ) : null}
 
