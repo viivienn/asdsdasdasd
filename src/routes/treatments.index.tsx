@@ -55,7 +55,8 @@ function TreatmentsIndex() {
     <>
       <h1 className="font-display text-4xl">Treatments</h1>
       <p className="mt-3 max-w-2xl text-muted-foreground">
-        Eight treatments in this release. Each profile answers the same questions in the same order.
+        {data.length} published treatment profiles. Each one presents available facts in the same
+        structured order and omits unsupported fields.
       </p>
 
       <fieldset className="mt-8">

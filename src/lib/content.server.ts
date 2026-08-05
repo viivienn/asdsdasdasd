@@ -35,6 +35,12 @@ import {
   selectRegionalEstimate,
   type PostalRegionRow,
 } from "./regional-pricing";
+import {
+  findLanding,
+  treatmentMatchesLanding,
+  type LandingConfig,
+  type LandingKind,
+} from "./seo-taxonomy";
 
 function publicClient() {
   const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
@@ -478,6 +484,109 @@ export async function listReviewedComparisons(): Promise<AvailableComparison[]> 
     treatmentsResult,
     comparisons,
     (sourcesResult.data ?? []) as unknown as TreatmentSource[],
+  );
+}
+
+export interface TaxonomyLandingData {
+  config: LandingConfig;
+  treatments: CatalogEntry[];
+  comparisons: AvailableComparison[];
+  sources: TreatmentSource[];
+}
+
+/** Source-backed catalog relationships for stable concern and class landings. */
+export async function getTaxonomyLanding(
+  kind: LandingKind,
+  slug: string,
+): Promise<TaxonomyLandingData | null> {
+  const config = findLanding(kind, slug);
+  if (!config) return null;
+  const [catalog, experience] = await Promise.all([listCatalog(), listComparisonExperience()]);
+  const treatments = catalog.filter((treatment) => treatmentMatchesLanding(treatment, config));
+  if (treatments.length === 0) return { config, treatments: [], comparisons: [], sources: [] };
+  const ids = new Set(treatments.map((treatment) => treatment.id));
+  const slugs = new Set(treatments.map((treatment) => treatment.slug));
+  const { data } = await publicClient()
+    .from("treatment_sources")
+    .select(
+      "id,treatment_id,claim_field,source_title,source_url,source_type,publication_date,evidence_level",
+    )
+    .in("treatment_id", [...ids]);
+  return {
+    config,
+    treatments,
+    comparisons: experience.comparisons.filter(
+      (comparison) =>
+        slugs.has(comparison.treatment_a_slug) || slugs.has(comparison.treatment_b_slug),
+    ),
+    sources: (data ?? []) as unknown as TreatmentSource[],
+  };
+}
+
+export interface RegionalPriceLanding {
+  treatment: Treatment;
+  estimate: RegionalPriceEstimate;
+  relatedComparisons: AvailableComparison[];
+  lastmod: string;
+}
+
+function normalizeRegionalEstimate(row: Record<string, unknown>): RegionalPriceEstimate {
+  return {
+    ...(row as unknown as RegionalPriceEstimate),
+    estimated_average: row.estimated_average == null ? null : String(row.estimated_average),
+    estimated_median: row.estimated_median == null ? null : String(row.estimated_median),
+    estimated_low: String(row.estimated_low),
+    estimated_high: String(row.estimated_high),
+    source_urls: Array.isArray(row.source_urls)
+      ? row.source_urls.filter((value): value is string => typeof value === "string")
+      : [],
+  };
+}
+
+/** Published RLS-approved regional datasets with a concrete treatment subject. */
+export async function listRegionalPriceLandings(): Promise<RegionalPriceLanding[]> {
+  const client = publicClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const schema = client as any;
+  const [treatments, estimatesResult, experience] = await Promise.all([
+    loadTreatmentRows(client),
+    schema
+      .from("regional_price_estimates")
+      .select(
+        "id,treatment_id,comparison_group_slug,country_code,region_slug,region_name,currency,pricing_unit,treatment_area,estimated_average,estimated_median,estimated_low,estimated_high,source_count,source_urls,methodology_note,limitations,researched_at,updated_at",
+      )
+      .not("treatment_id", "is", null),
+    listComparisonExperience(),
+  ]);
+  if (estimatesResult.error) return [];
+  const treatmentById = new Map(treatments.map((treatment) => [treatment.id, treatment]));
+  return (estimatesResult.data ?? []).flatMap((raw: Record<string, unknown>) => {
+    const treatment = treatmentById.get(String(raw.treatment_id));
+    const sourceUrls = Array.isArray(raw.source_urls) ? raw.source_urls : [];
+    if (!treatment || Number(raw.source_count) < 1 || sourceUrls.length === 0) return [];
+    const estimate = normalizeRegionalEstimate(raw);
+    return [
+      {
+        treatment,
+        estimate,
+        relatedComparisons: experience.comparisons.filter((comparison) =>
+          [comparison.treatment_a_slug, comparison.treatment_b_slug].includes(treatment.slug),
+        ),
+        lastmod: String(raw.updated_at ?? raw.researched_at).slice(0, 10),
+      },
+    ];
+  });
+}
+
+export async function getRegionalPriceLanding(
+  treatmentSlug: string,
+  regionSlug: string,
+): Promise<RegionalPriceLanding | null> {
+  const pages = await listRegionalPriceLandings();
+  return (
+    pages.find(
+      (page) => page.treatment.slug === treatmentSlug && page.estimate.region_slug === regionSlug,
+    ) ?? null
   );
 }
 

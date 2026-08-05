@@ -13,7 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteShell } from "../components/site-shell";
 import { AccountProvider } from "../components/account-provider";
-import { SITE, SITE_URL, organizationJsonLd } from "../lib/site";
+import { SITE, SITE_URL, organizationJsonLd, verificationMeta } from "../lib/site";
 import { fetchSearchIndex } from "../lib/content.functions";
 import { buildSearchIndex } from "../lib/search-index";
 
@@ -83,21 +83,44 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Aesthetic Index — Understand cosmetic treatments" },
+      { title: "Aesthetic Index | Compare Cosmetic Treatments, Risks, Downtime & Prices" },
       {
         name: "description",
         content:
-          "Explore cosmetic treatment products, devices, and procedures. Compare similar options and see researched regional price estimates.",
+          "Compare cosmetic treatments, risks, downtime, and researched regional prices using source-backed profiles and side-by-side tables.",
       },
       { property: "og:site_name", content: "Aesthetic Index" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:title", content: "Aesthetic Index — Understand cosmetic treatments" },
-      { name: "twitter:title", content: "Aesthetic Index — Understand cosmetic treatments" },
-      { property: "og:description", content: "Explore cosmetic treatment products, devices, and procedures. Compare similar options and see researched regional price estimates." },
-      { name: "twitter:description", content: "Explore cosmetic treatment products, devices, and procedures. Compare similar options and see researched regional price estimates." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/299475be-5c96-4713-a20d-70799437d328" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/299475be-5c96-4713-a20d-70799437d328" },
+      {
+        property: "og:title",
+        content: "Aesthetic Index | Compare Cosmetic Treatments, Risks, Downtime & Prices",
+      },
+      {
+        name: "twitter:title",
+        content: "Aesthetic Index | Compare Cosmetic Treatments, Risks, Downtime & Prices",
+      },
+      {
+        property: "og:description",
+        content:
+          "Compare cosmetic treatments, risks, downtime, and researched regional prices using source-backed profiles and side-by-side tables.",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Compare cosmetic treatments, risks, downtime, and researched regional prices using source-backed profiles and side-by-side tables.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/299475be-5c96-4713-a20d-70799437d328",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/299475be-5c96-4713-a20d-70799437d328",
+      },
+      ...verificationMeta(),
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -123,6 +146,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
               "@type": "WebSite",
               "@id": `${SITE_URL}#website`,
               name: SITE.name,
+              alternateName: SITE.descriptiveName,
               url: SITE.url,
               description: SITE.description,
               inLanguage: "en",

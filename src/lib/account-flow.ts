@@ -26,8 +26,8 @@ export const SIGNUP_SOURCE_KEY = "aesthetic-index:signup-source";
 export function safeNextPath(next: string | null | undefined): string {
   if (!next || !next.startsWith("/") || next.startsWith("//")) return "/";
   try {
-    const url = new URL(next, "https://aestheticindex.co");
-    if (url.origin !== "https://aestheticindex.co") return "/";
+    const url = new URL(next, "https://aestheticindex.app");
+    if (url.origin !== "https://aestheticindex.app") return "/";
     return `${url.pathname}${url.search}${url.hash}`;
   } catch {
     return "/";

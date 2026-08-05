@@ -14,19 +14,19 @@ export const GOAL_FILTERS: GoalFilter[] = [
     keywords: ["neuromodulator"],
   },
   {
-    slug: "volume-contour",
+    slug: "volume-and-contour",
     label: "Volume & contour",
     detail: "Cheeks, jawline, temples",
     keywords: ["filler", "biostimulator", "collagen stimulator"],
   },
   {
-    slug: "lift-tighten",
+    slug: "lift-and-tighten",
     label: "Lift & tighten",
     detail: "Skin laxity and firmness",
     keywords: ["energy device"],
   },
   {
-    slug: "texture-pores",
+    slug: "texture-and-pores",
     label: "Texture & pores",
     detail: "Surface quality and tone",
     keywords: ["facial", "exfoliation", "microneedling"],

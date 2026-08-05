@@ -66,6 +66,7 @@ function TreatmentHeader({
           media={media}
           className="size-20 sm:size-24"
           showCredit
+          priority
         />
       </div>
       <div className="w-full min-w-0">

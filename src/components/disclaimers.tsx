@@ -7,6 +7,14 @@ import { Link } from "@tanstack/react-router";
 export const FOOTER_DISCLAIMER =
   "Aesthetic Index provides general educational information and aggregates publicly available pricing data. It does not provide medical advice, diagnosis, treatment recommendations, or guarantees of results. Treatment suitability, risks, outcomes, and pricing vary. Consult a qualified licensed healthcare professional before making treatment decisions.";
 
+export function MedicalDisclaimerLink() {
+  return (
+    <Link to="/medical-disclaimer" className="underline underline-offset-4">
+      Read the Medical Disclaimer.
+    </Link>
+  );
+}
+
 function Panel({
   heading,
   children,

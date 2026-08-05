@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { fetchTreatment } from "@/lib/content.functions";
+import { fetchRegionalPriceDirectory, fetchTreatment } from "@/lib/content.functions";
 import {
   TREATMENT_PROFILE_ROWS,
   comparisonOtherSlug,
@@ -12,15 +12,28 @@ import { TreatmentDisclaimer } from "@/components/disclaimers";
 import { CompareWith } from "@/components/treatment-actions";
 import { AccountValueCard, SaveTreatmentButton } from "@/components/account-actions";
 import { TreatmentVisual } from "@/components/treatment-visual";
-import { absoluteUrl } from "@/lib/site";
+import {
+  SITE_URL,
+  absoluteUrl,
+  breadcrumbJsonLd,
+  organizationJsonLd,
+  pageMetadata,
+} from "@/lib/site";
 import { consolidateTreatmentSources, formatEditorialDate } from "@/lib/presentation";
 import type { AvailableComparison, TreatmentPickerRecord } from "@/lib/content-types";
+import { landingBasePath, relatedLandingsForTreatment } from "@/lib/seo-taxonomy";
 
 export const Route = createFileRoute("/treatments/$slug")({
   loader: async ({ params }) => {
-    const result = await fetchTreatment({ data: { slug: params.slug } });
+    const [result, regionalPricePages] = await Promise.all([
+      fetchTreatment({ data: { slug: params.slug } }),
+      fetchRegionalPriceDirectory(),
+    ]);
     if (!result.data.treatment) throw notFound();
-    return result;
+    return {
+      ...result,
+      regionalPricePages: regionalPricePages.filter((page) => page.treatment.slug === params.slug),
+    };
   },
   head: ({ params, loaderData }) => {
     const treatment = loaderData?.data.treatment;
@@ -33,17 +46,53 @@ export const Route = createFileRoute("/treatments/$slug")({
       treatment.summary ??
       `What ${treatment.name} changes, how it works, downtime, longevity, and risks.`;
     const reviewed = Boolean(treatment.last_reviewed_at && loaderData.data.sources.length);
+    const path = `/treatments/${params.slug}`;
+    const pickerTreatment = loaderData.experience.treatments.find(
+      (entry) => entry.id === treatment.id,
+    );
     return {
-      meta: [
-        { title: `${treatment.name}: Results, Downtime & Risks | Aesthetic Index` },
-        { name: "description", content: description.slice(0, 155) },
-        { property: "og:title", content: treatment.name },
-        { property: "og:description", content: description.slice(0, 155) },
-        { property: "og:url", content: absoluteUrl(`/treatments/${params.slug}`) },
-        { property: "og:type", content: "article" },
-        { name: "robots", content: reviewed ? "index, follow" : "noindex, follow" },
-      ],
-      links: [{ rel: "canonical", href: absoluteUrl(`/treatments/${params.slug}`) }],
+      ...pageMetadata({
+        title: `${treatment.name}: uses, results, risks, downtime & cost | Aesthetic Index`,
+        description,
+        path,
+        indexable: reviewed,
+        type: "article",
+        image: pickerTreatment?.media?.url,
+      }),
+      scripts: reviewed
+        ? [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@graph": [
+                  organizationJsonLd(),
+                  breadcrumbJsonLd([
+                    { name: "Home", path: "/" },
+                    { name: "Treatments", path: "/treatments" },
+                    { name: treatment.name, path },
+                  ]),
+                  {
+                    "@type": "MedicalWebPage",
+                    "@id": absoluteUrl(path),
+                    url: absoluteUrl(path),
+                    name: treatment.name,
+                    description,
+                    dateModified: treatment.last_reviewed_at,
+                    publisher: { "@id": `${SITE_URL}#organization` },
+                    about: { "@type": "MedicalTherapy", name: treatment.name },
+                    citation: loaderData.data.sources.map((source) => ({
+                      "@type": "CreativeWork",
+                      name: source.source_title,
+                      url: source.source_url,
+                      datePublished: source.publication_date ?? undefined,
+                    })),
+                  },
+                ],
+              }),
+            },
+          ]
+        : [],
     };
   },
   errorComponent: () => <p>We couldn't load this treatment. Please refresh.</p>,
@@ -62,7 +111,7 @@ export const Route = createFileRoute("/treatments/$slug")({
 
 function TreatmentPage() {
   const { slug } = Route.useParams();
-  const { data, experience } = Route.useLoaderData();
+  const { data, experience, regionalPricePages } = Route.useLoaderData();
   const treatment = data.treatment as Treatment;
   const sources = data.sources as TreatmentSource[];
   const sourceDocuments = consolidateTreatmentSources(sources);
@@ -105,6 +154,7 @@ function TreatmentPage() {
             media={pickerTreatment?.media ?? null}
             className="aspect-[4/5] h-auto w-full max-w-sm border-0 bg-transparent shadow-none"
             showCredit
+            priority
           />
         </div>
         <div className="lg:py-5">
@@ -221,13 +271,56 @@ function TreatmentPage() {
         </section>
       ) : null}
 
+      <RelatedDirectories treatment={treatment} />
+
       <section className="mt-12">
         <RegionalPriceLookup
           treatments={[{ id: treatment.id, slug: treatment.slug, name: treatment.name }]}
         />
       </section>
 
+      {regionalPricePages.length ? (
+        <section className="mt-10">
+          <h2 className="text-2xl">Published regional price estimates</h2>
+          <ul className="mt-3 flex flex-wrap gap-2 text-sm">
+            {regionalPricePages.map((page) => (
+              <li key={page.estimate.region_slug}>
+                <Link
+                  to="/prices/$treatment/$region"
+                  params={{ treatment: treatment.slug, region: page.estimate.region_slug }}
+                  className="inline-block rounded-full border border-rule bg-card px-3 py-1.5 hover:border-primary"
+                >
+                  {treatment.name} cost in {page.estimate.region_name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       <TreatmentDisclaimer />
     </>
+  );
+}
+
+function RelatedDirectories({ treatment }: { treatment: Treatment }) {
+  const landings = relatedLandingsForTreatment(treatment);
+  if (!landings.length) return null;
+  return (
+    <nav aria-label="Related treatment directories" className="mt-12">
+      <h2 className="text-2xl">Related directories</h2>
+      <ul className="mt-3 flex flex-wrap gap-2 text-sm">
+        {landings.map((landing) => (
+          <li key={`${landing.kind}:${landing.slug}`}>
+            <a
+              href={`${landingBasePath(landing.kind)}/${landing.slug}`}
+              className="inline-block rounded-full border border-rule bg-card px-3 py-1.5 hover:border-primary"
+            >
+              {landing.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }

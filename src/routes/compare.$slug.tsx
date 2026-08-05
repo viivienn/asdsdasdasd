@@ -5,6 +5,7 @@ import {
   parsePairSlug,
   sourcePublisher,
   treatmentLabel,
+  type Comparison,
   type Treatment,
   type TreatmentSource,
 } from "@/lib/content-types";
@@ -17,6 +18,7 @@ import { RegionalPriceLookup } from "@/components/regional-price-lookup";
 import { SaveComparisonButton } from "@/components/account-actions";
 import { ComparisonSignupPrompt } from "@/components/comparison-signup-prompt";
 import { consolidateTreatmentSources, formatEditorialDate } from "@/lib/presentation";
+import { landingBasePath, relatedLandingsForTreatment } from "@/lib/seo-taxonomy";
 
 export const Route = createFileRoute("/compare/$slug")({
   loader: async ({ params }) => {
@@ -46,12 +48,9 @@ export const Route = createFileRoute("/compare/$slug")({
 
     const nameA = loaderData.a.name;
     const nameB = loaderData.b.name;
-    const title =
-      loaderData.comparison?.title_override ??
-      `${nameA} vs. ${nameB}: Differences, Results, Risks & Cost | Aesthetic Index`;
-    const description =
-      loaderData.comparison?.description_override ??
-      `Compare ${nameA} and ${nameB} side by side, including intended uses, results, longevity, downtime, reversibility, risks, regulatory information, and typical pricing.`;
+    const displayTitle = loaderData.comparison?.title_override ?? `${nameA} vs. ${nameB}`;
+    const title = `${displayTitle}: Results, Risks, Downtime & Cost | Aesthetic Index`;
+    const description = `Compare ${nameA} and ${nameB} by intended use, results, downtime, risks, reversibility, regulatory information, and typical pricing.`;
     const url = absoluteUrl(`/compare/${params.slug}`);
     const reviewedAt =
       loaderData.comparison?.last_verified_at ??
@@ -95,7 +94,6 @@ export const Route = createFileRoute("/compare/$slug")({
                 inLanguage: "en",
                 isAccessibleForFree: true,
                 dateModified: reviewedAt,
-                datePublished: reviewedAt,
                 publisher: { "@id": `${SITE_URL}#organization` },
                 about: [
                   { "@type": "MedicalTherapy", name: nameA },
@@ -154,6 +152,7 @@ function ComparisonPage() {
   const b = data.b as Treatment;
   const comparison = data.comparison;
   const label = comparison?.title_override ?? `${a.name} vs. ${b.name}`;
+  const bottomLine = comparison?.one_sentence_difference ?? comparison?.description_override;
   const template = resolveTemplate(
     a,
     b,
@@ -192,6 +191,34 @@ function ComparisonPage() {
         </p>
       ) : null}
 
+      {bottomLine ? (
+        <section
+          id="bottom-line"
+          className="mt-7 scroll-mt-24 rounded-2xl border border-rule bg-card p-5"
+        >
+          <h2 className="font-display text-2xl">Bottom line</h2>
+          <p className="mt-2 max-w-4xl text-base leading-7">{bottomLine}</p>
+          <div className="mt-4 flex flex-wrap gap-3 text-sm">
+            <Link
+              to="/treatments/$slug"
+              params={{ slug: a.slug }}
+              className="underline underline-offset-4"
+            >
+              Read the {a.name} profile
+            </Link>
+            <Link
+              to="/treatments/$slug"
+              params={{ slug: b.slug }}
+              className="underline underline-offset-4"
+            >
+              Read the {b.name} profile
+            </Link>
+          </div>
+        </section>
+      ) : null}
+
+      <KeyDifferences a={a} b={b} sources={sources} />
+
       <ComparisonGlance
         a={a}
         b={b}
@@ -210,6 +237,8 @@ function ComparisonPage() {
         sources={sources}
         label={label}
       />
+
+      <ComparisonQuestions a={a} b={b} comparison={comparison} sources={sources} />
 
       <details id="sources" className="group mt-12 scroll-mt-24 border-y border-rule">
         <summary className="cursor-pointer list-none py-4 text-xl font-medium marker:hidden">
@@ -240,9 +269,239 @@ function ComparisonPage() {
         <ComparisonDisclaimer />
       </section>
 
-      <RelatedComparisons currentSlug={slug} reviewedSlugs={data.reviewedSlugs ?? []} />
+      <RelatedComparisons
+        currentSlug={slug}
+        reviewedSlugs={data.reviewedSlugs ?? []}
+        treatmentSlugs={[a.slug, b.slug]}
+      />
+      <RelatedDirectories a={a} b={b} />
       <ComparisonSignupPrompt comparisonSlug={slug} />
     </>
+  );
+}
+
+function KeyDifferences({
+  a,
+  b,
+  sources,
+}: {
+  a: Treatment;
+  b: Treatment;
+  sources: TreatmentSource[];
+}) {
+  const rows = [
+    {
+      label: "Primary purpose",
+      field: "primary_purpose",
+      a: a.primary_purpose,
+      b: b.primary_purpose,
+    },
+    { label: "Technology or formulation", field: "mechanism", a: a.mechanism, b: b.mechanism },
+    { label: "Pricing basis", field: "pricing_basis", a: a.pricing_basis, b: b.pricing_basis },
+  ].filter((row) => row.a || row.b);
+  if (!rows.length) return null;
+  return (
+    <section id="key-differences" className="mt-8 scroll-mt-24">
+      <h2 className="font-display text-2xl">Key differences</h2>
+      <dl className="mt-4 grid gap-3 lg:grid-cols-3">
+        {rows.map((row) => {
+          const supportingSources = [
+            ...new Map(
+              sources
+                .filter((source) => source.claim_field === row.field)
+                .map((source) => [source.source_url, source]),
+            ).values(),
+          ];
+          return (
+            <div key={row.label} className="rounded-2xl border border-rule bg-muted/35 p-4">
+              <dt className="text-xs font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+                {row.label}
+              </dt>
+              <dd className="mt-3 space-y-2 text-sm leading-6">
+                {row.a ? (
+                  <p>
+                    <strong>{a.name}:</strong> {row.a}
+                  </p>
+                ) : null}
+                {row.b ? (
+                  <p>
+                    <strong>{b.name}:</strong> {row.b}
+                  </p>
+                ) : null}
+                {supportingSources.length ? (
+                  <p className="pt-1 text-xs text-muted-foreground">
+                    Sources:{" "}
+                    {supportingSources.map((source, index) => (
+                      <span key={source.source_url}>
+                        {index ? ", " : ""}
+                        <a
+                          href={source.source_url}
+                          target="_blank"
+                          rel="nofollow noopener"
+                          className="underline underline-offset-2"
+                        >
+                          {source.source_title}
+                        </a>
+                      </span>
+                    ))}
+                  </p>
+                ) : null}
+              </dd>
+            </div>
+          );
+        })}
+      </dl>
+    </section>
+  );
+}
+
+function ComparisonQuestions({
+  a,
+  b,
+  comparison,
+  sources,
+}: {
+  a: Treatment;
+  b: Treatment;
+  comparison: Comparison | null;
+  sources: TreatmentSource[];
+}) {
+  const questions: Array<{
+    question: string;
+    fields: Array<keyof Treatment>;
+    answer: string | null;
+  }> = [
+    {
+      question: "What is the main difference?",
+      fields: ["primary_purpose"],
+      answer: comparison?.one_sentence_difference ?? comparison?.description_override ?? null,
+    },
+    {
+      question: "How do the technologies or formulations differ?",
+      fields: ["mechanism"],
+      answer:
+        a.mechanism && b.mechanism ? `${a.name}: ${a.mechanism} ${b.name}: ${b.mechanism}` : null,
+    },
+    {
+      question: "When do results typically appear?",
+      fields: ["result_timing"],
+      answer:
+        a.result_timing && b.result_timing
+          ? `${a.name}: ${a.result_timing} ${b.name}: ${b.result_timing}`
+          : null,
+    },
+    {
+      question: "How long can results last?",
+      fields: ["longevity_text"],
+      answer:
+        a.longevity_text && b.longevity_text
+          ? `${a.name}: ${a.longevity_text} ${b.name}: ${b.longevity_text}`
+          : null,
+    },
+    {
+      question: "How do the recorded regulatory uses differ?",
+      fields: ["fda_status", "canada_status"],
+      answer:
+        a.fda_status && b.fda_status
+          ? `${a.name} (United States): ${a.fda_status} ${b.name} (United States): ${b.fda_status}${
+              a.canada_status && b.canada_status
+                ? ` ${a.name} (Canada): ${a.canada_status} ${b.name} (Canada): ${b.canada_status}`
+                : ""
+            }`
+          : null,
+    },
+    {
+      question: "How should the pricing basis be compared?",
+      fields: ["pricing_basis"],
+      answer:
+        a.pricing_basis && b.pricing_basis
+          ? `${a.name} is recorded ${a.pricing_basis}; ${b.name} is recorded ${b.pricing_basis}. Different units, syringes, vials, sessions, areas, or packages should not be converted without an authoritative basis.`
+          : null,
+    },
+    {
+      question: "What remains provider-dependent?",
+      fields: ["provider_variables"],
+      answer:
+        a.provider_variables && b.provider_variables
+          ? `${a.name}: ${a.provider_variables} ${b.name}: ${b.provider_variables}`
+          : null,
+    },
+    {
+      question: "What does this comparison not establish?",
+      fields: [],
+      answer:
+        "It does not establish a universal winner, personal suitability, an individual dose or protocol, a guaranteed result, or a clinic quote.",
+    },
+  ].filter((item): item is { question: string; fields: Array<keyof Treatment>; answer: string } =>
+    Boolean(item.answer),
+  );
+
+  if (!questions.length) return null;
+  return (
+    <section id="questions" className="mt-12 scroll-mt-24">
+      <h2 className="font-display text-2xl">Common comparison questions</h2>
+      <div className="mt-4 divide-y divide-rule border-y border-rule">
+        {questions.map((item) => {
+          const claimSources = sources.filter((source) =>
+            item.fields.includes(source.claim_field as keyof Treatment),
+          );
+          const uniqueSources = [
+            ...new Map(claimSources.map((source) => [source.source_url, source])).values(),
+          ];
+          return (
+            <article key={item.question} className="py-5">
+              <h3 className="font-medium">{item.question}</h3>
+              <p className="mt-2 max-w-4xl text-sm leading-6 text-muted-foreground">
+                {item.answer}
+              </p>
+              {uniqueSources.length ? (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Sources:{" "}
+                  {uniqueSources.map((source, index) => (
+                    <span key={source.source_url}>
+                      {index ? ", " : ""}
+                      <a
+                        href={source.source_url}
+                        target="_blank"
+                        rel="nofollow noopener"
+                        className="underline underline-offset-2"
+                      >
+                        {source.source_title}
+                      </a>
+                    </span>
+                  ))}
+                </p>
+              ) : null}
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function RelatedDirectories({ a, b }: { a: Treatment; b: Treatment }) {
+  const landings = [...relatedLandingsForTreatment(a), ...relatedLandingsForTreatment(b)];
+  const unique = [
+    ...new Map(landings.map((landing) => [`${landing.kind}:${landing.slug}`, landing])).values(),
+  ];
+  if (!unique.length) return null;
+  return (
+    <nav aria-label="Related treatment directories" className="mt-10">
+      <h2 className="font-display text-2xl">Related treatment directories</h2>
+      <ul className="mt-3 flex flex-wrap gap-2 text-sm">
+        {unique.map((landing) => (
+          <li key={`${landing.kind}:${landing.slug}`}>
+            <a
+              href={`${landingBasePath(landing.kind)}/${landing.slug}`}
+              className="inline-block rounded-full border border-rule bg-card px-3 py-1.5 hover:border-primary"
+            >
+              {landing.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }
 
@@ -271,11 +530,19 @@ function Breadcrumb({ label }: { label: string }) {
 function RelatedComparisons({
   currentSlug,
   reviewedSlugs,
+  treatmentSlugs,
 }: {
   currentSlug: string;
   reviewedSlugs: string[];
+  treatmentSlugs: [string, string];
 }) {
-  const related = reviewedSlugs.filter((candidate) => candidate !== currentSlug).slice(0, 6);
+  const related = reviewedSlugs
+    .filter((candidate) => {
+      if (candidate === currentSlug) return false;
+      const pair = parsePairSlug(candidate);
+      return Boolean(pair && pair.some((slug) => treatmentSlugs.includes(slug)));
+    })
+    .slice(0, 6);
   if (related.length === 0) return null;
   return (
     <section className="mt-12">

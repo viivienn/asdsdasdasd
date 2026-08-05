@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { ArrowRight, Search } from "lucide-react";
 import { z } from "zod";
 import { fetchCatalog } from "@/lib/content.functions";
@@ -41,6 +41,20 @@ const ENTITY_TABS: Array<{ entity: EntityType; label: string }> = [
 
 export const Route = createFileRoute("/explore/")({
   validateSearch: (search) => searchSchema.parse(search),
+  beforeLoad: ({ search }) => {
+    if (
+      search.goal &&
+      !search.type &&
+      !search.entity &&
+      GOAL_FILTERS.some((goal) => goal.slug === search.goal)
+    ) {
+      throw redirect({
+        to: "/concerns/$slug",
+        params: { slug: search.goal },
+        statusCode: 301,
+      });
+    }
+  },
   loader: () => fetchCatalog(),
   head: () => ({
     meta: [

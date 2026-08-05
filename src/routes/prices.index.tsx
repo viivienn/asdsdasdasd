@@ -1,12 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BadgeDollarSign, CalendarClock, FileSearch } from "lucide-react";
-import { fetchCompareIndex } from "@/lib/content.functions";
+import { fetchCompareIndex, fetchRegionalPriceDirectory } from "@/lib/content.functions";
 import { RegionalPriceLookup } from "@/components/regional-price-lookup";
 import { absoluteUrl } from "@/lib/site";
 import type { TreatmentPickerRecord } from "@/lib/content-types";
 
 export const Route = createFileRoute("/prices/")({
-  loader: () => fetchCompareIndex(),
+  loader: async () => {
+    const [experience, pages] = await Promise.all([
+      fetchCompareIndex(),
+      fetchRegionalPriceDirectory(),
+    ]);
+    return { ...experience, pages };
+  },
   head: () => ({
     meta: [
       { title: "Local cosmetic treatment price estimates | Aesthetic Index" },
@@ -26,7 +32,7 @@ export const Route = createFileRoute("/prices/")({
 });
 
 function Prices() {
-  const { treatments } = Route.useLoaderData();
+  const { treatments, pages } = Route.useLoaderData();
 
   return (
     <>
@@ -76,6 +82,39 @@ function Prices() {
           </p>
         </article>
       </section>
+
+      {pages.length ? (
+        <section className="mx-auto mt-14 max-w-5xl" aria-labelledby="published-prices-heading">
+          <h2 id="published-prices-heading" className="font-display text-3xl">
+            Published treatment and market estimates
+          </h2>
+          <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
+            Every linked page has a stored research date, compatible pricing basis, public source
+            list, and limitations. Empty markets are not listed.
+          </p>
+          <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {pages.map((page) => (
+              <li key={`${page.treatment.slug}-${page.estimate.region_slug}`}>
+                <Link
+                  to="/prices/$treatment/$region"
+                  params={{ treatment: page.treatment.slug, region: page.estimate.region_slug }}
+                  className="block h-full rounded-2xl border border-rule bg-card p-4 hover:border-primary"
+                >
+                  <span className="block font-medium">{page.treatment.name}</span>
+                  <span className="mt-1 block text-sm text-muted-foreground">
+                    {page.estimate.region_name} · {page.estimate.currency} ·{" "}
+                    {page.estimate.pricing_unit}
+                  </span>
+                  <span className="mt-2 block text-xs text-muted-foreground">
+                    {page.estimate.source_count} public sources · researched{" "}
+                    {page.estimate.researched_at}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <section className="mx-auto mt-14 max-w-3xl border-t border-rule pt-10 text-sm text-muted-foreground">
         <h2 className="font-display text-2xl text-foreground">What the estimate means</h2>

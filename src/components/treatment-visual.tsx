@@ -34,12 +34,14 @@ export function TreatmentVisual({
   media,
   className = "size-16",
   showCredit = false,
+  priority = false,
 }: {
   slug: string;
   name: string;
   media: TreatmentMedia | null;
   className?: string;
   showCredit?: boolean;
+  priority?: boolean;
 }) {
   const generatedImage = GENERATED_TREATMENT_IMAGES[slug];
 
@@ -49,7 +51,11 @@ export function TreatmentVisual({
         <img
           src={generatedImage}
           alt={`${name} product image`}
-          loading="lazy"
+          width={400}
+          height={500}
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : "auto"}
+          decoding="async"
           className={`${className} shrink-0 rounded-xl border border-rule bg-card object-cover`}
         />
         {showCredit ? (
@@ -67,7 +73,11 @@ export function TreatmentVisual({
         <img
           src={media.url}
           alt={media.alt_text}
-          loading="lazy"
+          width={400}
+          height={500}
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : "auto"}
+          decoding="async"
           className={`${className} rounded-xl border border-rule bg-card object-contain p-1`}
         />
         {showCredit ? (
