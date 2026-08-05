@@ -2,9 +2,9 @@ import type { TreatmentMedia } from "@/lib/content-types";
 import { TreatmentArtwork, hasTreatmentArtwork } from "@/components/treatment-artwork";
 
 const GENERATED_TREATMENT_IMAGES: Record<string, string> = {
-  botox: "/treatment-images/botox.jpg",
+  botox: "/treatment-images/botox.webp",
   dysport: "/treatment-images/dysport.webp",
-  "ha-filler": "/treatment-images/ha-filler.jpg",
+  "ha-filler": "/treatment-images/ha-filler.webp",
   juvederm: "/treatment-images/juvederm.webp",
   restylane: "/treatment-images/restylane.webp",
   "juvederm-voluma": "/treatment-images/juvederm-voluma.webp",
@@ -50,9 +50,9 @@ export function TreatmentVisual({
       <figure className="min-w-0">
         <img
           src={generatedImage}
-          alt={`${name} product image`}
-          width={400}
-          height={500}
+          alt={`${name} generated product visualization`}
+          width={1254}
+          height={1254}
           loading={priority ? "eager" : "lazy"}
           fetchPriority={priority ? "high" : "auto"}
           decoding="async"

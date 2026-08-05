@@ -447,6 +447,7 @@ with payload as (
     row_template text,
     title_override text,
     description_override text,
+    one_sentence_difference text,
     is_featured boolean,
     is_indexable boolean,
     sort_rank integer,
@@ -488,7 +489,7 @@ select
   treatment_a_id,
   treatment_b_id,
   slug,
-  null,
+  one_sentence_difference,
   null,
   null,
   null,
@@ -507,7 +508,7 @@ select
 from resolved
 on conflict (pair_key) do update set
   slug = excluded.slug,
-  one_sentence_difference = null,
+  one_sentence_difference = excluded.one_sentence_difference,
   consider_a_when = null,
   consider_b_when = null,
   neither_when = null,

@@ -50,7 +50,9 @@ export const Route = createFileRoute("/compare/$slug")({
     const nameB = loaderData.b.name;
     const displayTitle = loaderData.comparison?.title_override ?? `${nameA} vs. ${nameB}`;
     const title = `${displayTitle}: Results, Risks, Downtime & Cost | Aesthetic Index`;
-    const description = `Compare ${nameA} and ${nameB} by intended use, results, downtime, risks, reversibility, regulatory information, and typical pricing.`;
+    const description =
+      loaderData.comparison?.description_override ??
+      `Compare ${nameA} and ${nameB} by intended use, results, downtime, risks, reversibility, regulatory information, and typical pricing.`;
     const url = absoluteUrl(`/compare/${params.slug}`);
     const reviewedAt =
       loaderData.comparison?.last_verified_at ??
@@ -198,6 +200,7 @@ function ComparisonPage() {
         >
           <h2 className="font-display text-2xl">Bottom line</h2>
           <p className="mt-2 max-w-4xl text-base leading-7">{bottomLine}</p>
+          <BottomLineSources sources={sources} a={a} b={b} />
           <div className="mt-4 flex flex-wrap gap-3 text-sm">
             <Link
               to="/treatments/$slug"
@@ -277,6 +280,52 @@ function ComparisonPage() {
       <RelatedDirectories a={a} b={b} />
       <ComparisonSignupPrompt comparisonSlug={slug} />
     </>
+  );
+}
+
+function BottomLineSources({
+  sources,
+  a,
+  b,
+}: {
+  sources: TreatmentSource[];
+  a: Treatment;
+  b: Treatment;
+}) {
+  const priorities = ["primary_purpose", "mechanism", "fda_status"];
+  const primaryFor = (treatment: Treatment) => {
+    for (const field of priorities) {
+      const source = sources.find(
+        (candidate) => candidate.treatment_id === treatment.id && candidate.claim_field === field,
+      );
+      if (source) return source;
+    }
+    return sources.find((candidate) => candidate.treatment_id === treatment.id) ?? null;
+  };
+  const summarySources = [primaryFor(a), primaryFor(b)].filter(
+    (source, index, all): source is TreatmentSource =>
+      Boolean(source) &&
+      all.findIndex((candidate) => candidate?.source_url === source?.source_url) === index,
+  );
+  if (!summarySources.length) return null;
+  return (
+    <p className="mt-3 text-xs leading-5 text-muted-foreground">
+      Summary sources:{" "}
+      {summarySources.map((source, index) => (
+        <span key={source.source_url}>
+          {index ? "; " : ""}
+          <a
+            href={source.source_url}
+            target="_blank"
+            rel="nofollow noopener"
+            className="underline underline-offset-2"
+          >
+            {source.source_title}
+          </a>{" "}
+          ({sourcePublisher(source.source_url)})
+        </span>
+      ))}
+    </p>
   );
 }
 

@@ -77,6 +77,8 @@ interface PackComparison {
   treatment_b_slug: string;
   comparison_mode: "direct" | "different_approach";
   row_template: string;
+  description_override: string;
+  one_sentence_difference: string;
   is_featured: boolean;
   is_indexable: boolean;
   publication_status: "draft" | "review" | "published";
@@ -276,6 +278,24 @@ test("every published treatment is complete, source-backed, and non-demonstratio
 test("featured comparison artifact remains compatible with the legacy import filename", () => {
   assert.deepEqual(comparisonDocument.comparisons, legacyComparisonDocument.comparisons);
   assert.equal(comparisons.length, 8);
+});
+
+test("launch comparisons have concise metadata and answer-first bottom lines", () => {
+  assert.equal(comparisons.length, 8);
+  for (const comparison of comparisons) {
+    const wordCount = comparison.one_sentence_difference.trim().split(/\s+/).length;
+    assert.ok(
+      wordCount >= 80 && wordCount <= 150,
+      `${comparison.slug} bottom line has ${wordCount} words`,
+    );
+    assert.ok(
+      comparison.description_override.length >= 100 &&
+        comparison.description_override.length <= 160,
+      `${comparison.slug} meta description has ${comparison.description_override.length} characters`,
+    );
+    assert.doesNotMatch(comparison.one_sentence_difference, /\b(best|perfect|risk-free)\b/i);
+    assert.doesNotMatch(comparison.one_sentence_difference, /(?<!not )\bguaranteed\b/i);
+  }
 });
 
 test("published intended areas use the controlled values", () => {

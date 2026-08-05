@@ -55,6 +55,7 @@ test("concern and class landing slugs are unique and canonical", () => {
   for (const landing of LANDINGS) {
     assert.match(landing.slug, /^[a-z0-9-]+$/);
     assert.ok(landing.definition.length > 40);
+    assert.ok(landing.howItWorks.length > 40);
     assert.ok(landing.limitations.length > 40);
   }
 });
