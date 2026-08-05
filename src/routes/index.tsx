@@ -22,6 +22,10 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:title", content: "Aesthetic Index — Understand cosmetic treatments" },
       {
+        name: "robots",
+        content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      },
+      {
         property: "og:description",
         content:
           "Explore cosmetic treatment products, devices, and procedures. Compare similar options and see researched regional price estimates.",

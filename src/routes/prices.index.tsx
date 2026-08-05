@@ -4,6 +4,7 @@ import { fetchCompareIndex, fetchRegionalPriceDirectory } from "@/lib/content.fu
 import { RegionalPriceLookup } from "@/components/regional-price-lookup";
 import { absoluteUrl } from "@/lib/site";
 import type { TreatmentPickerRecord } from "@/lib/content-types";
+import type { RegionalPriceLanding } from "@/lib/content.server";
 
 export const Route = createFileRoute("/prices/")({
   loader: async () => {
@@ -93,7 +94,7 @@ function Prices() {
             list, and limitations. Empty markets are not listed.
           </p>
           <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {pages.map((page) => (
+            {pages.map((page: RegionalPriceLanding) => (
               <li key={`${page.treatment.slug}-${page.estimate.region_slug}`}>
                 <Link
                   to="/prices/$treatment/$region"

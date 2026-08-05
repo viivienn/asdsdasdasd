@@ -283,7 +283,7 @@ function TreatmentPage() {
         <section className="mt-10">
           <h2 className="text-2xl">Published regional price estimates</h2>
           <ul className="mt-3 flex flex-wrap gap-2 text-sm">
-            {regionalPricePages.map((page) => (
+            {regionalPricePages.map((page: { estimate: { region_slug: string; region_name: string } }) => (
               <li key={page.estimate.region_slug}>
                 <Link
                   to="/prices/$treatment/$region"
