@@ -171,7 +171,7 @@ function RegionalPricePage() {
       <section id="sources" className="mt-12 scroll-mt-24">
         <h2 className="font-display text-2xl">Public pricing sources</h2>
         <ul className="mt-4 space-y-2 text-sm">
-          {estimate.source_urls.map((url) => (
+          {estimate.source_urls.map((url: string) => (
             <li key={url}>
               <a
                 href={url}
@@ -201,7 +201,7 @@ function RegionalPricePage() {
           <article>
             <h2 className="font-display text-2xl">Related comparisons</h2>
             <ul className="mt-3 space-y-2 text-sm">
-              {relatedComparisons.map((comparison) => (
+              {relatedComparisons.map((comparison: { slug: string }) => (
                 <li key={comparison.slug}>
                   <Link
                     to="/compare/$slug"
