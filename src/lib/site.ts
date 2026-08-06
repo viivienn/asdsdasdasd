@@ -14,7 +14,7 @@ export const SITE_URL = configuredSiteUrl.replace(/\/+$/, "");
 export const SITE = {
   name: "Aesthetic Index",
   url: SITE_URL,
-  logo: `${SITE_URL}/favicon.ico`,
+  logo: `${SITE_URL}/favicon.png`,
   descriptiveName: "Aesthetic Index — Cosmetic Treatment Comparisons and Prices",
   description:
     "Source-backed cosmetic treatment profiles, comparisons, risks, downtime, and researched regional price estimates.",

@@ -9,6 +9,7 @@ import { trackAnswerEngineReferral } from "@/lib/analytics";
 import type { EntityType, PopularComparison } from "@/lib/content-types";
 import type { SearchEntry, SearchIndex } from "@/lib/search-index";
 import { GOAL_FILTERS } from "@/lib/taxonomy";
+import logoAsset from "@/assets/aesthetic-index-logo.png.asset.json";
 
 function CatalogLink({ entry, onNavigate }: { entry: SearchEntry; onNavigate?: () => void }) {
   return (
@@ -394,12 +395,14 @@ export function SiteShell({
             aria-label="Aesthetic Index home"
             className="flex shrink-0 items-center gap-2.5"
           >
-            <span
+            <img
+              src={logoAsset.url}
+              alt=""
               aria-hidden="true"
-              className="grid size-9 place-items-center rounded-xl bg-primary font-display text-sm font-bold text-primary-foreground"
-            >
-              AI
-            </span>
+              width={36}
+              height={36}
+              className="size-9 shrink-0 rounded-xl object-contain"
+            />
             <span className="font-display text-lg font-semibold tracking-tight">
               Aesthetic Index
             </span>
