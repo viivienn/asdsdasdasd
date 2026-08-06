@@ -9,6 +9,7 @@ import { trackAnswerEngineReferral } from "@/lib/analytics";
 import type { EntityType, PopularComparison } from "@/lib/content-types";
 import type { SearchEntry, SearchIndex } from "@/lib/search-index";
 import { GOAL_FILTERS } from "@/lib/taxonomy";
+import logoAsset from "@/assets/aesthetic-index-logo.png.asset.json";
 
 function CatalogLink({ entry, onNavigate }: { entry: SearchEntry; onNavigate?: () => void }) {
   return (
