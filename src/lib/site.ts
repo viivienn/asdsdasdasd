@@ -24,8 +24,8 @@ export const SITE = {
   pricingMethodology: `${SITE_URL}/methodology`,
   medicalDisclaimer: `${SITE_URL}/medical-disclaimer`,
   correctionPolicy: `${SITE_URL}/about#corrections`,
-  // Keep the established mailbox until the owner confirms mail delivery on the .app domain.
-  contactEmail: "corrections@aestheticindex.co",
+  // Contact email for corrections and general inquiries.
+  contactEmail: "moodbyruby@gmail.com",
 } as const;
 
 export function absoluteUrl(path: string): string {

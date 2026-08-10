@@ -67,14 +67,14 @@ function About() {
 
         <h2 className="mt-10 text-2xl">Contact</h2>
         <p>
-          General:{" "}
-          <a href="mailto:hello@aestheticindex.co" className="underline underline-offset-4">
-            hello@aestheticindex.co
+        General:{" "}
+          <a href="mailto:moodbyruby@gmail.com" className="underline underline-offset-4">
+            moodbyruby@gmail.com
           </a>
           <br />
           Corrections:{" "}
-          <a href="mailto:corrections@aestheticindex.co" className="underline underline-offset-4">
-            corrections@aestheticindex.co
+          <a href="mailto:moodbyruby@gmail.com" className="underline underline-offset-4">
+            moodbyruby@gmail.com
           </a>
         </p>
         <p>

@@ -114,8 +114,8 @@ const SECTIONS: Array<{ heading: string; body: React.ReactNode }> = [
         </p>
         <p>
           If you find an error, please write to{" "}
-          <a href="mailto:corrections@aestheticindex.co" className="underline underline-offset-4">
-            corrections@aestheticindex.co
+          <a href="mailto:moodbyruby@gmail.com" className="underline underline-offset-4">
+            moodbyruby@gmail.com
           </a>{" "}
           — corrections are noted on the page rather than silently edited.
         </p>

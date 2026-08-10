@@ -188,8 +188,8 @@ function PricingPage() {
         <FeaturePreview title="Corrections">
           <p className="text-sm text-muted-foreground">
             Spotted a wrong or out-of-date price? Email{" "}
-            <a href="mailto:corrections@aestheticindex.co" className="underline underline-offset-4">
-              corrections@aestheticindex.co
+            <a href="mailto:moodbyruby@gmail.com" className="underline underline-offset-4">
+              moodbyruby@gmail.com
             </a>{" "}
             with the clinic and the listing URL.
           </p>
@@ -197,8 +197,8 @@ function PricingPage() {
         <FeaturePreview title="Submit a public price">
           <p className="text-sm text-muted-foreground">
             Send a link to a publicly posted price to{" "}
-            <a href="mailto:prices@aestheticindex.co" className="underline underline-offset-4">
-              prices@aestheticindex.co
+            <a href="mailto:moodbyruby@gmail.com" className="underline underline-offset-4">
+              moodbyruby@gmail.com
             </a>
             . We verify against the clinic's own page before publishing.
           </p>
