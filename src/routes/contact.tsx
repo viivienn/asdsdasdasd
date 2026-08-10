@@ -49,10 +49,10 @@ function Contact() {
             Product feedback, accessibility issues, and general questions.
           </p>
           <a
-            href="mailto:hello@aestheticindex.co"
+            href="mailto:moodbyruby@gmail.com"
             className="mt-4 inline-block underline underline-offset-4"
           >
-            hello@aestheticindex.co
+            moodbyruby@gmail.com
           </a>
         </article>
       </section>
